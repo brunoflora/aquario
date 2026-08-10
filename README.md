@@ -1,8 +1,8 @@
 # Parâmetros da Água do Aquário — Ciclídeos Nacionais
 
-Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em duas abas: **Parâmetros da água** (registro diário, score ponderado da qualidade da água e os *gates* — critérios de liberação — para introdução de novas espécies, hoje especificamente o Green Terror) e **Aquário & sump** (ficha de referência da configuração física do sistema).
+Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em duas abas: **Parâmetros** (registro diário, score ponderado da qualidade da água e os *gates* — critérios de liberação — para introdução de novas espécies, hoje especificamente o Green Terror) e **Configurações** (ficha de referência da configuração física do sistema, com os números do relatório técnico-estrutural).
 
-Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`). Ver `HANDOFF.md` para o histórico completo do porquê da migração.
+Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`). Ver `HANDOFF.md` para o histórico completo do porquê da migração, e `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Configurações.
 
 ## Como usar
 
@@ -12,14 +12,33 @@ Para publicar como site (ex: GitHub Pages), basta habilitar Pages apontando para
 
 ## O que o app faz
 
+### Aba Parâmetros
+
 - **Registro diário**: temperatura, pH, KH, amônia (NH₃), nitrito (NO₂), nitrato (NO₃) e turbidez, com uma nota livre por dia. Salva automaticamente a cada alteração (sem botão "Salvar", sem risco de perder o que foi digitado).
-- **Score de água (0–100)**: média ponderada do status de cada parâmetro (bom/alerta/ruim) contra faixas fixas. Pesos: temperatura 20, pH 15, KH 10, NH₃ 20, NO₂ 20, NO₃ 10, turbidez 5.
+- **Score de água (0–100), zerado até completar o registro do dia**: enquanto qualquer um dos 6 parâmetros numéricos do dia estiver vazio, o score aparece como **0** (não uma média parcial otimista) e o painel mostra quantos campos ainda faltam (ex: "3 de 6 campos em aberto") — tanto no medidor quanto no plano de ação. Assim que os 6 estiverem preenchidos, o score real é calculado como média ponderada do status de cada parâmetro (bom/alerta/ruim). Pesos: temperatura 20, pH 15, KH 10, NH₃ 20, NO₂ 20, NO₃ 10, turbidez 5.
 - **Gates de liberação**: contagem de dias consecutivos (por data, não por ordem de digitação) com água clara (5 dias) e biologia zerada — NH₃/NO₂ ≈ 0 (3 dias). Quando os dois critérios são atendidos, o painel indica que o ambiente está pronto para o Green Terror.
 - **Plano de ação**: recomendações geradas a partir do último registro e do progresso dos gates.
 - **Fases do projeto**: checklist livre (ciclagem, plantio/decoração, quarentena, estabilização, introdução, formação de casais, venda de excedentes) com status e notas por fase.
 - **Critérios adicionais do gate**: checklist manual para condições que não vêm de um parâmetro de água (ex: aprovação de um veterinário).
-- **Aba Aquário & sump**: ficha de referência da montagem física — dimensões e volume do aquário e da sump, câmaras de decantação, mídias mecânica/biológica, bomba de retorno e vazão, aquecedor, iluminação, CO₂, substrato, decoração e rotina de manutenção (TPA e troca de mídia filtrante). Também salva automaticamente.
-- **Exportar/Importar JSON**: backup manual de tudo (leituras, fases, critérios e configuração do sistema) em um arquivo `.json`.
+
+### Aba Configurações
+
+Ficha de referência da montagem física, já pré-preenchida com os números do relatório técnico-estrutural (09/08/2026):
+
+- **Aquário principal (display)**: dimensões, volume bruto/líquido, lâmina d'água útil, espessura de vidro, material, datas de montagem/ciclagem.
+- **Sump**: dimensões, volume bruto e em operação, detalhe das 3 câmaras (decantação/biológica/retorno), espessura de vidro, bomba de retorno (modelo, vazão nominal e real estimada), mídias mecânica e biológica.
+- **Hidráulica & segurança anti-transbordo**: diâmetro da descida (dado crítico ainda pendente de medição), altura manométrica, turnover, wave maker, status do furo anti-sifão e registro do teste de queda de energia.
+- **Equipamentos**: aquecedor, iluminação, bombas adicionais, CO₂, controlador.
+- **Substrato, decoração e manutenção**: substrato, rochas, plantas, % e frequência de TPA, troca de mídia filtrante.
+- **Carga estrutural**: peso total do sistema, carga por m² e notas de posicionamento sobre a laje.
+- **Fauna atual**: espécies, quantidade, tamanho atual/adulto e observações de compatibilidade (inclui o alerta de incompatibilidade do Pangasius).
+- **Ações prioritárias (relatório estrutural)**: checklist com as 11 recomendações do relatório, por prioridade (🔴 crítica → 🟢 baixa), marcável conforme cada ação é concluída.
+
+Tudo nesta aba também salva automaticamente e entra no export/import JSON.
+
+### Comum às duas abas
+
+- **Exportar/Importar JSON**: backup manual de tudo (leituras, fases, critérios, configuração do sistema e ações prioritárias) em um arquivo `.json`.
 
 ## Onde os dados ficam guardados (limitação atual, honesta)
 
@@ -33,7 +52,7 @@ Para um projeto de 6+ meses ligado a decisões comerciais (timing de venda, form
 
 ## Caminho de migração para produção (Supabase)
 
-O arquivo `supabase-schema.sql` já traz o schema mínimo (tabelas `readings`, `phase_data`, `gate_criteria`). Para migrar:
+O arquivo `supabase-schema.sql` já traz o schema mínimo (tabelas `readings`, `phase_data`, `gate_criteria`, `tank_config` e `struct_tasks`). Para migrar:
 
 1. Criar um projeto no [Supabase](https://supabase.com) (tier gratuito é suficiente para este volume de dados).
 2. Rodar `supabase-schema.sql` no SQL editor do projeto.

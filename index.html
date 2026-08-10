@@ -230,6 +230,7 @@
 
   .aq-gauge-label { font-size: 0.82rem; color: var(--text-muted); }
   .aq-gauge-label strong { display: block; color: var(--text); font-size: 0.95rem; font-family: var(--font-display); }
+  .aq-gauge-openfields { display: block; margin-top: 3px; font-size: 0.72rem; font-weight: 600; font-family: var(--font-mono); }
 
   .aq-gates {
     display: flex;
@@ -494,8 +495,8 @@
   </header>
 
   <div class="aq-tabs" role="tablist" aria-label="Seções do painel">
-    <button type="button" class="aq-tab" id="tab-btn-params" role="tab" aria-selected="true" aria-controls="tab-panel-params">Parâmetros da água</button>
-    <button type="button" class="aq-tab" id="tab-btn-config" role="tab" aria-selected="false" aria-controls="tab-panel-config" tabindex="-1">Aquário &amp; sump</button>
+    <button type="button" class="aq-tab" id="tab-btn-params" role="tab" aria-selected="true" aria-controls="tab-panel-params">Parâmetros</button>
+    <button type="button" class="aq-tab" id="tab-btn-config" role="tab" aria-selected="false" aria-controls="tab-panel-config" tabindex="-1">Configurações</button>
   </div>
 
   <div id="tab-panel-params" role="tabpanel" aria-labelledby="tab-btn-params">
@@ -503,7 +504,7 @@
   <section class="aq-card aq-summary-strip" id="aq-summary-strip" aria-label="Resumo do estado da água">
     <div class="aq-gauge-wrap">
       <div class="aq-gauge" id="aq-gauge"><div class="aq-gauge-value" id="aq-gauge-value">—</div></div>
-      <div class="aq-gauge-label"><strong id="aq-gauge-date">Sem registros</strong>Score de água de hoje</div>
+      <div class="aq-gauge-label"><strong id="aq-gauge-date">Sem registros</strong>Score de água de hoje<span class="aq-gauge-openfields" id="aq-gauge-openfields"></span></div>
     </div>
     <div class="aq-gates" id="aq-gates"></div>
     <div class="aq-sparkline-wrap">
@@ -621,36 +622,48 @@
   <section class="aq-card" style="margin-bottom:20px;">
     <div class="aq-eyebrow" style="margin-bottom:6px;">Documentação do sistema</div>
     <h2 class="aq-section-title" style="margin-bottom:4px;">Configuração do aquário e sump</h2>
-    <div class="aq-sub" style="max-width:70ch;">Ficha de referência da montagem física — dimensões, volumes, filtragem e equipamentos. Não muda com frequência, mas fica salva junto com o resto para consulta rápida (ex: ao calcular dosagem de medicamento por litro, ou explicar o sistema para um comprador).</div>
+    <div class="aq-sub" style="max-width:70ch;">Ficha de referência da montagem física, com os números do relatório técnico-estrutural (09/08/2026). Campos marcados <strong>[EST]</strong> no relatório são estimativas — substitua pelas medidas reais quando as tiver. Fica salva junto com o resto para consulta rápida (dosagem de medicamento por litro, explicar o sistema a um comprador, etc.).</div>
   </section>
 
   <section class="aq-grid-2">
     <div class="aq-card">
-      <h2 class="aq-section-title">Aquário principal</h2>
+      <h2 class="aq-section-title">Aquário principal (display)</h2>
       <div class="aq-form-grid">
         <div class="aq-field">
           <label for="c-tank-dims">Dimensões (C×L×A cm)</label>
-          <input type="text" id="c-tank-dims" placeholder="200 × 80 × 70" />
+          <input type="text" id="c-tank-dims" placeholder="200 × 50 × 70" />
         </div>
         <div class="aq-field">
           <label for="c-tank-volume-gross">Volume bruto (L)</label>
-          <input type="number" id="c-tank-volume-gross" step="1" placeholder="1120" />
+          <input type="number" id="c-tank-volume-gross" step="0.1" placeholder="700" />
         </div>
         <div class="aq-field">
-          <label for="c-tank-volume-net">Volume líquido estimado (L)</label>
-          <input type="number" id="c-tank-volume-net" step="1" placeholder="950" />
+          <label for="c-tank-volume-net">Volume líquido estimado (L) <span class="aq-hint">descontando substrato e rocha</span></label>
+          <input type="number" id="c-tank-volume-net" step="0.1" placeholder="597.5" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-water-level">Lâmina d'água útil (cm) <span class="aq-hint">[EST]</span></label>
+          <input type="number" id="c-tank-water-level" step="0.5" placeholder="65" />
         </div>
         <div class="aq-field">
           <label for="c-tank-material">Material</label>
-          <input type="text" id="c-tank-material" placeholder="Vidro / Acrílico" />
+          <input type="text" id="c-tank-material" placeholder="Vidro" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-glass-thickness">Espessura do vidro (mm) <span class="aq-hint">[EST]</span></label>
+          <input type="number" id="c-tank-glass-thickness" step="0.5" placeholder="15" />
         </div>
         <div class="aq-field">
           <label for="c-tank-brand">Fabricante / marca</label>
           <input type="text" id="c-tank-brand" placeholder="" />
         </div>
         <div class="aq-field">
-          <label for="c-tank-setup-date">Data de montagem</label>
-          <input type="date" id="c-tank-setup-date" />
+          <label for="c-tank-setup-date">Início do projeto</label>
+          <input type="text" id="c-tank-setup-date" placeholder="Nov/2025" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-cycling-date">Início da ciclagem</label>
+          <input type="text" id="c-tank-cycling-date" placeholder="Dez/2025" />
         </div>
       </div>
     </div>
@@ -659,32 +672,48 @@
       <h2 class="aq-section-title">Sump</h2>
       <div class="aq-form-grid">
         <div class="aq-field">
-          <label for="c-sump-dims">Dimensões (C×L×A cm)</label>
-          <input type="text" id="c-sump-dims" placeholder="80 × 40 × 40" />
+          <label for="c-sump-dims">Dimensões externas (C×L×A cm)</label>
+          <input type="text" id="c-sump-dims" placeholder="94 × 34 × 34" />
         </div>
         <div class="aq-field">
-          <label for="c-sump-volume">Volume total (L)</label>
-          <input type="number" id="c-sump-volume" step="1" placeholder="120" />
+          <label for="c-sump-volume">Volume bruto (L)</label>
+          <input type="number" id="c-sump-volume" step="0.1" placeholder="108.7" />
         </div>
         <div class="aq-field">
-          <label for="c-sump-chambers">Câmaras de decantação</label>
+          <label for="c-sump-volume-operation">Volume em operação @25cm (L)</label>
+          <input type="number" id="c-sump-volume-operation" step="0.1" placeholder="79.1" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-chambers">Câmaras</label>
           <input type="number" id="c-sump-chambers" step="1" placeholder="3" />
         </div>
-        <div class="aq-field">
-          <label for="c-sump-pump-flow">Vazão de retorno (L/h)</label>
-          <input type="number" id="c-sump-pump-flow" step="1" placeholder="3000" />
-        </div>
         <div class="aq-field aq-field-wide">
+          <label for="c-sump-chamber-detail">Detalhe das câmaras</label>
+          <input type="text" id="c-sump-chamber-detail" placeholder="C1 Decantação 39cm (33,2L) · C2 Biológica 10cm (8,5L) · C3 Retorno 44cm (37,4L)" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-glass-thickness">Espessura do vidro (mm) <span class="aq-hint">[EST]</span></label>
+          <input type="number" id="c-sump-glass-thickness" step="0.5" placeholder="8" />
+        </div>
+        <div class="aq-field">
           <label for="c-sump-pump-model">Bomba de retorno (modelo)</label>
-          <input type="text" id="c-sump-pump-model" placeholder="" />
+          <input type="text" id="c-sump-pump-model" placeholder="Oceantech 9000 L/h" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-pump-flow">Vazão nominal (L/h)</label>
+          <input type="number" id="c-sump-pump-flow" step="1" placeholder="9000" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-pump-flow-real">Vazão real estimada (L/h)</label>
+          <input type="number" id="c-sump-pump-flow-real" step="1" placeholder="5000" />
         </div>
         <div class="aq-field">
           <label for="c-sump-mech-media">Mídia mecânica</label>
-          <input type="text" id="c-sump-mech-media" placeholder="Manta / esponja / bulk fiber" />
+          <input type="text" id="c-sump-mech-media" placeholder="Manta de perlon (34×39cm)" />
         </div>
         <div class="aq-field">
           <label for="c-sump-bio-media">Mídia biológica</label>
-          <input type="text" id="c-sump-bio-media" placeholder="Bio balls / matrix / biohome" />
+          <input type="text" id="c-sump-bio-media" placeholder="Quartzite Glass 10L + cerâmicas" />
         </div>
       </div>
     </div>
@@ -692,11 +721,41 @@
 
   <section class="aq-grid-2">
     <div class="aq-card">
+      <h2 class="aq-section-title">Hidráulica &amp; segurança anti-transbordo</h2>
+      <div class="aq-form-grid">
+        <div class="aq-field aq-field-wide">
+          <label for="c-hyd-downpipe-diameter">Diâmetro da descida (overflow) <span class="aq-hint">dado crítico pendente de medição</span></label>
+          <input type="text" id="c-hyd-downpipe-diameter" placeholder="medir — define o teto real de vazão" />
+        </div>
+        <div class="aq-field">
+          <label for="c-hyd-return-head">Altura manométrica do retorno (m) <span class="aq-hint">[EST]</span></label>
+          <input type="text" id="c-hyd-return-head" placeholder="1,2–1,4" />
+        </div>
+        <div class="aq-field">
+          <label for="c-hyd-turnover">Turnover pelo sump</label>
+          <input type="text" id="c-hyd-turnover" placeholder="7,3–8,4×/h" />
+        </div>
+        <div class="aq-field aq-field-wide">
+          <label for="c-hyd-wavemaker">Wave maker / circulação cruzada</label>
+          <input type="text" id="c-hyd-wavemaker" placeholder="15W, fluxo cruzado [EST] 6.000–9.000 L/h" />
+        </div>
+        <div class="aq-field aq-field-wide">
+          <label for="c-hyd-antisiphon">Furo anti-sifão no recalque</label>
+          <input type="text" id="c-hyd-antisiphon" placeholder="Pendente — furar 3–4mm abaixo da linha d'água" />
+        </div>
+        <div class="aq-field aq-field-wide">
+          <label for="c-hyd-notes">Teste de queda de energia</label>
+          <textarea id="c-hyd-notes" placeholder="Resultado do teste (bomba desligada na tomada, medir onde o nível estabiliza no sump)."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="aq-card">
       <h2 class="aq-section-title">Equipamentos</h2>
       <div class="aq-form-grid">
-        <div class="aq-field">
-          <label for="c-eq-heater">Aquecedor (modelo/potência e qtd)</label>
-          <input type="text" id="c-eq-heater" placeholder="2x 300W" />
+        <div class="aq-field aq-field-wide">
+          <label for="c-eq-heater">Aquecedor</label>
+          <input type="text" id="c-eq-heater" placeholder="Nenhum instalado — recomendado 2× 300W em C3 + termostato externo" />
         </div>
         <div class="aq-field">
           <label for="c-eq-lighting">Iluminação (modelo e fotoperíodo)</label>
@@ -704,7 +763,7 @@
         </div>
         <div class="aq-field">
           <label for="c-eq-extra-pumps">Bombas adicionais / circulação</label>
-          <input type="text" id="c-eq-extra-pumps" placeholder="" />
+          <input type="text" id="c-eq-extra-pumps" placeholder="Wave maker 15W (fluxo cruzado)" />
         </div>
         <div class="aq-field">
           <label for="c-eq-co2">CO₂</label>
@@ -712,7 +771,7 @@
         </div>
         <div class="aq-field">
           <label for="c-eq-controller">Controlador / timer</label>
-          <input type="text" id="c-eq-controller" placeholder="" />
+          <input type="text" id="c-eq-controller" placeholder="Termostato externo (recomendado, ainda não instalado)" />
         </div>
         <div class="aq-field">
           <label for="c-eq-other">Outros equipamentos</label>
@@ -720,17 +779,19 @@
         </div>
       </div>
     </div>
+  </section>
 
+  <section class="aq-grid-2">
     <div class="aq-card">
       <h2 class="aq-section-title">Substrato, decoração e manutenção</h2>
       <div class="aq-form-grid">
         <div class="aq-field">
           <label for="c-sub-substrate">Substrato</label>
-          <input type="text" id="c-sub-substrate" placeholder="Areia / cascalho" />
+          <input type="text" id="c-sub-substrate" placeholder="Areia N00 (~50L)" />
         </div>
         <div class="aq-field">
           <label for="c-sub-hardscape">Rochas / troncos</label>
-          <input type="text" id="c-sub-hardscape" placeholder="" />
+          <input type="text" id="c-sub-hardscape" placeholder="MixRock + Sansibar (~20L)" />
         </div>
         <div class="aq-field aq-field-wide">
           <label for="c-sub-plants">Plantas</label>
@@ -738,17 +799,51 @@
         </div>
         <div class="aq-field">
           <label for="c-maint-percent">TPA — % por troca</label>
-          <input type="number" id="c-maint-percent" step="1" placeholder="20" />
+          <input type="number" id="c-maint-percent" step="1" placeholder="33" />
         </div>
         <div class="aq-field">
           <label for="c-maint-frequency">TPA — frequência</label>
-          <input type="text" id="c-maint-frequency" placeholder="Semanal" />
+          <input type="text" id="c-maint-frequency" placeholder="Semanal ou quinzenal (33% = 225L)" />
         </div>
         <div class="aq-field">
           <label for="c-maint-media-frequency">Troca de mídia filtrante</label>
-          <input type="text" id="c-maint-media-frequency" placeholder="Mensal" />
+          <input type="text" id="c-maint-media-frequency" placeholder="Perlon 10–14 dias · carvão 4–6 semanas · Purigen 4–6 meses" />
         </div>
       </div>
+    </div>
+
+    <div class="aq-card">
+      <h2 class="aq-section-title">Carga estrutural</h2>
+      <div class="aq-form-grid">
+        <div class="aq-field aq-field-wide">
+          <label for="c-struct-weight">Peso total do sistema</label>
+          <input type="text" id="c-struct-weight" placeholder="≈ 1.069 kg (display 951 kg + sump 118 kg)" />
+        </div>
+        <div class="aq-field aq-field-wide">
+          <label for="c-struct-load">Carga por m² (footprint do display)</label>
+          <input type="text" id="c-struct-load" placeholder="≈ 951 kg/m² — acima do limite NBR 6120 (150–200 kg/m²)" />
+        </div>
+        <div class="aq-field aq-field-wide">
+          <label for="c-struct-notes">Notas estruturais</label>
+          <textarea id="c-struct-notes" placeholder="Posicionamento sobre parede estrutural, orientação do eixo, avaliação de engenheiro, regimento do condomínio."></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="aq-card" style="margin-bottom:20px;">
+    <h2 class="aq-section-title">Fauna atual</h2>
+    <textarea id="c-fauna-notes" class="aq-phase-notes" style="min-height:90px;" placeholder="Espécies, quantidade, tamanho atual/adulto e observações de compatibilidade."></textarea>
+  </section>
+
+  <section class="aq-card" style="margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+      <h2 class="aq-section-title" style="margin:0;">Ações prioritárias (relatório estrutural)</h2>
+    </div>
+    <ul class="aq-criteria-list" id="aq-struct-tasks-list"></ul>
+    <div class="aq-criteria-add">
+      <input type="text" id="f-struct-task-new" placeholder="Adicionar nova ação..." />
+      <button class="aq-btn" id="btn-struct-task-add">Adicionar</button>
     </div>
   </section>
 
@@ -772,17 +867,83 @@
     readings: "aq_readings_v1",
     phases: "aq_phases_v1",
     criteria: "aq_criteria_v1",
-    config: "aq_config_v1"
+    config: "aq_config_v1",
+    structTasks: "aq_struct_tasks_v1"
   };
 
   var CONFIG_FIELDS = [
-    "tank-dims", "tank-volume-gross", "tank-volume-net", "tank-material", "tank-brand", "tank-setup-date",
-    "sump-dims", "sump-volume", "sump-chambers", "sump-pump-flow", "sump-pump-model", "sump-mech-media", "sump-bio-media",
+    "tank-dims", "tank-volume-gross", "tank-volume-net", "tank-water-level", "tank-material", "tank-glass-thickness", "tank-brand", "tank-setup-date", "tank-cycling-date",
+    "sump-dims", "sump-volume", "sump-volume-operation", "sump-chambers", "sump-chamber-detail", "sump-glass-thickness", "sump-pump-model", "sump-pump-flow", "sump-pump-flow-real", "sump-mech-media", "sump-bio-media",
+    "hyd-downpipe-diameter", "hyd-return-head", "hyd-turnover", "hyd-wavemaker", "hyd-antisiphon", "hyd-notes",
     "eq-heater", "eq-lighting", "eq-extra-pumps", "eq-co2", "eq-controller", "eq-other",
     "sub-substrate", "sub-hardscape", "sub-plants",
     "maint-percent", "maint-frequency", "maint-media-frequency",
+    "struct-weight", "struct-load", "struct-notes",
+    "fauna-notes",
     "notes"
   ];
+
+  var DEFAULT_CONFIG = {
+    "tank-dims": "200 × 50 × 70",
+    "tank-volume-gross": 700,
+    "tank-volume-net": 597.5,
+    "tank-water-level": 65,
+    "tank-material": "Vidro",
+    "tank-glass-thickness": 15,
+    "tank-brand": "",
+    "tank-setup-date": "Nov/2025",
+    "tank-cycling-date": "Dez/2025",
+    "sump-dims": "94 × 34 × 34",
+    "sump-volume": 108.7,
+    "sump-volume-operation": 79.1,
+    "sump-chambers": 3,
+    "sump-chamber-detail": "C1 Decantação 39cm (33,2L) · C2 Biológica 10cm (8,5L) · C3 Retorno 44cm (37,4L)",
+    "sump-glass-thickness": 8,
+    "sump-pump-model": "Oceantech 9000 L/h",
+    "sump-pump-flow": 9000,
+    "sump-pump-flow-real": 5000,
+    "sump-mech-media": "Manta de perlon (34×39cm)",
+    "sump-bio-media": "Quartzite Glass 10L + cerâmicas adicionais",
+    "hyd-downpipe-diameter": "",
+    "hyd-return-head": "1,2–1,4",
+    "hyd-turnover": "7,3–8,4×/h",
+    "hyd-wavemaker": "15W, fluxo cruzado [EST] 6.000–9.000 L/h",
+    "hyd-antisiphon": "Pendente — furar 3–4mm abaixo da linha d'água",
+    "hyd-notes": "",
+    "eq-heater": "Nenhum instalado — recomendado 2× 300W em C3 + termostato externo",
+    "eq-lighting": "",
+    "eq-extra-pumps": "Wave maker 15W (fluxo cruzado)",
+    "eq-co2": "Não utilizado",
+    "eq-controller": "Termostato externo (recomendado, ainda não instalado)",
+    "eq-other": "",
+    "sub-substrate": "Areia N00 (~50L)",
+    "sub-hardscape": "MixRock + Sansibar (~20L)",
+    "sub-plants": "",
+    "maint-percent": 33,
+    "maint-frequency": "Semanal ou quinzenal (33% = 225L)",
+    "maint-media-frequency": "Perlon 10–14 dias · carvão 4–6 semanas · Purigen 4–6 meses",
+    "struct-weight": "≈ 1.069 kg (display 951 kg + sump 118 kg)",
+    "struct-load": "≈ 951 kg/m² — acima do limite NBR 6120 (150–200 kg/m²)",
+    "struct-notes": "Encostar em parede estrutural, eixo de 2m perpendicular ao vão da laje, avaliar com engenheiro se houver dúvida, verificar regimento do condomínio.",
+    "fauna-notes": "Oscar Bronze 1× (15cm → 30–38cm adulto) · Jack Dempsey Blue 1× (10cm → 20–25cm) · Severum Gold 2× (10 e 6cm → 20–25cm cada) · Lambaris 6× (~5cm → 10–12cm) · Pangasius Albino 1× (10cm → 100–130cm adulto — incompatível com o sistema, planejar realocação em 6–12 meses).",
+    "notes": ""
+  };
+
+  var DEFAULT_STRUCT_TASKS = [
+    { label: "🔴 Furar tubo de recalque (furo anti-sifão 3–4mm abaixo da linha d'água)", checked: false },
+    { label: "🔴 Corrigir KH de 0 para 3 dKH com bicarbonato (protocolo de 7 dias)", checked: false },
+    { label: "🔴 Medir diâmetro da descida e instalar registro de esfera no recalque se < 50mm", checked: false },
+    { label: "🟠 Instalar 2× 300W + termostato externo, subindo 0,5°C/dia", checked: false },
+    { label: "🟠 Planejar realocação do Pangasius (6–12 meses)", checked: false },
+    { label: "🟡 Expandir mídia biológica da C2 para 12–18L", checked: false },
+    { label: "🟡 Confirmar espessura de vidro e existência de travessas", checked: false },
+    { label: "🟡 Avaliar posicionamento sobre a laje (parede estrutural)", checked: false },
+    { label: "🟢 Adicionar 2–3 colunas de rocha para quebra de linha de visão", checked: false },
+    { label: "🟢 Fotoperíodo fixo de 8h com timer", checked: false },
+    { label: "🟢 Reduzir troca de perlon para 10–14 dias", checked: false }
+  ];
+
+  var CORE_PARAMS = ["temp", "ph", "kh", "nh3", "no2", "no3"];
 
   var WEIGHTS = { temp: 20, ph: 15, kh: 10, nh3: 20, no2: 20, no3: 10, turbidez: 5 };
 
@@ -846,7 +1007,8 @@
     readings: loadJSON(STORAGE_KEYS.readings, []),
     phases: loadJSON(STORAGE_KEYS.phases, DEFAULT_PHASES),
     criteria: loadJSON(STORAGE_KEYS.criteria, []),
-    config: loadJSON(STORAGE_KEYS.config, {})
+    config: loadJSON(STORAGE_KEYS.config, DEFAULT_CONFIG),
+    structTasks: loadJSON(STORAGE_KEYS.structTasks, DEFAULT_STRUCT_TASKS)
   };
 
   var editingDate = null;
@@ -867,7 +1029,17 @@
     return "bad";
   }
 
+  function countOpenFields(reading) {
+    if (!reading) return CORE_PARAMS.length;
+    return CORE_PARAMS.filter(function (key) {
+      var v = reading[key];
+      return v === null || v === undefined || v === "";
+    }).length;
+  }
+
   function computeWaterScore(reading) {
+    if (!reading) return null;
+    if (countOpenFields(reading) > 0) return 0;
     var total = 0, totalWeight = 0;
     Object.keys(WEIGHTS).forEach(function (key) {
       var value = reading[key];
@@ -927,6 +1099,14 @@
     if (!lastReading) {
       items.push({ level: "warn", text: "Registre o parâmetro de hoje para começar a receber recomendações." });
       return items;
+    }
+    var openKeys = CORE_PARAMS.filter(function (key) {
+      var v = lastReading[key];
+      return v === null || v === undefined || v === "";
+    });
+    if (openKeys.length > 0) {
+      var openLabels = openKeys.map(function (key) { return PARAM_LABELS[key]; }).join(", ");
+      items.push({ level: "warn", text: "Score zerado até completar todos os parâmetros de hoje. Faltam: " + openLabels + "." });
     }
     var messages = {
       temp: {
@@ -996,17 +1176,28 @@
     var sorted = sortedReadings();
     var last = sorted.length ? sorted[sorted.length - 1] : null;
     var score = last ? computeWaterScore(last) : null;
+    var openCount = last ? countOpenFields(last) : CORE_PARAMS.length;
     var gauge = document.getElementById("aq-gauge");
     var gaugeValue = document.getElementById("aq-gauge-value");
     var gaugeDate = document.getElementById("aq-gauge-date");
+    var openEl = document.getElementById("aq-gauge-openfields");
     var color = "var(--text-muted)";
-    if (score !== null) {
+    if (score !== null && openCount === 0) {
       color = score >= 80 ? "var(--good)" : score >= 50 ? "var(--warn)" : "var(--bad)";
     }
     gauge.style.setProperty("--pct", score === null ? 0 : score);
     gauge.style.setProperty("--gauge-color", color);
     gaugeValue.textContent = score === null ? "—" : score;
     gaugeDate.textContent = last ? "Registro de " + last.date.split("-").reverse().join("/") : "Sem registros";
+    if (!last) {
+      openEl.textContent = "";
+    } else if (openCount > 0) {
+      openEl.textContent = openCount + " de " + CORE_PARAMS.length + " campos em aberto";
+      openEl.style.color = "var(--warn)";
+    } else {
+      openEl.textContent = "todos os parâmetros preenchidos";
+      openEl.style.color = "var(--good)";
+    }
 
     var gates = evaluateGates();
     var gatesEl = document.getElementById("aq-gates");
@@ -1146,11 +1337,24 @@
     }).join("");
   }
 
+  function renderStructTasks() {
+    var list = document.getElementById("aq-struct-tasks-list");
+    if (state.structTasks.length === 0) {
+      list.innerHTML = '<li style="color:var(--text-muted); font-size:0.82rem;">Nenhuma ação pendente.</li>';
+      return;
+    }
+    list.innerHTML = state.structTasks.map(function (t, i) {
+      return '<li class="aq-criteria-item"><input type="checkbox" data-idx="' + i + '" ' + (t.checked ? "checked" : "") + " />" +
+        "<span>" + t.label + '</span><button class="aq-icon-btn" data-action="remove-struct-task" data-idx="' + i + '" title="Remover">✕</button></li>';
+    }).join("");
+  }
+
   function renderAll() {
     var summary = renderSummary();
     renderHistory(summary.sorted);
     renderPhases();
     renderCriteria();
+    renderStructTasks();
   }
 
   // ---------- form <-> data ----------
@@ -1371,9 +1575,35 @@
     }
   });
 
+  document.getElementById("btn-struct-task-add").addEventListener("click", function () {
+    var input = document.getElementById("f-struct-task-new");
+    var label = input.value.trim();
+    if (!label) return;
+    state.structTasks.push({ label: label, checked: false });
+    saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
+    input.value = "";
+    renderStructTasks();
+  });
+
+  document.getElementById("aq-struct-tasks-list").addEventListener("click", function (e) {
+    var removeBtn = e.target.closest('[data-action="remove-struct-task"]');
+    if (removeBtn) {
+      state.structTasks.splice(Number(removeBtn.getAttribute("data-idx")), 1);
+      saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
+      renderStructTasks();
+    }
+  });
+  document.getElementById("aq-struct-tasks-list").addEventListener("change", function (e) {
+    if (e.target.type === "checkbox") {
+      var idx = Number(e.target.getAttribute("data-idx"));
+      state.structTasks[idx].checked = e.target.checked;
+      saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
+    }
+  });
+
   document.getElementById("btn-export").addEventListener("click", function () {
     flushConfigSaveNow();
-    var payload = { exportedAt: new Date().toISOString(), readings: state.readings, phases: state.phases, criteria: state.criteria, config: state.config };
+    var payload = { exportedAt: new Date().toISOString(), readings: state.readings, phases: state.phases, criteria: state.criteria, config: state.config, structTasks: state.structTasks };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
@@ -1402,10 +1632,12 @@
             state.phases = Array.isArray(data.phases) ? data.phases : state.phases;
             state.criteria = Array.isArray(data.criteria) ? data.criteria : state.criteria;
             state.config = data.config && typeof data.config === "object" ? data.config : state.config;
+            state.structTasks = Array.isArray(data.structTasks) ? data.structTasks : state.structTasks;
             saveJSON(STORAGE_KEYS.readings, state.readings);
             saveJSON(STORAGE_KEYS.phases, state.phases);
             saveJSON(STORAGE_KEYS.criteria, state.criteria);
             saveJSON(STORAGE_KEYS.config, state.config);
+            saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
             loadConfigForm(state.config);
             renderAll();
             renderSaveIndicator("dados importados com sucesso");
