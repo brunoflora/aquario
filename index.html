@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Diário de Água — Aquário Jumbo Ciclídeos</title>
-<meta name="description" content="Registro diário de parâmetros de água, score ponderado e gates de liberação de espécies para o aquário jumbo de ciclídeos nacionais." />
+<title>Parâmetros da Água do Aquário — Ciclídeos Nacionais</title>
+<meta name="description" content="Registro diário de parâmetros de água, score ponderado, gates de liberação de espécies e configuração do aquário/sump — aquário jumbo de ciclídeos nacionais." />
 </head>
 <body>
 <style>
@@ -144,6 +144,36 @@
     font-size: 0.68rem;
     color: var(--text-muted);
     font-weight: 600;
+  }
+
+  .aq-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .aq-tab {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 10px 4px;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .aq-tab + .aq-tab { margin-left: 14px; }
+
+  .aq-tab:hover { color: var(--text); }
+
+  .aq-tab[aria-selected="true"] {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
   }
 
   .aq-card {
@@ -454,14 +484,21 @@
   <header class="aq-header">
     <div>
       <div class="aq-eyebrow">Aquário jumbo — Ciclídeos Nacionais</div>
-      <h1>Diário de água</h1>
-      <div class="aq-sub">Registro diário de parâmetros, score da água e critérios de liberação para novas espécies.</div>
+      <h1>Parâmetros da água do aquário</h1>
+      <div class="aq-sub">Registro diário de parâmetros, score da água, critérios de liberação para novas espécies e a configuração física do sistema.</div>
     </div>
     <div class="aq-save-indicator" id="aq-save-indicator">
       <span class="aq-save-dot"></span>
       <span id="aq-save-text">aguardando primeiro registro</span>
     </div>
   </header>
+
+  <div class="aq-tabs" role="tablist" aria-label="Seções do painel">
+    <button type="button" class="aq-tab" id="tab-btn-params" role="tab" aria-selected="true" aria-controls="tab-panel-params">Parâmetros da água</button>
+    <button type="button" class="aq-tab" id="tab-btn-config" role="tab" aria-selected="false" aria-controls="tab-panel-config" tabindex="-1">Aquário &amp; sump</button>
+  </div>
+
+  <div id="tab-panel-params" role="tabpanel" aria-labelledby="tab-btn-params">
 
   <section class="aq-card aq-summary-strip" id="aq-summary-strip" aria-label="Resumo do estado da água">
     <div class="aq-gauge-wrap">
@@ -577,6 +614,151 @@
     </div>
   </section>
 
+  </div>
+
+  <div id="tab-panel-config" role="tabpanel" aria-labelledby="tab-btn-config" hidden>
+
+  <section class="aq-card" style="margin-bottom:20px;">
+    <div class="aq-eyebrow" style="margin-bottom:6px;">Documentação do sistema</div>
+    <h2 class="aq-section-title" style="margin-bottom:4px;">Configuração do aquário e sump</h2>
+    <div class="aq-sub" style="max-width:70ch;">Ficha de referência da montagem física — dimensões, volumes, filtragem e equipamentos. Não muda com frequência, mas fica salva junto com o resto para consulta rápida (ex: ao calcular dosagem de medicamento por litro, ou explicar o sistema para um comprador).</div>
+  </section>
+
+  <section class="aq-grid-2">
+    <div class="aq-card">
+      <h2 class="aq-section-title">Aquário principal</h2>
+      <div class="aq-form-grid">
+        <div class="aq-field">
+          <label for="c-tank-dims">Dimensões (C×L×A cm)</label>
+          <input type="text" id="c-tank-dims" placeholder="200 × 80 × 70" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-volume-gross">Volume bruto (L)</label>
+          <input type="number" id="c-tank-volume-gross" step="1" placeholder="1120" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-volume-net">Volume líquido estimado (L)</label>
+          <input type="number" id="c-tank-volume-net" step="1" placeholder="950" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-material">Material</label>
+          <input type="text" id="c-tank-material" placeholder="Vidro / Acrílico" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-brand">Fabricante / marca</label>
+          <input type="text" id="c-tank-brand" placeholder="" />
+        </div>
+        <div class="aq-field">
+          <label for="c-tank-setup-date">Data de montagem</label>
+          <input type="date" id="c-tank-setup-date" />
+        </div>
+      </div>
+    </div>
+
+    <div class="aq-card">
+      <h2 class="aq-section-title">Sump</h2>
+      <div class="aq-form-grid">
+        <div class="aq-field">
+          <label for="c-sump-dims">Dimensões (C×L×A cm)</label>
+          <input type="text" id="c-sump-dims" placeholder="80 × 40 × 40" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-volume">Volume total (L)</label>
+          <input type="number" id="c-sump-volume" step="1" placeholder="120" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-chambers">Câmaras de decantação</label>
+          <input type="number" id="c-sump-chambers" step="1" placeholder="3" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-pump-flow">Vazão de retorno (L/h)</label>
+          <input type="number" id="c-sump-pump-flow" step="1" placeholder="3000" />
+        </div>
+        <div class="aq-field aq-field-wide">
+          <label for="c-sump-pump-model">Bomba de retorno (modelo)</label>
+          <input type="text" id="c-sump-pump-model" placeholder="" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-mech-media">Mídia mecânica</label>
+          <input type="text" id="c-sump-mech-media" placeholder="Manta / esponja / bulk fiber" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sump-bio-media">Mídia biológica</label>
+          <input type="text" id="c-sump-bio-media" placeholder="Bio balls / matrix / biohome" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="aq-grid-2">
+    <div class="aq-card">
+      <h2 class="aq-section-title">Equipamentos</h2>
+      <div class="aq-form-grid">
+        <div class="aq-field">
+          <label for="c-eq-heater">Aquecedor (modelo/potência e qtd)</label>
+          <input type="text" id="c-eq-heater" placeholder="2x 300W" />
+        </div>
+        <div class="aq-field">
+          <label for="c-eq-lighting">Iluminação (modelo e fotoperíodo)</label>
+          <input type="text" id="c-eq-lighting" placeholder="LED full spectrum, 8h/dia" />
+        </div>
+        <div class="aq-field">
+          <label for="c-eq-extra-pumps">Bombas adicionais / circulação</label>
+          <input type="text" id="c-eq-extra-pumps" placeholder="" />
+        </div>
+        <div class="aq-field">
+          <label for="c-eq-co2">CO₂</label>
+          <input type="text" id="c-eq-co2" placeholder="Não utilizado" />
+        </div>
+        <div class="aq-field">
+          <label for="c-eq-controller">Controlador / timer</label>
+          <input type="text" id="c-eq-controller" placeholder="" />
+        </div>
+        <div class="aq-field">
+          <label for="c-eq-other">Outros equipamentos</label>
+          <input type="text" id="c-eq-other" placeholder="" />
+        </div>
+      </div>
+    </div>
+
+    <div class="aq-card">
+      <h2 class="aq-section-title">Substrato, decoração e manutenção</h2>
+      <div class="aq-form-grid">
+        <div class="aq-field">
+          <label for="c-sub-substrate">Substrato</label>
+          <input type="text" id="c-sub-substrate" placeholder="Areia / cascalho" />
+        </div>
+        <div class="aq-field">
+          <label for="c-sub-hardscape">Rochas / troncos</label>
+          <input type="text" id="c-sub-hardscape" placeholder="" />
+        </div>
+        <div class="aq-field aq-field-wide">
+          <label for="c-sub-plants">Plantas</label>
+          <input type="text" id="c-sub-plants" placeholder="" />
+        </div>
+        <div class="aq-field">
+          <label for="c-maint-percent">TPA — % por troca</label>
+          <input type="number" id="c-maint-percent" step="1" placeholder="20" />
+        </div>
+        <div class="aq-field">
+          <label for="c-maint-frequency">TPA — frequência</label>
+          <input type="text" id="c-maint-frequency" placeholder="Semanal" />
+        </div>
+        <div class="aq-field">
+          <label for="c-maint-media-frequency">Troca de mídia filtrante</label>
+          <input type="text" id="c-maint-media-frequency" placeholder="Mensal" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="aq-card" style="margin-bottom:20px;">
+    <h2 class="aq-section-title">Notas gerais sobre a configuração</h2>
+    <textarea id="c-notes" class="aq-phase-notes" style="min-height:80px;" placeholder="Histórico de mudanças no sistema, ajustes de hidráulica, problemas resolvidos, etc."></textarea>
+  </section>
+
+  </div>
+
   <div class="aq-footnote">
     <strong>Onde isto está salvo:</strong> os dados ficam no armazenamento local deste navegador (localStorage), vinculados a este dispositivo/navegador específico — não mais presos a uma conversa do Claude, mas também ainda sem sincronização entre dispositivos. Use "Exportar JSON" regularmente para backup. Para acesso multi-dispositivo com link compartilhável e histórico agregado (médias móveis, gráficos), veja o schema Supabase incluído no repositório (<code>supabase-schema.sql</code>) e o <code>README.md</code>.
   </div>
@@ -589,8 +771,18 @@
   var STORAGE_KEYS = {
     readings: "aq_readings_v1",
     phases: "aq_phases_v1",
-    criteria: "aq_criteria_v1"
+    criteria: "aq_criteria_v1",
+    config: "aq_config_v1"
   };
+
+  var CONFIG_FIELDS = [
+    "tank-dims", "tank-volume-gross", "tank-volume-net", "tank-material", "tank-brand", "tank-setup-date",
+    "sump-dims", "sump-volume", "sump-chambers", "sump-pump-flow", "sump-pump-model", "sump-mech-media", "sump-bio-media",
+    "eq-heater", "eq-lighting", "eq-extra-pumps", "eq-co2", "eq-controller", "eq-other",
+    "sub-substrate", "sub-hardscape", "sub-plants",
+    "maint-percent", "maint-frequency", "maint-media-frequency",
+    "notes"
+  ];
 
   var WEIGHTS = { temp: 20, ph: 15, kh: 10, nh3: 20, no2: 20, no3: 10, turbidez: 5 };
 
@@ -653,7 +845,8 @@
   var state = {
     readings: loadJSON(STORAGE_KEYS.readings, []),
     phases: loadJSON(STORAGE_KEYS.phases, DEFAULT_PHASES),
-    criteria: loadJSON(STORAGE_KEYS.criteria, [])
+    criteria: loadJSON(STORAGE_KEYS.criteria, []),
+    config: loadJSON(STORAGE_KEYS.config, {})
   };
 
   var editingDate = null;
@@ -1014,6 +1207,78 @@
     upsertReading(reading);
   }
 
+  // ---------- config tab (aquário & sump) ----------
+
+  function readConfigForm() {
+    var config = {};
+    CONFIG_FIELDS.forEach(function (key) {
+      var el = document.getElementById("c-" + key);
+      if (el) config[key] = el.value;
+    });
+    return config;
+  }
+
+  function loadConfigForm(config) {
+    CONFIG_FIELDS.forEach(function (key) {
+      var el = document.getElementById("c-" + key);
+      if (el) el.value = config[key] || "";
+    });
+  }
+
+  var configSaveTimer = null;
+  function scheduleConfigSave() {
+    clearTimeout(configSaveTimer);
+    configSaveTimer = setTimeout(function () {
+      state.config = readConfigForm();
+      saveJSON(STORAGE_KEYS.config, state.config);
+      renderSaveIndicator("configuração salva automaticamente às " + new Date().toLocaleTimeString("pt-BR"));
+    }, 300);
+  }
+
+  function flushConfigSaveNow() {
+    clearTimeout(configSaveTimer);
+    state.config = readConfigForm();
+    saveJSON(STORAGE_KEYS.config, state.config);
+  }
+
+  document.getElementById("tab-panel-config").addEventListener("input", scheduleConfigSave);
+  document.getElementById("tab-panel-config").addEventListener("change", scheduleConfigSave);
+  window.addEventListener("beforeunload", flushConfigSaveNow);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") flushConfigSaveNow();
+  });
+
+  // ---------- tabs ----------
+
+  var tabs = [
+    { btn: "tab-btn-params", panel: "tab-panel-params" },
+    { btn: "tab-btn-config", panel: "tab-panel-config" }
+  ];
+
+  function activateTab(activeBtnId) {
+    tabs.forEach(function (t) {
+      var btn = document.getElementById(t.btn);
+      var panel = document.getElementById(t.panel);
+      var active = t.btn === activeBtnId;
+      btn.setAttribute("aria-selected", String(active));
+      btn.tabIndex = active ? 0 : -1;
+      panel.hidden = !active;
+    });
+  }
+
+  tabs.forEach(function (t, i) {
+    var btn = document.getElementById(t.btn);
+    btn.addEventListener("click", function () { activateTab(t.btn); });
+    btn.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      var nextIndex = e.key === "ArrowRight" ? (i + 1) % tabs.length : (i - 1 + tabs.length) % tabs.length;
+      var nextBtn = document.getElementById(tabs[nextIndex].btn);
+      activateTab(tabs[nextIndex].btn);
+      nextBtn.focus();
+    });
+  });
+
   // ---------- events ----------
 
   document.getElementById("aq-app").addEventListener("input", function (e) {
@@ -1107,7 +1372,8 @@
   });
 
   document.getElementById("btn-export").addEventListener("click", function () {
-    var payload = { exportedAt: new Date().toISOString(), readings: state.readings, phases: state.phases, criteria: state.criteria };
+    flushConfigSaveNow();
+    var payload = { exportedAt: new Date().toISOString(), readings: state.readings, phases: state.phases, criteria: state.criteria, config: state.config };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
@@ -1135,9 +1401,12 @@
             state.readings = data.readings;
             state.phases = Array.isArray(data.phases) ? data.phases : state.phases;
             state.criteria = Array.isArray(data.criteria) ? data.criteria : state.criteria;
+            state.config = data.config && typeof data.config === "object" ? data.config : state.config;
             saveJSON(STORAGE_KEYS.readings, state.readings);
             saveJSON(STORAGE_KEYS.phases, state.phases);
             saveJSON(STORAGE_KEYS.criteria, state.criteria);
+            saveJSON(STORAGE_KEYS.config, state.config);
+            loadConfigForm(state.config);
             renderAll();
             renderSaveIndicator("dados importados com sucesso");
           }
@@ -1162,6 +1431,7 @@
     var sorted = sortedReadings();
     var mostRecent = sorted.length ? sorted[sorted.length - 1] : null;
     loadForm(existing || { date: today, temp: "", ph: "", kh: "", nh3: "", no2: "", no3: "", turbidez: false, notes: "" });
+    loadConfigForm(state.config);
     if (!storageAvailable) {
       renderSaveIndicator("aviso: armazenamento local indisponível — dados só duram esta sessão");
     } else if (mostRecent) {

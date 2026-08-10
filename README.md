@@ -1,6 +1,6 @@
-# Diário de Água — Aquário Jumbo Ciclídeos
+# Parâmetros da Água do Aquário — Ciclídeos Nacionais
 
-Painel de acompanhamento diário do aquário jumbo de ciclídeos nacionais: parâmetros de água, score ponderado da qualidade da água e os *gates* (critérios de liberação) para introdução de novas espécies — hoje, especificamente o Green Terror.
+Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em duas abas: **Parâmetros da água** (registro diário, score ponderado da qualidade da água e os *gates* — critérios de liberação — para introdução de novas espécies, hoje especificamente o Green Terror) e **Aquário & sump** (ficha de referência da configuração física do sistema).
 
 Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`). Ver `HANDOFF.md` para o histórico completo do porquê da migração.
 
@@ -18,7 +18,8 @@ Para publicar como site (ex: GitHub Pages), basta habilitar Pages apontando para
 - **Plano de ação**: recomendações geradas a partir do último registro e do progresso dos gates.
 - **Fases do projeto**: checklist livre (ciclagem, plantio/decoração, quarentena, estabilização, introdução, formação de casais, venda de excedentes) com status e notas por fase.
 - **Critérios adicionais do gate**: checklist manual para condições que não vêm de um parâmetro de água (ex: aprovação de um veterinário).
-- **Exportar/Importar JSON**: backup manual de tudo (leituras, fases, critérios) em um arquivo `.json`.
+- **Aba Aquário & sump**: ficha de referência da montagem física — dimensões e volume do aquário e da sump, câmaras de decantação, mídias mecânica/biológica, bomba de retorno e vazão, aquecedor, iluminação, CO₂, substrato, decoração e rotina de manutenção (TPA e troca de mídia filtrante). Também salva automaticamente.
+- **Exportar/Importar JSON**: backup manual de tudo (leituras, fases, critérios e configuração do sistema) em um arquivo `.json`.
 
 ## Onde os dados ficam guardados (limitação atual, honesta)
 
