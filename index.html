@@ -11,20 +11,27 @@
   :root {
     --bg: #eef1ea;
     --surface: #ffffff;
-    --surface-2: #e3e9dd;
+    --surface-2: #e8eee6;
+    --surface-3: #dce5d8;
     --text: #16211c;
-    --text-muted: #55645a;
+    --text-muted: #516057;
     --accent: #2f6f5e;
-    --accent-soft: #dcece3;
-    --good: #2f7a4d;
-    --good-soft: #dcefe1;
-    --warn: #97701c;
-    --warn-soft: #f4e9d2;
-    --bad: #a13d2c;
-    --bad-soft: #f5ddd7;
-    --border: rgba(22, 33, 28, 0.14);
-    --outline: rgba(22, 33, 28, 0.4);
-    --outline-variant: rgba(22, 33, 28, 0.14);
+    --accent-soft: #e0ece7;
+    --good: #1f6b3f;
+    --good-soft: #e2ece6;
+    --warn: #7a5a12;
+    --warn-soft: #ebe6db;
+    --bad: #9c3826;
+    --bad-soft: #f3e7e5;
+    --border: rgba(22, 33, 28, 0.20);
+    --outline: rgba(22, 33, 28, 0.62);
+    /* limite de controle de formulário — precisa de 3:1 (WCAG 1.4.11) */
+    --field-border: rgba(22, 33, 28, 0.52);
+    /* divisórias decorativas — não carregam informação, isentas de 1.4.11 */
+    --outline-variant: rgba(22, 33, 28, 0.20);
+    --snack-bg: #16211c;
+    --snack-text: #eef1ea;
+    --snack-action: #63d3ae;
     --shadow: 0 1px 2px rgba(22, 33, 28, 0.3), 0 1px 3px 1px rgba(22, 33, 28, 0.15);
     --elevation-1: 0 1px 2px rgba(22, 33, 28, 0.3), 0 1px 3px 1px rgba(22, 33, 28, 0.15);
     --elevation-2: 0 1px 2px rgba(22, 33, 28, 0.3), 0 2px 6px 2px rgba(22, 33, 28, 0.15);
@@ -67,22 +74,27 @@
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0d1512;
-      --surface: #131e18;
-      --surface-2: #1a271f;
-      --text: #e9efe8;
-      --text-muted: #9cb1a2;
-      --accent: #63d3ae;
-      --accent-soft: rgba(99, 211, 174, 0.14);
-      --good: #57c17c;
-      --good-soft: rgba(87, 193, 124, 0.14);
-      --warn: #e3ab4b;
-      --warn-soft: rgba(227, 171, 75, 0.14);
-      --bad: #e2725f;
-      --bad-soft: rgba(226, 114, 95, 0.16);
-      --border: rgba(233, 239, 232, 0.14);
-      --outline: rgba(233, 239, 232, 0.45);
-      --outline-variant: rgba(233, 239, 232, 0.14);
+      --bg: #070d0b;
+      --surface: #0e1613;
+      --surface-2: #18221e;
+      --surface-3: #212d28;
+      --text: #e8efea;
+      --text-muted: #a3b7ab;
+      --accent: #5fd3ab;
+      --accent-soft: rgba(95, 211, 171, 0.16);
+      --good: #5cc57f;
+      --good-soft: rgba(92, 197, 127, 0.16);
+      --warn: #e8b45c;
+      --warn-soft: rgba(232, 180, 92, 0.16);
+      --bad: #f28e78;
+      --bad-soft: rgba(242, 142, 120, 0.16);
+      --border: rgba(232, 239, 234, 0.22);
+      --outline: rgba(232, 239, 234, 0.55);
+      --field-border: rgba(232, 239, 234, 0.42);
+      --outline-variant: rgba(232, 239, 234, 0.22);
+      --snack-bg: #212d28;
+      --snack-text: #e8efea;
+      --snack-action: #5fd3ab;
       --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px 1px rgba(0, 0, 0, 0.3);
       --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px 1px rgba(0, 0, 0, 0.3);
       --elevation-2: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 6px 2px rgba(0, 0, 0, 0.3);
@@ -92,22 +104,27 @@
   }
 
   :root[data-theme="dark"] {
-    --bg: #0d1512;
-    --surface: #131e18;
-    --surface-2: #1a271f;
-    --text: #e9efe8;
-    --text-muted: #9cb1a2;
-    --accent: #63d3ae;
-    --accent-soft: rgba(99, 211, 174, 0.14);
-    --good: #57c17c;
-    --good-soft: rgba(87, 193, 124, 0.14);
-    --warn: #e3ab4b;
-    --warn-soft: rgba(227, 171, 75, 0.14);
-    --bad: #e2725f;
-    --bad-soft: rgba(226, 114, 95, 0.16);
-    --border: rgba(233, 239, 232, 0.14);
-    --outline: rgba(233, 239, 232, 0.45);
-    --outline-variant: rgba(233, 239, 232, 0.14);
+    --bg: #070d0b;
+    --surface: #0e1613;
+    --surface-2: #18221e;
+    --surface-3: #212d28;
+    --text: #e8efea;
+    --text-muted: #a3b7ab;
+    --accent: #5fd3ab;
+    --accent-soft: rgba(95, 211, 171, 0.16);
+    --good: #5cc57f;
+    --good-soft: rgba(92, 197, 127, 0.16);
+    --warn: #e8b45c;
+    --warn-soft: rgba(232, 180, 92, 0.16);
+    --bad: #f28e78;
+    --bad-soft: rgba(242, 142, 120, 0.16);
+    --border: rgba(232, 239, 234, 0.22);
+    --outline: rgba(232, 239, 234, 0.55);
+    --field-border: rgba(232, 239, 234, 0.42);
+    --outline-variant: rgba(232, 239, 234, 0.22);
+    --snack-text: #e8efea;
+    --snack-bg: #212d28;
+    --snack-action: #5fd3ab;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px 1px rgba(0, 0, 0, 0.3);
     --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px 1px rgba(0, 0, 0, 0.3);
     --elevation-2: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 6px 2px rgba(0, 0, 0, 0.3);
@@ -224,6 +241,92 @@
   .aq-tabs::-webkit-scrollbar { display: none; }
 
   .aq-field-inline { max-width: 380px; }
+
+  /* ---------- Snackbar (padrão MUI): feedback + desfazer ---------- */
+
+  .aq-snackbar-host {
+    position: fixed;
+    /* à direita: os botões de ação do formulário ficam à esquerda */
+    right: var(--sp-3);
+    bottom: var(--sp-3);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    max-width: min(560px, calc(100vw - 48px));
+    pointer-events: none;
+  }
+
+  @media (max-width: 600px) {
+    .aq-snackbar-host { left: var(--sp-1); right: var(--sp-1); bottom: var(--sp-1); max-width: none; }
+  }
+
+  .aq-snackbar {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: 12px var(--sp-2);
+    border-radius: var(--shape-xs);
+    background: var(--snack-bg);
+    color: var(--snack-text);
+    box-shadow: var(--elevation-3);
+    font-size: var(--fs-body2);
+    line-height: 1.45;
+    animation: aq-snack-in var(--dur-standard) var(--ease-decelerate);
+  }
+  .aq-snackbar[data-variant="error"] { background: var(--bad); color: #ffffff; }
+  .aq-snackbar-msg { flex: 1; min-width: 0; }
+  .aq-snackbar-action {
+    flex: none;
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--snack-action);
+    font-family: inherit;
+    font-size: var(--fs-caption);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px var(--sp-1);
+    border-radius: var(--shape-xs);
+    cursor: pointer;
+  }
+  .aq-snackbar[data-variant="error"] .aq-snackbar-action { color: #ffffff; text-decoration: underline; }
+  .aq-snackbar-action:hover { background: rgba(255, 255, 255, 0.12); }
+  .aq-snackbar-action:focus-visible { outline: 2px solid var(--snack-action); outline-offset: 2px; }
+  .aq-snackbar[data-variant="error"] .aq-snackbar-action:focus-visible { outline-color: #ffffff; }
+
+  @keyframes aq-snack-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aq-snackbar { animation: none; }
+  }
+
+  /* ---------- índice de capítulos (acesso direto, heurística 7) ---------- */
+
+  .aq-chapter-index { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+  .aq-chapter-index a {
+    font-size: var(--fs-caption);
+    text-decoration: none;
+    color: var(--text-muted);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--shape-full);
+    padding: 5px 12px;
+    transition: border-color var(--dur-short) var(--ease-standard), color var(--dur-short) var(--ease-standard);
+  }
+  .aq-chapter-index a:hover { color: var(--accent); border-color: var(--accent); }
+  .aq-chapter-index a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .aq-chapter-index a b { font-family: var(--font-mono); color: var(--accent); font-weight: 700; }
+
+  .aq-chapter[id] { scroll-margin-top: 72px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
 
   .aq-visually-hidden {
     position: absolute;
@@ -480,7 +583,7 @@
     font-size: var(--fs-body2);
     padding: 10px var(--sp-15);
     border-radius: var(--shape-xs);
-    border: 1px solid var(--outline-variant);
+    border: 1px solid var(--field-border);
     background: var(--surface);
     color: var(--text);
     width: 100%;
@@ -569,7 +672,7 @@
     padding: 8px 10px;
     border-radius: var(--shape-xs);
     background: var(--surface-2);
-    border: 1px solid var(--outline);
+    border: 1px solid var(--field-border);
   }
   .aq-checkbox-row input { width: 16px; height: 16px; accent-color: var(--accent); }
   .aq-checkbox-row label { text-transform: none; font-weight: 500; font-size: 0.85rem; color: var(--text); letter-spacing: 0; }
@@ -729,7 +832,7 @@
     font-family: var(--font-mono);
     border-radius: var(--shape-xs);
     padding: 3px 8px;
-    border: 1px solid var(--outline);
+    border: 1px solid var(--field-border);
     background: var(--surface);
   }
   .aq-phase-notes {
@@ -739,7 +842,7 @@
     font-size: 0.82rem;
     padding: 6px 8px;
     border-radius: var(--shape-xs);
-    border: 1px solid var(--outline);
+    border: 1px solid var(--field-border);
     background: var(--surface);
     color: var(--text);
     min-height: 40px;
@@ -763,7 +866,7 @@
   }
   .aq-empty-note { color: var(--text-muted); font-size: 0.82rem; list-style: none; }
   .aq-criteria-add { display: flex; gap: 6px; }
-  .aq-criteria-add input { flex: 1; font-family: var(--font-body); font-size: 0.85rem; padding: 7px 9px; border-radius: var(--shape-xs); border: 1px solid var(--outline); background: var(--surface-2); color: var(--text); }
+  .aq-criteria-add input { flex: 1; font-family: var(--font-body); font-size: 0.85rem; padding: 7px 9px; border-radius: var(--shape-xs); border: 1px solid var(--field-border); background: var(--surface-2); color: var(--text); }
 
   .aq-tools-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -1199,9 +1302,22 @@
         <span class="aq-stat-note" id="calc-kh-note">sem medição de KH registrada ainda</span>
       </div>
     </div>
+
+    <nav class="aq-chapter-index" aria-label="Índice dos capítulos">
+      <a href="#cap-fluxo"><b>◇</b> O caminho da água</a>
+      <a href="#cap-01"><b>01</b> O rio</a>
+      <a href="#cap-02"><b>02</b> A várzea</a>
+      <a href="#cap-03"><b>03</b> A correnteza</a>
+      <a href="#cap-04"><b>04</b> A cheia</a>
+      <a href="#cap-05"><b>05</b> Água preta</a>
+      <a href="#cap-06"><b>06</b> O leito</a>
+      <a href="#cap-07"><b>07</b> Os habitantes</a>
+      <a href="#cap-08"><b>08</b> O calendário</a>
+      <a href="#cap-ficha"><b>✎</b> Ficha técnica</a>
+    </nav>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-fluxo">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">◇</span>
       <div>
@@ -1242,7 +1358,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-01">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">01</span>
       <div>
@@ -1265,7 +1381,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-02">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">02</span>
       <div>
@@ -1302,7 +1418,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-03">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">03</span>
       <div>
@@ -1326,7 +1442,7 @@
     <p class="aq-lede">Somando o wave maker de fluxo cruzado (~6.000–9.000 L/h <span class="aq-hint">[EST]</span>), a movimentação interna chega a <strong>18–23× o volume por hora</strong> — o suficiente para não haver zona morta em 2 metros de comprimento. O fluxo cruzado é a escolha certa para esse formato.</p>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-04">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">04</span>
       <div>
@@ -1375,7 +1491,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-05">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">05</span>
       <div>
@@ -1422,7 +1538,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-06">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">06</span>
       <div>
@@ -1452,7 +1568,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-07">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">07</span>
       <div>
@@ -1504,7 +1620,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-08">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">08</span>
       <div>
@@ -1559,7 +1675,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-ficha">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">✎</span>
       <div>
@@ -1620,7 +1736,7 @@
     </div>
   </section>
 
-  <section class="aq-card aq-chapter">
+  <section class="aq-card aq-chapter" id="cap-pendentes">
     <div class="aq-chapter-head">
       <span class="aq-chapter-num">?</span>
       <div>
@@ -1633,6 +1749,8 @@
   </section>
 
   </div>
+
+  <div class="aq-snackbar-host" id="aq-snackbar-host" aria-live="polite" aria-atomic="true"></div>
 
   <div class="aq-footnote">
     <strong>Onde isto está salvo:</strong> os dados ficam no armazenamento local deste navegador (localStorage), vinculados a este dispositivo/navegador específico — não mais presos a uma conversa do Claude, mas também ainda sem sincronização entre dispositivos. Use "Exportar JSON" regularmente para backup. Para acesso multi-dispositivo com link compartilhável e histórico agregado (médias móveis, gráficos), veja o schema Supabase incluído no repositório (<code>supabase-schema.sql</code>) e o <code>README.md</code>.
@@ -1987,6 +2105,100 @@
     config: loadJSON(STORAGE_KEYS.config, DEFAULT_CONFIG),
     structTasks: migrateStructTasks(loadJSON(STORAGE_KEYS.structTasks, null))
   };
+
+  // ---------- Snackbar + desfazer (heurísticas 1, 3 e 9 de Nielsen) ----------
+
+  var snackTimer = null;
+
+  function dismissSnackbar() {
+    clearTimeout(snackTimer);
+    var host = document.getElementById("aq-snackbar-host");
+    if (host) host.innerHTML = "";
+  }
+
+  function showSnackbar(message, options) {
+    options = options || {};
+    var host = document.getElementById("aq-snackbar-host");
+    if (!host) return;
+    clearTimeout(snackTimer);
+    var isError = options.variant === "error";
+    var bar = document.createElement("div");
+    bar.className = "aq-snackbar";
+    bar.setAttribute("data-variant", isError ? "error" : "default");
+    bar.setAttribute("role", isError ? "alert" : "status");
+
+    var msg = document.createElement("span");
+    msg.className = "aq-snackbar-msg";
+    msg.textContent = message;
+    bar.appendChild(msg);
+
+    if (options.actionLabel && options.onAction) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "aq-snackbar-action";
+      btn.textContent = options.actionLabel;
+      btn.addEventListener("click", function () {
+        dismissSnackbar();
+        options.onAction();
+      });
+      bar.appendChild(btn);
+    }
+
+    var close = document.createElement("button");
+    close.type = "button";
+    close.className = "aq-snackbar-action";
+    close.setAttribute("aria-label", "Fechar aviso");
+    close.textContent = "✕";
+    close.addEventListener("click", dismissSnackbar);
+    bar.appendChild(close);
+
+    host.innerHTML = "";
+    host.appendChild(bar);
+    // undo precisa de tempo de leitura e reação; erro fica até ser lido
+    snackTimer = setTimeout(dismissSnackbar, isError ? 12000 : options.onAction ? 10000 : 5000);
+  }
+
+  function snapshotState() {
+    return JSON.parse(JSON.stringify({
+      readings: state.readings, phases: state.phases, criteria: state.criteria,
+      config: state.config, structTasks: state.structTasks
+    }));
+  }
+
+  function persistAll() {
+    saveJSON(STORAGE_KEYS.readings, state.readings);
+    saveJSON(STORAGE_KEYS.phases, state.phases);
+    saveJSON(STORAGE_KEYS.criteria, state.criteria);
+    saveJSON(STORAGE_KEYS.config, state.config);
+    saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
+  }
+
+  function restoreState(snap) {
+    state.readings = snap.readings;
+    state.phases = snap.phases;
+    state.criteria = snap.criteria;
+    state.config = snap.config;
+    state.structTasks = snap.structTasks;
+    persistAll();
+    loadConfigForm(state.config);
+    renderAll();
+  }
+
+  // Executa uma ação destrutiva de forma reversível: sem diálogo de confirmação,
+  // com desfazer disponível. É o padrão que a NN/g prefere para ações reversíveis.
+  function doUndoable(message, mutate) {
+    var snap = snapshotState();
+    mutate();
+    persistAll();
+    renderAll();
+    showSnackbar(message, {
+      actionLabel: "Desfazer",
+      onAction: function () {
+        restoreState(snap);
+        showSnackbar("Ação desfeita.");
+      }
+    });
+  }
 
   function esc(value) {
     return String(value === null || value === undefined ? "" : value)
@@ -2489,12 +2701,30 @@
     renderAll();
   }
 
+  function readingHasData(reading) {
+    if (reading.notes && reading.notes.trim() !== "") return true;
+    if (reading.turbidez) return true;
+    return CORE_PARAMS.some(function (key) {
+      var v = reading[key];
+      return v !== "" && v !== null && v !== undefined;
+    });
+  }
+
+  // Só grava se houver algo digitado. Sem isto, abrir e fechar a página criava
+  // um registro em branco para hoje, que sujava o histórico e quebrava o streak
+  // dos gates (um dia sem dados interrompe a contagem de dias consecutivos).
+  function shouldPersist(reading) {
+    if (!reading.date) return false;
+    if (readingHasData(reading)) return true;
+    return state.readings.some(function (r) { return r.date === reading.date; });
+  }
+
   var saveTimer = null;
   function scheduleAutosave() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
       var reading = readForm();
-      if (!reading.date) return;
+      if (!shouldPersist(reading)) return;
       editingDate = reading.date;
       upsertReading(reading);
     }, 300);
@@ -2503,7 +2733,7 @@
   function flushAutosaveNow() {
     clearTimeout(saveTimer);
     var reading = readForm();
-    if (!reading.date) return;
+    if (!shouldPersist(reading)) return;
     upsertReading(reading);
   }
 
@@ -2809,25 +3039,29 @@
     loadForm(existing || { date: today, temp: "", ph: "", kh: "", nh3: "", no2: "", no3: "", turbidez: false, notes: "" });
   });
 
+  function deleteReading(date) {
+    var label = date.split("-").reverse().join("/");
+    doUndoable("Registro de " + label + " excluído.", function () {
+      state.readings = state.readings.filter(function (r) { return r.date !== date; });
+    });
+    renderSaveIndicator("registro de " + label + " excluído");
+  }
+
   document.getElementById("btn-delete-current").addEventListener("click", function () {
     var date = document.getElementById("f-date").value;
     if (!date) return;
-    if (!window.confirm("Excluir o registro de " + date + "?")) return;
-    state.readings = state.readings.filter(function (r) { return r.date !== date; });
-    saveJSON(STORAGE_KEYS.readings, state.readings);
-    renderAll();
-    renderSaveIndicator("registro de " + date + " excluído");
+    if (!state.readings.some(function (r) { return r.date === date; })) {
+      showSnackbar("Não há registro salvo nesta data para excluir.");
+      return;
+    }
+    deleteReading(date);
   });
 
   document.getElementById("aq-history-body").addEventListener("click", function (e) {
     var delBtn = e.target.closest('[data-action="delete"]');
     if (delBtn) {
       e.stopPropagation();
-      var date = delBtn.getAttribute("data-date");
-      if (!window.confirm("Excluir o registro de " + date + "?")) return;
-      state.readings = state.readings.filter(function (r) { return r.date !== date; });
-      saveJSON(STORAGE_KEYS.readings, state.readings);
-      renderAll();
+      deleteReading(delBtn.getAttribute("data-date"));
       return;
     }
     var row = e.target.closest("tr[data-date]");
@@ -2865,9 +3099,12 @@
   document.getElementById("aq-criteria-list").addEventListener("click", function (e) {
     var removeBtn = e.target.closest('[data-action="remove-criteria"]');
     if (removeBtn) {
-      state.criteria.splice(Number(removeBtn.getAttribute("data-idx")), 1);
-      saveJSON(STORAGE_KEYS.criteria, state.criteria);
-      renderCriteria();
+      var idx = Number(removeBtn.getAttribute("data-idx"));
+      var removed = state.criteria[idx];
+      if (!removed) return;
+      doUndoable('Critério "' + removed.label + '" removido.', function () {
+        state.criteria.splice(idx, 1);
+      });
     }
   });
   document.getElementById("aq-criteria-list").addEventListener("change", function (e) {
@@ -2892,9 +3129,12 @@
     var removeBtn = e.target.closest('[data-action="remove-struct-task"]');
     if (!removeBtn) return;
     e.preventDefault();
-    state.structTasks.splice(Number(removeBtn.getAttribute("data-idx")), 1);
-    saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
-    renderStructTasks();
+    var idx = Number(removeBtn.getAttribute("data-idx"));
+    var removed = state.structTasks[idx];
+    if (!removed) return;
+    doUndoable('Ação "' + removed.label + '" removida.', function () {
+      state.structTasks.splice(idx, 1);
+    });
   });
   document.getElementById("tab-panel-check").addEventListener("change", function (e) {
     if (e.target.type !== "checkbox") return;
@@ -2930,27 +3170,37 @@
     reader.onload = function () {
       try {
         var data = JSON.parse(reader.result);
-        if (Array.isArray(data.readings)) {
-          if (window.confirm("Importar substituirá os registros atuais deste navegador. Continuar?")) {
-            state.readings = data.readings;
-            state.phases = Array.isArray(data.phases) ? data.phases : state.phases;
-            state.criteria = Array.isArray(data.criteria) ? data.criteria : state.criteria;
-            state.config = data.config && typeof data.config === "object" ? data.config : state.config;
-            state.structTasks = Array.isArray(data.structTasks) ? migrateStructTasks(data.structTasks) : state.structTasks;
-            saveJSON(STORAGE_KEYS.readings, state.readings);
-            saveJSON(STORAGE_KEYS.phases, state.phases);
-            saveJSON(STORAGE_KEYS.criteria, state.criteria);
-            saveJSON(STORAGE_KEYS.config, state.config);
-            saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
+        if (!Array.isArray(data.readings)) {
+          showSnackbar(
+            "Este arquivo não parece um backup do painel: falta a lista \"readings\". Use um arquivo gerado pelo próprio botão Exportar JSON.",
+            { variant: "error" }
+          );
+        } else {
+          // heurística 5: diga exatamente o que vai entrar e o que será substituído
+          var resumo = data.readings.length + " leitura(s)" +
+            (Array.isArray(data.structTasks) ? ", " + data.structTasks.length + " ação(ões)" : "") +
+            (data.config ? ", ficha do sistema" : "");
+          var atual = state.readings.length;
+          var ok = window.confirm(
+            "Importar " + resumo + ".\n\n" +
+            "Isto substitui os " + atual + " registro(s) atuais deste navegador.\n" +
+            "Você poderá desfazer logo em seguida."
+          );
+          if (ok) {
+            doUndoable("Backup importado: " + resumo + ".", function () {
+              state.readings = data.readings;
+              state.phases = Array.isArray(data.phases) ? data.phases : state.phases;
+              state.criteria = Array.isArray(data.criteria) ? data.criteria : state.criteria;
+              state.config = data.config && typeof data.config === "object" ? data.config : state.config;
+              state.structTasks = Array.isArray(data.structTasks) ? migrateStructTasks(data.structTasks) : state.structTasks;
+            });
             loadConfigForm(state.config);
             renderAll();
             renderSaveIndicator("dados importados com sucesso");
           }
-        } else {
-          window.alert("Arquivo JSON inválido: campo 'readings' não encontrado.");
         }
       } catch (err) {
-        window.alert("Não foi possível ler o arquivo: " + err.message);
+        showSnackbar("Não foi possível ler o arquivo — ele não é um JSON válido. Detalhe: " + err.message, { variant: "error" });
       }
       document.getElementById("file-import").value = "";
     };

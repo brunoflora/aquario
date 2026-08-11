@@ -15,6 +15,35 @@ A interface segue o **sistema do MUI** implementado nativamente em CSS — sem R
 - **Padrões do MUI Dashboard**: cards `outlined` (borda de 1px, sem sombra), faixas de estatística, app bar fixa que ganha elevação ao descolar do topo, abas roláveis no mobile.
 - A ficha técnica é gerada de um **spec declarativo** (`CONFIG_SPEC`), o que garante anatomia idêntica em todos os 43 campos.
 
+## Acessibilidade e contraste
+
+Todos os pares de cor que a interface realmente usa foram medidos (script em `scripts/contrast.js`), nos dois temas:
+
+- **0 reprovações** no WCAG 2.1 AA. Texto de corpo vai de 5,1:1 a 16,6:1 — a maioria dos pares passa também no AAA (7:1).
+- **Limite de campo de formulário** ganhou token próprio (`--field-border`, 3,4:1 claro / 3,7:1 escuro). Antes usava a mesma cor das divisórias decorativas, a 1,3:1 — falha real do critério 1.4.11, já que a borda é o que identifica o controle. O padrão do próprio MUI (`rgba(0,0,0,0.23)`, ~2,6:1) também não passa; aqui foi deliberadamente elevado.
+- **Divisórias decorativas** (`--outline-variant`) seguem suaves de propósito: não carregam informação e são isentas do 1.4.11. Os dois tokens são separados justamente para que um não puxe o outro.
+- Foco visível em todos os 44 controles alcançáveis por teclado, verificado navegando por Tab.
+- Snackbar anuncia por `role="status"`; erros por `role="alert"`.
+
+O tema escuro segue a lógica de *elevation overlay* do Material: quanto mais alta a superfície, mais clara (`--bg` #070d0b → `--surface` #0e1613 → `--surface-2` #18221e → `--surface-3` #212d28), com viés de matiz esverdeado coerente com o assunto — água preta amazônica.
+
+## Heurísticas de usabilidade (Nielsen / NN/g)
+
+Auditoria das 10 heurísticas e o que mudou:
+
+| # | Heurística | Estado |
+|---|---|---|
+| 1 | Visibilidade do status | Indicador de salvamento, medidor de score, contadores do checklist e **snackbar** de confirmação |
+| 2 | Correspondência com o mundo real | Vocabulário de aquarista e a analogia do rio; nada de jargão de sistema |
+| 3 | Controle e liberdade | **Corrigido** — toda exclusão agora é reversível com *Desfazer*, em vez de um diálogo nativo irreversível |
+| 4 | Consistência e padrões | Sistema MUI aplicado a todos os campos, botões e superfícies |
+| 5 | Prevenção de erro | Helper text reativo antecipa o erro; o import diz **o que** vai entrar e **o que** será substituído antes de confirmar |
+| 6 | Reconhecer em vez de lembrar | Faixas ideais visíveis sob cada campo; o infográfico explica o número no lugar onde ele aparece |
+| 7 | Flexibilidade e eficiência | **Adicionado** — índice de capítulos para pular direto; navegação por setas nas abas |
+| 8 | Estética e design minimalista | Superfícies planas, cor reservada ao dado |
+| 9 | Recuperação de erros | **Corrigido** — `alert()` substituído por snackbar que diz o que houve e como resolver |
+| 10 | Ajuda e documentação | Os oito capítulos são a documentação, embutida no ponto de uso |
+
 ## Como usar
 
 Abra `index.html` diretamente no navegador — não há build, não há dependências, não há servidor. É uma única página autocontida (HTML + CSS + JavaScript vanilla).
