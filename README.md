@@ -1,6 +1,8 @@
 # Parâmetros da Água do Aquário — Ciclídeos Nacionais
 
-Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em duas abas: **Parâmetros** (registro diário, score ponderado da qualidade da água e os *gates* — critérios de liberação — para introdução de novas espécies, hoje especificamente o Green Terror) e **Configurações** (ficha de referência da configuração física do sistema, com os números do relatório técnico-estrutural).
+Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em três abas: **Parâmetros** (registro diário, score ponderado da qualidade da água e os *gates* — critérios de liberação — para introdução de novas espécies, hoje especificamente o Green Terror), **Configurações** (o sistema explicado em formato de infográfico narrativo, com a ficha técnica editável ao final) e **Checklist** (as 11 ações prioritárias do relatório estrutural e as 6 medições pendentes, com progresso e custo em aberto).
+
+A interface usa uma analogia de rio amazônico que não é decorativa — ela mapeia função: o display é *o rio*, o sump é *a várzea* (na Amazônia é a planície alagada que filtra o rio), a hidráulica é *a correnteza*, a queda de energia é *a cheia*, o KH 0 é *água preta*, a carga na laje é *o leito* e a manutenção é *o calendário das águas*.
 
 Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`). Ver `HANDOFF.md` para o histórico completo do porquê da migração, e `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Configurações.
 
@@ -23,20 +25,30 @@ Para publicar como site (ex: GitHub Pages), basta habilitar Pages apontando para
 
 ### Aba Configurações
 
-Ficha de referência da montagem física, já pré-preenchida com os números do relatório técnico-estrutural (09/08/2026):
+O sistema contado como infográfico escaneável, em oito capítulos, cada um com o número que importa em destaque e o risco explicitado logo abaixo:
 
-- **Aquário principal (display)**: dimensões, volume bruto/líquido, lâmina d'água útil, espessura de vidro, material, datas de montagem/ciclagem.
-- **Sump**: dimensões, volume bruto e em operação, detalhe das 3 câmaras (decantação/biológica/retorno), espessura de vidro, bomba de retorno (modelo, vazão nominal e real estimada), mídias mecânica e biológica.
-- **Hidráulica & segurança anti-transbordo**: diâmetro da descida (dado crítico ainda pendente de medição), altura manométrica, turnover, wave maker, status do furo anti-sifão e registro do teste de queda de energia.
-- **Equipamentos**: aquecedor, iluminação, bombas adicionais, CO₂, controlador.
-- **Substrato, decoração e manutenção**: substrato, rochas, plantas, % e frequência de TPA, troca de mídia filtrante.
-- **Carga estrutural**: peso total do sistema, carga por m² e notas de posicionamento sobre a laje.
-- **Fauna atual**: espécies, quantidade, tamanho atual/adulto e observações de compatibilidade (inclui o alerta de incompatibilidade do Pangasius).
-- **Ações prioritárias (relatório estrutural)**: checklist com as 11 recomendações do relatório, por prioridade (🔴 crítica → 🟢 baixa), marcável conforme cada ação é concluída.
+| # | Capítulo | O que mostra |
+|---|---|---|
+| ◇ | **O caminho da água** | Diagrama do circuito display → descida → C1 → C2 → C3 → bomba, com os dois pontos frágeis marcados |
+| 01 | **O rio** (display) | Por que o volume real é 598 L e não 700 — e por que dosar por 700 gera 17% de sobredose |
+| 02 | **A várzea** (sump) | As 3 câmaras em barra proporcional, com a C2 (8,5 L) marcada como gargalo diante do alvo de 12–18 L |
+| 03 | **A correnteza** (hidráulica) | Vazão real ~5.000 L/h vs. a tabela de capacidade da descida por diâmetro — o dado que falta medir |
+| 04 | **A cheia** (queda de energia) | Barras comparando 50 L (sem anti-sifão, ✕ transborda 22 L) e 20 L (com anti-sifão, ✓) contra os 28,4 L de folga do sump |
+| 05 | **Água preta** (química) | Por que KH 0 funciona no rio Negro e não em 598 L, com o protocolo de bicarbonato de 7 dias em linha do tempo |
+| 06 | **O leito** (carga estrutural) | 951 kg/m² contra a faixa de 150–200 kg/m² da NBR 6120, em barra |
+| 07 | **Os habitantes** (fauna) | Tamanho atual vs. adulto de cada espécie, medido contra os 200 cm do aquário — o Pangasius ocupa 65% da barra |
+| 08 | **O calendário das águas** | Volumes e frequências de manutenção já calculados para 682 L |
 
-Tudo nesta aba também salva automaticamente e entra no export/import JSON.
+Ao final, **Ficha técnica editável**: todos os campos do relatório (display, sump, hidráulica, equipamentos, substrato, manutenção, carga estrutural, fauna e notas), pré-preenchidos, com salvamento automático e inclusão no export/import JSON.
 
-### Comum às duas abas
+### Aba Checklist
+
+- **Ações prioritárias**: as 11 recomendações do relatório agrupadas por prioridade (crítica → baixa), cada uma com o impacto explicado e o custo estimado.
+- **Painel de progresso**: concluídas, críticas em aberto, custo ainda em aberto (soma automática dos itens não marcados) e medições pendentes. A barra fica vermelha enquanto houver crítica em aberto.
+- **Medições pendentes**: os 6 dados que substituem as estimativas `[EST]` e fecham o relatório.
+- **Ações próprias**: itens adicionados manualmente, separados dos do relatório (não entram na contagem de progresso do relatório e podem ser removidos; os do relatório não podem).
+
+### Comum às três abas
 
 - **Exportar/Importar JSON**: backup manual de tudo (leituras, fases, critérios, configuração do sistema e ações prioritárias) em um arquivo `.json`.
 

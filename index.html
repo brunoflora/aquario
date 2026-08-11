@@ -129,10 +129,10 @@
     letter-spacing: -0.01em;
   }
 
-  .aq-header .aq-sub {
+  .aq-sub {
     color: var(--text-muted);
     font-size: 0.92rem;
-    max-width: 60ch;
+    max-width: 62ch;
   }
 
   .aq-save-indicator {
@@ -176,15 +176,13 @@
     border-bottom: 1px solid var(--border);
   }
 
-  #tab-panel-params, #tab-panel-config {
+  .aq-panel {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 
-  #tab-panel-params[hidden], #tab-panel-config[hidden] {
-    display: none;
-  }
+  .aq-panel[hidden] { display: none; }
 
   .aq-tab {
     position: relative;
@@ -237,9 +235,13 @@
 
   .aq-card {
     background: var(--surface);
-    border-radius: var(--shape-md);
-    padding: 18px 20px;
-    box-shadow: var(--elevation-1);
+    border-radius: var(--shape-lg);
+    padding: 22px 24px;
+    border: 1px solid var(--outline-variant);
+  }
+
+  @media (max-width: 600px) {
+    .aq-card { padding: 18px 16px; }
   }
 
   .aq-summary-strip {
@@ -640,14 +642,251 @@
 
   .aq-footnote { margin-top: 26px; font-size: 0.76rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 14px; }
   .aq-footnote strong { color: var(--text); }
+
+  /* ---------- camada infográfica (aba Configurações) ---------- */
+
+  .aq-chapter { display: flex; flex-direction: column; gap: 14px; }
+
+  .aq-chapter-head { display: flex; gap: 14px; align-items: flex-start; }
+
+  .aq-chapter-num {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--shape-full);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .aq-chapter-title {
+    font-family: var(--font-display);
+    font-size: 1.16rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 1px 0 0;
+    text-wrap: balance;
+  }
+
+  .aq-lede { margin: 0; font-size: 0.9rem; color: var(--text-muted); max-width: 68ch; }
+  .aq-lede + .aq-lede { margin-top: -4px; }
+  .aq-lede strong { color: var(--text); font-weight: 600; }
+  .aq-lede em { font-style: italic; }
+
+  .aq-stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+    gap: 1px;
+    background: var(--surface);
+    border-radius: var(--shape-md);
+    overflow: hidden;
+  }
+
+  .aq-stat {
+    background: var(--surface);
+    outline: 1px solid var(--outline-variant);
+    padding: 15px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .aq-stat-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; color: var(--text-muted); }
+  .aq-stat-value { font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .aq-stat-note { font-size: 0.74rem; color: var(--text-muted); }
+  .aq-stat[data-tone="bad"] .aq-stat-value { color: var(--bad); }
+  .aq-stat[data-tone="warn"] .aq-stat-value { color: var(--warn); }
+  .aq-stat[data-tone="good"] .aq-stat-value { color: var(--good); }
+
+  .aq-flow { list-style: none; margin: 0; padding: 0 0 4px; display: flex; align-items: stretch; gap: 6px; overflow-x: auto; }
+
+  .aq-flow-node {
+    flex: 1 1 0;
+    min-width: 116px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--shape-sm);
+    background: var(--surface-2);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .aq-flow-node[data-tone="bad"] { border-color: var(--bad); background: var(--bad-soft); }
+  .aq-flow-vol { font-family: var(--font-mono); font-weight: 700; font-size: 0.95rem; }
+  .aq-flow-node[data-tone="bad"] .aq-flow-vol { color: var(--bad); }
+  .aq-flow-name { font-size: 0.77rem; font-weight: 600; }
+  .aq-flow-note { font-size: 0.69rem; color: var(--text-muted); }
+
+  .aq-flow-link {
+    flex: none;
+    min-width: 62px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--text-muted);
+  }
+  .aq-flow-link b { font-size: 0.9rem; color: var(--outline); font-weight: 400; }
+  .aq-flow-link[data-tone="bad"] { color: var(--bad); }
+  .aq-flow-link[data-tone="bad"] b { color: var(--bad); }
+
+  .aq-propbar { display: flex; gap: 2px; border-radius: var(--shape-sm); overflow: hidden; }
+  .aq-propbar-seg { min-width: 0; padding: 12px 10px; background: var(--surface-2); display: flex; flex-direction: column; gap: 2px; }
+  .aq-propbar-seg[data-tone="bad"] { background: var(--bad-soft); }
+  .aq-propbar-name { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aq-propbar-val { font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700; }
+  .aq-propbar-sub { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aq-propbar-seg[data-tone="bad"] .aq-propbar-name,
+  .aq-propbar-seg[data-tone="bad"] .aq-propbar-val,
+  .aq-propbar-seg[data-tone="bad"] .aq-propbar-sub { color: var(--bad); }
+
+  .aq-meter { display: flex; flex-direction: column; gap: 12px; }
+  .aq-meter-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 0.8rem; margin-bottom: 4px; }
+  .aq-meter-head b { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .aq-meter-track { position: relative; height: 24px; background: var(--surface-2); border-radius: var(--shape-xs); overflow: hidden; }
+  .aq-meter-fill { position: absolute; top: 0; bottom: 0; left: 0; background: var(--accent); border-radius: var(--shape-xs); }
+  .aq-meter-fill[data-tone="bad"] { background: var(--bad); }
+  .aq-meter-fill[data-tone="good"] { background: var(--good); }
+  .aq-meter-fill[data-tone="warn"] { background: var(--warn); }
+  .aq-meter-limit { position: absolute; top: 0; bottom: 0; border-left: 2px dashed var(--text); opacity: 0.5; }
+  .aq-meter-zone { position: absolute; top: 0; bottom: 0; background: var(--good-soft); }
+  .aq-meter-legend { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+  .aq-meter-verdict { font-size: 0.78rem; font-weight: 600; }
+  .aq-meter-verdict[data-tone="bad"] { color: var(--bad); }
+  .aq-meter-verdict[data-tone="good"] { color: var(--good); }
+
+  .aq-scale { display: flex; flex-wrap: wrap; gap: 6px; }
+  .aq-scale-item { border: 1px solid var(--outline-variant); border-radius: var(--shape-sm); padding: 7px 11px; display: flex; flex-direction: column; gap: 1px; }
+  .aq-scale-item b { font-family: var(--font-mono); font-size: 0.82rem; }
+  .aq-scale-item small { font-size: 0.68rem; color: var(--text-muted); }
+  .aq-scale-item[data-tone="bad"] { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .aq-scale-item[data-tone="good"] { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .aq-scale-item[data-tone="bad"] small, .aq-scale-item[data-tone="good"] small { color: inherit; opacity: 0.85; }
+
+  .aq-fauna { display: flex; flex-direction: column; gap: 8px; }
+  .aq-fauna-row { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 14px; align-items: center; }
+  @media (max-width: 620px) { .aq-fauna-row { grid-template-columns: 1fr; gap: 3px; } }
+  .aq-fauna-name { font-size: 0.8rem; font-weight: 600; }
+  .aq-fauna-name small { display: block; font-weight: 400; font-size: 0.69rem; font-style: italic; color: var(--text-muted); }
+  .aq-fauna-track { position: relative; height: 22px; background: var(--surface-2); border-radius: var(--shape-xs); }
+  .aq-fauna-adult { position: absolute; top: 0; bottom: 0; left: 0; background: var(--accent-soft); border-right: 2px solid var(--accent); border-radius: var(--shape-xs); }
+  .aq-fauna-now { position: absolute; top: 0; bottom: 0; left: 0; background: var(--accent); border-radius: var(--shape-xs); }
+  .aq-fauna-row[data-tone="bad"] .aq-fauna-adult { background: var(--bad-soft); border-right-color: var(--bad); }
+  .aq-fauna-row[data-tone="bad"] .aq-fauna-now { background: var(--bad); }
+  .aq-fauna-size { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 0.69rem; color: var(--text-muted); }
+  .aq-fauna-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.72rem; color: var(--text-muted); }
+  .aq-fauna-key span { display: flex; align-items: center; gap: 5px; }
+  .aq-fauna-key i { width: 11px; height: 11px; border-radius: 3px; display: block; }
+
+  .aq-timeline { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+  .aq-timeline-step { flex: 1 1 0; min-width: 108px; border: 1px solid var(--outline-variant); border-radius: var(--shape-sm); padding: 11px 12px; display: flex; flex-direction: column; gap: 2px; }
+  .aq-timeline-step[data-tone="good"] { border-color: var(--good); background: var(--good-soft); }
+  .aq-timeline-day { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; color: var(--text-muted); }
+  .aq-timeline-dose { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; }
+  .aq-timeline-note { font-size: 0.71rem; color: var(--text-muted); }
+
+  .aq-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px, 1fr)); gap: 0 22px; margin: 0; }
+  .aq-facts > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--outline-variant); font-size: 0.82rem; }
+  .aq-facts dt { color: var(--text-muted); }
+  .aq-facts dd { margin: 0; font-family: var(--font-mono); font-weight: 600; text-align: right; }
+  .aq-facts dd[data-tone="bad"] { color: var(--bad); }
+  .aq-facts dd[data-tone="warn"] { color: var(--warn); }
+
+  .aq-callout { display: flex; gap: 11px; align-items: flex-start; padding: 13px 15px; border-radius: var(--shape-sm); background: var(--surface-2); font-size: 0.85rem; }
+  .aq-callout[data-tone="bad"] { background: var(--bad-soft); }
+  .aq-callout[data-tone="warn"] { background: var(--warn-soft); }
+  .aq-callout[data-tone="good"] { background: var(--good-soft); }
+  .aq-callout p { margin: 0; }
+  .aq-callout p + p { margin-top: 6px; }
+  .aq-callout strong { font-weight: 700; }
+  .aq-callout-icon {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .aq-callout[data-tone="bad"] .aq-callout-icon { color: var(--bad); }
+  .aq-callout[data-tone="warn"] .aq-callout-icon { color: var(--warn); }
+  .aq-callout[data-tone="good"] .aq-callout-icon { color: var(--good); }
+
+  .aq-details { border: 1px solid var(--outline-variant); border-radius: var(--shape-md); background: var(--surface); }
+  .aq-details + .aq-details { margin-top: 8px; }
+  .aq-details > summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    list-style: none;
+    border-radius: var(--shape-md);
+  }
+  .aq-details > summary::-webkit-details-marker { display: none; }
+  .aq-details > summary::before { content: "+"; font-family: var(--font-mono); font-weight: 700; color: var(--accent); width: 12px; }
+  .aq-details[open] > summary::before { content: "−"; }
+  .aq-details[open] > summary { border-bottom: 1px solid var(--outline-variant); border-radius: var(--shape-md) var(--shape-md) 0 0; }
+  .aq-details > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .aq-details-body { padding: 16px 18px 18px; }
+
+  /* ---------- aba Checklist ---------- */
+
+  .aq-progress-track { height: 8px; border-radius: var(--shape-full); background: var(--surface-2); overflow: hidden; }
+  .aq-progress-fill { height: 100%; width: 0%; border-radius: var(--shape-full); background: var(--accent); transition: width 0.3s ease; }
+
+  @media (prefers-reduced-motion: reduce) { .aq-progress-fill { transition: none; } }
+
+  .aq-check-group + .aq-check-group { margin-top: 22px; }
+  .aq-check-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .aq-check-head h3 { margin: 0; font-family: var(--font-display); font-size: 1rem; font-weight: 600; }
+  .aq-check-meta { font-size: 0.73rem; color: var(--text-muted); font-family: var(--font-mono); }
+  .aq-check-intro { margin: 0 0 10px; font-size: 0.8rem; color: var(--text-muted); max-width: 68ch; }
+  .aq-check-list { display: flex; flex-direction: column; gap: 7px; }
+
+  .aq-task {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--shape-sm);
+    background: var(--surface);
+    cursor: pointer;
+  }
+  .aq-task:hover { border-color: var(--outline); }
+  .aq-task input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); flex: none; margin-top: 1px; }
+  .aq-task-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .aq-task-title { font-size: 0.87rem; font-weight: 600; }
+  .aq-task-impact { font-size: 0.78rem; color: var(--text-muted); }
+  .aq-task-cost { flex: none; font-family: var(--font-mono); font-size: 0.73rem; color: var(--text-muted); padding-top: 1px; }
+  .aq-task[data-checked="true"] { background: var(--surface-2); border-color: transparent; }
+  .aq-task[data-checked="true"] .aq-task-title { text-decoration: line-through; color: var(--text-muted); }
+  .aq-task[data-checked="true"] .aq-task-impact { opacity: 0.65; }
+  .aq-task:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 1px; }
 </style>
 
 <div id="aq-app">
   <header class="aq-header">
     <div>
       <div class="aq-eyebrow">Aquário jumbo — Ciclídeos Nacionais</div>
-      <h1>Parâmetros da água do aquário</h1>
-      <div class="aq-sub">Registro diário de parâmetros, score da água, critérios de liberação para novas espécies e a configuração física do sistema.</div>
+      <h1>Um trecho de rio amazônico, medido todo dia</h1>
+      <div class="aq-sub">598 litros de água preta em 2 metros de leito. Aqui se registra o parâmetro do dia, se lê a ficha do sistema e se risca a lista do que ainda falta consertar.</div>
     </div>
     <div class="aq-save-indicator" id="aq-save-indicator">
       <span class="aq-save-dot"></span>
@@ -658,9 +897,10 @@
   <div class="aq-tabs" role="tablist" aria-label="Seções do painel">
     <button type="button" class="aq-tab" id="tab-btn-params" role="tab" aria-selected="true" aria-controls="tab-panel-params">Parâmetros</button>
     <button type="button" class="aq-tab" id="tab-btn-config" role="tab" aria-selected="false" aria-controls="tab-panel-config" tabindex="-1">Configurações</button>
+    <button type="button" class="aq-tab" id="tab-btn-check" role="tab" aria-selected="false" aria-controls="tab-panel-check" tabindex="-1">Checklist</button>
   </div>
 
-  <div id="tab-panel-params" role="tabpanel" aria-labelledby="tab-btn-params">
+  <div id="tab-panel-params" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-params">
 
   <section class="aq-card aq-summary-strip" id="aq-summary-strip" aria-label="Resumo do estado da água">
     <div class="aq-gauge-wrap">
@@ -783,12 +1023,391 @@
 
   </div>
 
-  <div id="tab-panel-config" role="tabpanel" aria-labelledby="tab-btn-config" hidden>
+  <div id="tab-panel-config" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-config" hidden>
 
-  <section class="aq-card">
-    <div class="aq-eyebrow" style="margin-bottom:6px;">Documentação do sistema</div>
-    <h2 class="aq-section-title" style="margin-bottom:4px;">Configuração do aquário e sump</h2>
-    <div class="aq-sub" style="max-width:70ch;">Ficha de referência da montagem física, com os números do relatório técnico-estrutural (09/08/2026). Campos marcados <strong>[EST]</strong> no relatório são estimativas — substitua pelas medidas reais quando as tiver. Fica salva junto com o resto para consulta rápida (dosagem de medicamento por litro, explicar o sistema a um comprador, etc.).</div>
+  <section class="aq-card aq-chapter">
+    <div>
+      <div class="aq-eyebrow" style="margin-bottom:6px;">A ficha do sistema · relatório de 09/08/2026</div>
+      <h2 class="aq-chapter-title" style="font-size:1.4rem;">Todo aquário amazônico é um rio encurtado</h2>
+    </div>
+    <p class="aq-lede">Lá fora, o Oscar e o Severum vivem num sistema de milhares de quilômetros que se autorregula: a cheia dilui, a várzea filtra, a mata tampona. Aqui esse rio tem <strong>2 metros</strong>, e cada uma dessas funções virou um equipamento que pode falhar numa terça-feira à noite.</p>
+    <p class="aq-lede">Esta aba é o mapa desse rio encurtado — oito capítulos, dos litros reais até o peso na laje. Onde o relatório usou estimativa, está marcado <strong>[EST]</strong>.</p>
+
+    <div class="aq-stat-row">
+      <div class="aq-stat">
+        <span class="aq-stat-label">Volume real</span>
+        <span class="aq-stat-value">598 L</span>
+        <span class="aq-stat-note">dose por este número, não por 700</span>
+      </div>
+      <div class="aq-stat">
+        <span class="aq-stat-label">Em circulação</span>
+        <span class="aq-stat-value">682 L</span>
+        <span class="aq-stat-note">display + sump + tubulação</span>
+      </div>
+      <div class="aq-stat" data-tone="good">
+        <span class="aq-stat-label">Turnover</span>
+        <span class="aq-stat-value">7,3×/h</span>
+        <span class="aq-stat-note">alvo 5–10×/h · dentro da faixa</span>
+      </div>
+      <div class="aq-stat" data-tone="bad">
+        <span class="aq-stat-label">Sobre a laje</span>
+        <span class="aq-stat-value">1.069 kg</span>
+        <span class="aq-stat-note">951 kg/m² no footprint</span>
+      </div>
+      <div class="aq-stat" data-tone="bad">
+        <span class="aq-stat-label">Tampão</span>
+        <span class="aq-stat-value">0 dKH</span>
+        <span class="aq-stat-note">pH sem nenhuma inércia</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">◇</span>
+      <div>
+        <div class="aq-eyebrow">O caminho da água</div>
+        <h2 class="aq-chapter-title">Um circuito fechado, com um trecho ainda no escuro</h2>
+      </div>
+    </div>
+    <p class="aq-lede">A água faz esta volta cerca de <strong>sete vezes por hora</strong>. Ela é tão rápida quanto o trecho mais estreito — e o trecho mais estreito nunca foi medido.</p>
+    <ol class="aq-flow">
+      <li class="aq-flow-node">
+        <span class="aq-flow-vol">598 L</span>
+        <span class="aq-flow-name">O rio</span>
+        <span class="aq-flow-note">display 200×50×70</span>
+      </li>
+      <li class="aq-flow-link" data-tone="bad" aria-hidden="true"><b>→</b>descida Ø?</li>
+      <li class="aq-flow-node">
+        <span class="aq-flow-vol">33 L</span>
+        <span class="aq-flow-name">C1 · decantação</span>
+        <span class="aq-flow-note">manta de perlon</span>
+      </li>
+      <li class="aq-flow-link" aria-hidden="true"><b>→</b></li>
+      <li class="aq-flow-node" data-tone="bad">
+        <span class="aq-flow-vol">8,5 L</span>
+        <span class="aq-flow-name">C2 · biológica</span>
+        <span class="aq-flow-note">gargalo — precisa 12–18 L</span>
+      </li>
+      <li class="aq-flow-link" aria-hidden="true"><b>→</b></li>
+      <li class="aq-flow-node">
+        <span class="aq-flow-vol">37 L</span>
+        <span class="aq-flow-name">C3 · retorno</span>
+        <span class="aq-flow-note">bomba Oceantech</span>
+      </li>
+      <li class="aq-flow-link" aria-hidden="true"><b>↺</b>~5.000 L/h</li>
+    </ol>
+    <div class="aq-callout" data-tone="warn">
+      <span class="aq-callout-icon">!</span>
+      <p>Dois pontos frágeis já aparecem no desenho: a <strong>descida sem diâmetro conhecido</strong> (capítulo 3) e a <strong>câmara biológica menor que a necessidade futura</strong> (capítulo 2).</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">01</span>
+      <div>
+        <div class="aq-eyebrow">O rio · display</div>
+        <h2 class="aq-chapter-title">Você vê 700 litros. Existem 598.</h2>
+      </div>
+    </div>
+    <p class="aq-lede">200 × 50 × 70 cm dá proporção de <em>corredeira</em>, não de poça: quatro vezes mais comprido que largo, exatamente o formato que um ciclídeo territorial usa para dividir espaço. Mas o volume de catálogo é uma ficção — substrato, rocha e borda livre comem <strong>102 litros</strong>.</p>
+    <dl class="aq-facts">
+      <div><dt>Coluna d'água a 65 cm <span class="aq-hint">[EST]</span></dt><dd>650,0 L</dd></div>
+      <div><dt>− substrato (areia N00)</dt><dd>−32,5 L</dd></div>
+      <div><dt>− rochas <span class="aq-hint">[EST]</span></dt><dd>−20,0 L</dd></div>
+      <div><dt>Volume líquido</dt><dd data-tone="warn">597,5 L</dd></div>
+      <div><dt>Área de superfície</dt><dd>1,00 m²</dd></div>
+      <div><dt>Área total de vidro</dt><dd>4,50 m²</dd></div>
+    </dl>
+    <div class="aq-callout" data-tone="bad">
+      <span class="aq-callout-icon">!</span>
+      <p><strong>Dosar por 700 L gera 17% de sobredose.</strong> Medicamento, declorador, bicarbonato, fertilizante: tudo se calcula sobre <strong>598 L</strong>. Num tratamento com metronidazol ou sal, essa diferença é a distância entre a dose terapêutica e a dose que danifica brânquia.</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">02</span>
+      <div>
+        <div class="aq-eyebrow">A várzea · sump</div>
+        <h2 class="aq-chapter-title">Quem filtra o rio não é o rio: é a planície que ele alaga</h2>
+      </div>
+    </div>
+    <p class="aq-lede">Na Amazônia a água limpa na várzea — o alagado raso onde ela desacelera, larga o sedimento e encontra bactéria. O sump é essa várzea, com 94 cm e três câmaras. O problema é que a câmara do meio, a que hospeda a bactéria, é <strong>a menor das três</strong>.</p>
+    <div class="aq-propbar" role="img" aria-label="Câmaras do sump em proporção: C1 decantação 39 cm com 33,2 L, C2 biológica 10 cm com 8,5 L, C3 retorno 44 cm com 37,4 L.">
+      <div class="aq-propbar-seg" style="flex:39 1 0;">
+        <span class="aq-propbar-name">C1 · decantação</span>
+        <span class="aq-propbar-val">33,2 L</span>
+        <span class="aq-propbar-sub">39 cm · perlon</span>
+      </div>
+      <div class="aq-propbar-seg" data-tone="bad" style="flex:10 1 0;">
+        <span class="aq-propbar-name">C2 · bio</span>
+        <span class="aq-propbar-val">8,5 L</span>
+        <span class="aq-propbar-sub">10 cm</span>
+      </div>
+      <div class="aq-propbar-seg" style="flex:44 1 0;">
+        <span class="aq-propbar-name">C3 · retorno</span>
+        <span class="aq-propbar-val">37,4 L</span>
+        <span class="aq-propbar-sub">44 cm · bomba + aquecedor</span>
+      </div>
+    </div>
+    <div class="aq-callout" data-tone="bad">
+      <span class="aq-callout-icon">!</span>
+      <p><strong>A conta não fecha.</strong> A C2 comporta 8,5 L no nível de trabalho. O projeto declara 10 L de quartzito <em>mais</em> cerâmicas — ou a mídia está compactada acima da linha d'água, ou parte dela mora em outra câmara.</p>
+      <p>Hoje isso não aparece: amônia e nitrito zerados provam que a colônia dá conta da carga <em>atual</em>. A conta quebra quando o Oscar dobrar de tamanho. Alvo real: <strong>12–18 L de mídia porosa</strong>.</p>
+    </div>
+    <div class="aq-callout">
+      <span class="aq-callout-icon">✓</span>
+      <p><strong>Saída sem obra:</strong> cesto suspenso na C1, logo após o perlon, rende +8 a 12 L. Recolar divisória (C1 39→30, C2 10→19 cm) rende +7,7 L, mas exige esvaziar o sump.</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">03</span>
+      <div>
+        <div class="aq-eyebrow">A correnteza · hidráulica</div>
+        <h2 class="aq-chapter-title">Correnteza não se mede pela bomba. Mede-se pelo gargalo.</h2>
+      </div>
+    </div>
+    <p class="aq-lede">A Oceantech promete 9.000 L/h em papel — número medido com a bomba deitada no chão, sem cano. Depois de 1,3 m de altura e de uma mangueira flexível azul, entrega perto de <strong>5.000 L/h</strong>. Isso está ótimo: dá 7,3 renovações por hora, no terço superior da faixa ideal para ciclídeo grande.</p>
+    <p class="aq-lede">Só que a bomba empurra por cima e a gravidade devolve por baixo. <strong>Se a descida não escoar os mesmos 5.000 L/h, o display transborda</strong> — e o diâmetro dela nunca foi medido.</p>
+    <div class="aq-scale" role="img" aria-label="Vazão segura por gravidade conforme o diâmetro da descida: 25 mm até 1.200 L/h, 32 mm até 2.500, 40 mm até 3.500, 50 mm até 5.500, 60 mm até 9.000 L/h.">
+      <div class="aq-scale-item" data-tone="bad"><b>25 mm</b><small>~800–1.200 L/h · insuficiente</small></div>
+      <div class="aq-scale-item" data-tone="bad"><b>32 mm</b><small>~1.500–2.500 L/h · insuficiente</small></div>
+      <div class="aq-scale-item" data-tone="bad"><b>40 mm</b><small>~2.500–3.500 L/h · insuficiente</small></div>
+      <div class="aq-scale-item" data-tone="good"><b>50 mm</b><small>~4.000–5.500 L/h · no limite</small></div>
+      <div class="aq-scale-item" data-tone="good"><b>60 mm</b><small>~7.000–9.000 L/h · folgado</small></div>
+    </div>
+    <div class="aq-callout" data-tone="warn">
+      <span class="aq-callout-icon">?</span>
+      <p><strong>Pegue o paquímetro antes de qualquer outra coisa deste capítulo.</strong> Se a descida for menor que 50 mm, a bomba está superdimensionada e precisa de um registro de esfera no recalque para estrangular a vazão até o que o dreno aguenta.</p>
+      <p>Hoje o sistema só não transborda porque a altura manométrica já rouba metade da vazão da bomba. É uma folga acidental, não um projeto.</p>
+    </div>
+    <p class="aq-lede">Somando o wave maker de fluxo cruzado (~6.000–9.000 L/h <span class="aq-hint">[EST]</span>), a movimentação interna chega a <strong>18–23× o volume por hora</strong> — o suficiente para não haver zona morta em 2 metros de comprimento. O fluxo cruzado é a escolha certa para esse formato.</p>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">04</span>
+      <div>
+        <div class="aq-eyebrow">A cheia · queda de energia</div>
+        <h2 class="aq-chapter-title">Toda várzea tem um limite de cheia</h2>
+      </div>
+    </div>
+    <p class="aq-lede">Falta luz. A bomba para e o rio desce para a várzea por dois caminhos: a água que está acima da entrada do overflow, e a que o bocal de retorno <em>sifona</em> de volta pelo cano. O sump tem 28,4 litros de folga. A pergunta é quanto desce.</p>
+    <div class="aq-meter">
+      <div>
+        <div class="aq-meter-head"><span>Sem furo anti-sifão</span><b>50,0 L descem</b></div>
+        <div class="aq-meter-track">
+          <div class="aq-meter-fill" data-tone="bad" style="width:83.3%"></div>
+          <div class="aq-meter-limit" style="left:47.3%"></div>
+        </div>
+        <div class="aq-meter-verdict" data-tone="bad">✕ Transborda ~22 L no chão</div>
+      </div>
+      <div>
+        <div class="aq-meter-head"><span>Com furo anti-sifão de 3 mm</span><b>20,0 L descem</b></div>
+        <div class="aq-meter-track">
+          <div class="aq-meter-fill" data-tone="good" style="width:33.3%"></div>
+          <div class="aq-meter-limit" style="left:47.3%"></div>
+        </div>
+        <div class="aq-meter-verdict" data-tone="good">✓ Contém, com 8,4 L de margem</div>
+      </div>
+      <div class="aq-meter-legend">escala 0–60 L · linha tracejada = 28,4 L de folga no sump</div>
+    </div>
+    <div class="aq-callout" data-tone="good">
+      <span class="aq-callout-icon">✓</span>
+      <p><strong>Um furo de 3 mm, custo zero, transforma ✕ em ✓.</strong> Fure o tubo de recalque logo abaixo da linha d'água: assim que o nível chega ali, o furo suga ar e quebra o sifão na hora.</p>
+      <p>Complete com: bocal de retorno raso (1–2 cm submerso), nível de operação do sump baixado para 22–24 cm, e uma fita marcando a linha máxima na C3. Depois <strong>desligue a bomba na tomada e meça</strong> — é o único jeito de validar estes números.</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">05</span>
+      <div>
+        <div class="aq-eyebrow">Água preta · química</div>
+        <h2 class="aq-chapter-title">O rio Negro funciona com KH 0. Seu apartamento, não.</h2>
+      </div>
+    </div>
+    <p class="aq-lede">Água preta amazônica é exatamente isto: ácida, escura, dureza quase nula. O aquário reproduziu o bioma bem demais — <strong>0 dKH</strong>. A diferença é de escala: o rio Negro tem bilhões de litros e um estoque contínuo de ácido húmico vindo da mata. Ele oscila devagar porque é <em>grande</em>.</p>
+    <p class="aq-lede">598 litros não têm essa inércia. Sem tampão, o pH não tem freio: uma TPA, uma decomposição localizada ou o pico de CO₂ de uma madrugada derrubam de 6,6 para abaixo de 5,0 em horas. <strong>Abaixo de pH 6,0 a nitrificação para</strong> — e o filtro biológico que hoje funciona simplesmente desliga, com os peixes dentro.</p>
+    <div class="aq-timeline" role="img" aria-label="Protocolo de bicarbonato em 7 dias: 20 g no dia 1, 20 g no dia 3, 20 g no dia 5, medição no dia 7.">
+      <div class="aq-timeline-step">
+        <span class="aq-timeline-day">Dia 1</span>
+        <span class="aq-timeline-dose">20 g</span>
+        <span class="aq-timeline-note">dissolvido na C3 → ~1 dKH</span>
+      </div>
+      <div class="aq-timeline-step">
+        <span class="aq-timeline-day">Dia 3</span>
+        <span class="aq-timeline-dose">20 g</span>
+        <span class="aq-timeline-note">→ ~2 dKH</span>
+      </div>
+      <div class="aq-timeline-step">
+        <span class="aq-timeline-day">Dia 5</span>
+        <span class="aq-timeline-dose">20 g</span>
+        <span class="aq-timeline-note">→ ~3 dKH</span>
+      </div>
+      <div class="aq-timeline-step" data-tone="good">
+        <span class="aq-timeline-day">Dia 7</span>
+        <span class="aq-timeline-dose">medir</span>
+        <span class="aq-timeline-note">confirmar 2–4 dKH · pH 6,4–6,8</span>
+      </div>
+    </div>
+    <div class="aq-callout" data-tone="warn">
+      <span class="aq-callout-icon">!</span>
+      <p><strong>Nunca de uma vez só.</strong> 61 g de bicarbonato de sódio de grau alimentício levam de 0 a 3 dKH, mas jogados juntos deslocam o pH de golpe e causam choque osmótico. Fracionado em três doses, a subida é invisível para o peixe.</p>
+      <p>Depois: <strong>reponha ~6,8 g a cada TPA de 33%</strong>, senão o KH escorre pelo ralo junto com os 225 L.</p>
+    </div>
+    <div class="aq-callout">
+      <span class="aq-callout-icon">◇</span>
+      <p><strong>E as conchas / coral triturado?</strong> Funcionam e são à prova de esquecimento — dissolvem sozinhos conforme o pH cai. Mas estabilizam em pH 7,2–7,6, acima da faixa amazônica que este aquário busca. Para a meta de 6,4–6,8, <strong>bicarbonato dosado é a via correta</strong>; deixe a aragonita como plano B se a rotina de dosagem não pegar.</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">06</span>
+      <div>
+        <div class="aq-eyebrow">O leito · carga estrutural</div>
+        <h2 class="aq-chapter-title">Rio nenhum flutua: alguém embaixo segura o peso</h2>
+      </div>
+    </div>
+    <p class="aq-lede">Água (597 kg) + areia (75 kg) + rocha (50 kg) + vidro (169 kg) + móvel (60 kg) = <strong>951 kg de display</strong>, mais 118 kg de sump. Tudo isso apoiado em <strong>1,00 m²</strong> de laje, num edifício de orla onde a maresia já trabalha contra a armadura.</p>
+    <div class="aq-meter">
+      <div>
+        <div class="aq-meter-head"><span>Carga do display sobre a laje</span><b>951 kg/m²</b></div>
+        <div class="aq-meter-track">
+          <div class="aq-meter-zone" style="left:15%; width:5%"></div>
+          <div class="aq-meter-fill" data-tone="bad" style="width:95.1%"></div>
+        </div>
+        <div class="aq-meter-legend">escala 0–1.000 kg/m² · faixa verde = 150–200 kg/m² previstos pela NBR 6120 para piso residencial</div>
+      </div>
+    </div>
+    <div class="aq-callout" data-tone="warn">
+      <span class="aq-callout-icon">!</span>
+      <p><strong>5 a 6 vezes a sobrecarga de projeto — e isso não significa que a laje vai ceder.</strong> Carga concentrada é absorvida sem drama quando está bem posicionada. Significa que a posição deixou de ser uma decisão de decoração.</p>
+      <p>Encoste em <strong>parede estrutural ou viga</strong>, nunca no meio do vão. Deixe o eixo de 2 m <strong>perpendicular à direção do vão</strong>, para dividir a carga entre mais nervuras. Na dúvida, uma visita de engenheiro estrutural custa pouco perto do risco — e vale conferir o regimento do condomínio.</p>
+    </div>
+    <div class="aq-callout">
+      <span class="aq-callout-icon">◇</span>
+      <p><strong>O vidro também é estrutura.</strong> Para 70 cm de coluna e 200 cm sem travessa, a espessura recomendada é 15–19 mm com fator de segurança 3,0. Confirme a real e a existência de contraventamento no topo — o sinal de alerta é abaulamento visível no centro do painel frontal.</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">07</span>
+      <div>
+        <div class="aq-eyebrow">Os habitantes · fauna</div>
+        <h2 class="aq-chapter-title">Todo mundo aqui ainda é filhote</h2>
+      </div>
+    </div>
+    <p class="aq-lede">O aquário parece confortável porque nenhum peixe chegou ao tamanho adulto. Na escala abaixo, a barra cheia é o tamanho de hoje e a barra clara é onde cada um vai chegar — <strong>medida contra os 200 cm de comprimento do aquário</strong>.</p>
+    <div class="aq-fauna">
+      <div class="aq-fauna-row">
+        <div class="aq-fauna-name">Oscar Bronze<small>Astronotus ocellatus</small></div>
+        <div class="aq-fauna-track"><div class="aq-fauna-adult" style="width:19%"></div><div class="aq-fauna-now" style="width:7.5%"></div><span class="aq-fauna-size">15 → 38 cm</span></div>
+      </div>
+      <div class="aq-fauna-row">
+        <div class="aq-fauna-name">Jack Dempsey Blue<small>Rocio octofasciata</small></div>
+        <div class="aq-fauna-track"><div class="aq-fauna-adult" style="width:12.5%"></div><div class="aq-fauna-now" style="width:5%"></div><span class="aq-fauna-size">10 → 25 cm</span></div>
+      </div>
+      <div class="aq-fauna-row">
+        <div class="aq-fauna-name">Severum Gold ♀♂<small>Heros efasciatus · 2×</small></div>
+        <div class="aq-fauna-track"><div class="aq-fauna-adult" style="width:12.5%"></div><div class="aq-fauna-now" style="width:5%"></div><span class="aq-fauna-size">10 e 6 → 25 cm</span></div>
+      </div>
+      <div class="aq-fauna-row">
+        <div class="aq-fauna-name">Lambaris<small>Astyanax sp. · 6×</small></div>
+        <div class="aq-fauna-track"><div class="aq-fauna-adult" style="width:6%"></div><div class="aq-fauna-now" style="width:2.5%"></div><span class="aq-fauna-size">5 → 12 cm</span></div>
+      </div>
+      <div class="aq-fauna-row" data-tone="bad">
+        <div class="aq-fauna-name">Pangasius Albino<small>Pangasianodon hypophthalmus</small></div>
+        <div class="aq-fauna-track"><div class="aq-fauna-adult" style="width:65%"></div><div class="aq-fauna-now" style="width:5%"></div><span class="aq-fauna-size">10 → 130 cm</span></div>
+      </div>
+    </div>
+    <div class="aq-fauna-key">
+      <span><i style="background:var(--accent)"></i> tamanho hoje</span>
+      <span><i style="background:var(--accent-soft); border:1px solid var(--accent)"></i> tamanho adulto</span>
+      <span>escala: 100% = 200 cm (o aquário inteiro)</span>
+    </div>
+    <div class="aq-callout" data-tone="good">
+      <span class="aq-callout-icon">✓</span>
+      <p><strong>Sem o Pangasius, a conta fecha bem.</strong> A biomassa adulta dos ciclídeos fica em ~1,34 kg para 598 L = <strong>2,24 g/L</strong>, dentro do limite prático de 3–4 g/L para sistema com sump e TPA regular.</p>
+    </div>
+    <div class="aq-callout" data-tone="bad">
+      <span class="aq-callout-icon">!</span>
+      <p><strong>O Pangasius não é um problema de biomassa. É de geometria.</strong> Adulto pleno passa de 1 metro e pede 10.000 L. Mesmo com o crescimento retardado pelo confinamento — que é deformação, não adaptação — ele chega a 40–60 cm.</p>
+      <p>Nesse tamanho ocupa <strong>um terço do comprimento do aquário</strong>, é funcionalmente cego e propenso a pânico. O projeto já registra que ele se assusta fácil: um peixe de 40 cm em pânico dentro de 2 metros derruba rocha, arranca equipamento e pode trincar o vidro frontal. <strong>Realocar em 6–12 meses</strong> — o custo de esperar demais inclui o vidro.</p>
+    </div>
+    <div class="aq-callout" data-tone="warn">
+      <span class="aq-callout-icon">◇</span>
+      <p><strong>Território: 2.500 cm² por ciclídeo adulto</strong> (≈ 50 × 50 cm cada). É suficiente — <em>desde que haja quebra de linha de visão</em>. O layout aberto de hoje é belíssimo e funcionalmente hostil: cada peixe enxerga todos os outros o tempo inteiro.</p>
+      <p>Duas ou três <strong>colunas verticais de rocha</strong> (colunas, não pilhas) por volta dos 50 cm e 150 cm reforçam a linguagem de galeria, criam três territórios distintos e dão ao casal de Severum um sítio de desova protegido.</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">08</span>
+      <div>
+        <div class="aq-eyebrow">O calendário das águas · manutenção</div>
+        <h2 class="aq-chapter-title">O rio tem cheia e vazante. Aqui, quem faz isso é você.</h2>
+      </div>
+    </div>
+    <p class="aq-lede">O ciclo que na Amazônia leva um ano — enchente, cheia, vazante, seca — aqui cabe numa semana e depende inteiramente de rotina. Estes são os volumes já calculados para <strong>682 L</strong>, prontos para virar lembrete no celular.</p>
+    <div class="aq-stat-row">
+      <div class="aq-stat">
+        <span class="aq-stat-label">TPA 33%</span>
+        <span class="aq-stat-value">225 L</span>
+        <span class="aq-stat-note">semanal ou quinzenal</span>
+      </div>
+      <div class="aq-stat">
+        <span class="aq-stat-label">Declorador</span>
+        <span class="aq-stat-value">23 mL</span>
+        <span class="aq-stat-note">a cada TPA</span>
+      </div>
+      <div class="aq-stat">
+        <span class="aq-stat-label">Bicarbonato</span>
+        <span class="aq-stat-value">6,8 g</span>
+        <span class="aq-stat-note">reposição a cada TPA</span>
+      </div>
+      <div class="aq-stat" data-tone="warn">
+        <span class="aq-stat-label">Perlon</span>
+        <span class="aq-stat-value">10–14 d</span>
+        <span class="aq-stat-note">era 20–30 · revisado</span>
+      </div>
+      <div class="aq-stat">
+        <span class="aq-stat-label">Carvão ativado</span>
+        <span class="aq-stat-value">4–6 sem</span>
+        <span class="aq-stat-note">1,5–2 L por ciclo</span>
+      </div>
+      <div class="aq-stat">
+        <span class="aq-stat-label">Purigen</span>
+        <span class="aq-stat-value">4–6 mes</span>
+        <span class="aq-stat-note">regenerar ~700 mL</span>
+      </div>
+    </div>
+    <div class="aq-callout" data-tone="warn">
+      <span class="aq-callout-icon">!</span>
+      <p><strong>Perlon vencido inverte de função.</strong> Com peixe grande e ração carnívora, passar de 14 dias transforma a manta de removedor de sólidos em fonte de nitrato — ela continua segurando a sujeira, só que agora dissolvida.</p>
+    </div>
+    <div class="aq-callout">
+      <span class="aq-callout-icon">◇</span>
+      <p><strong>225 L não saem da torneira direto para o aquário.</strong> Com KH 0 e água de rua, prepare em reservatório <strong>24 h antes</strong>: aeração, declorador e bicarbonato. Isso evita o choque duplo de temperatura e química — e é o que separa uma TPA de rotina de um susto de pH.</p>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">✎</span>
+      <div>
+        <div class="aq-eyebrow">Ficha técnica editável</div>
+        <h2 class="aq-chapter-title">Os números do sistema, campo a campo</h2>
+      </div>
+    </div>
+    <p class="aq-lede">Tudo o que os capítulos acima resumem está aqui em formato editável, já pré-preenchido com o relatório. Salva sozinho e entra no export JSON. Atualize conforme medir o que ainda está como <strong>[EST]</strong>.</p>
   </section>
 
   <section class="aq-grid-2">
@@ -1003,19 +1622,67 @@
   </section>
 
   <section class="aq-card">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-      <h2 class="aq-section-title" style="margin:0;">Ações prioritárias (relatório estrutural)</h2>
+    <h2 class="aq-section-title">Notas gerais sobre a configuração</h2>
+    <textarea id="c-notes" class="aq-phase-notes" style="min-height:80px;" placeholder="Histórico de mudanças no sistema, ajustes de hidráulica, problemas resolvidos, etc."></textarea>
+  </section>
+
+  </div>
+
+  <div id="tab-panel-check" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-check" hidden>
+
+  <section class="aq-card aq-chapter">
+    <div>
+      <div class="aq-eyebrow" style="margin-bottom:6px;">Ações prioritárias · relatório estrutural</div>
+      <h2 class="aq-chapter-title" style="font-size:1.4rem;">Onze ações. Três não esperam a semana que vem.</h2>
     </div>
-    <ul class="aq-criteria-list" id="aq-struct-tasks-list"></ul>
-    <div class="aq-criteria-add">
-      <input type="text" id="f-struct-task-new" placeholder="Adicionar nova ação..." />
-      <button class="aq-btn" id="btn-struct-task-add">Adicionar</button>
+    <p class="aq-lede">A lista sai direto da síntese do relatório, na ordem em que o risco cobra. As críticas somam <strong>R$ 75</strong> — o que separa o sistema de hoje de um sistema seguro custa menos que uma ração boa.</p>
+
+    <div class="aq-stat-row">
+      <div class="aq-stat">
+        <span class="aq-stat-label">Concluídas</span>
+        <span class="aq-stat-value" id="aq-check-count">0 / 11</span>
+        <span class="aq-stat-note" id="aq-check-pct">nenhuma ação riscada ainda</span>
+      </div>
+      <div class="aq-stat" id="aq-check-critical-stat" data-tone="bad">
+        <span class="aq-stat-label">Críticas em aberto</span>
+        <span class="aq-stat-value" id="aq-check-critical">3</span>
+        <span class="aq-stat-note">risco de inundação, colapso de pH ou transbordo</span>
+      </div>
+      <div class="aq-stat">
+        <span class="aq-stat-label">Custo em aberto</span>
+        <span class="aq-stat-value" id="aq-check-cost">R$ 925</span>
+        <span class="aq-stat-note">soma das ações ainda não feitas</span>
+      </div>
+      <div class="aq-stat">
+        <span class="aq-stat-label">Medições pendentes</span>
+        <span class="aq-stat-value" id="aq-check-pending">6</span>
+        <span class="aq-stat-note">o que falta para o relatório fechar</span>
+      </div>
+    </div>
+
+    <div class="aq-progress-track" role="progressbar" aria-labelledby="aq-check-count" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="aq-check-progress">
+      <div class="aq-progress-fill" id="aq-check-progress-fill"></div>
     </div>
   </section>
 
   <section class="aq-card">
-    <h2 class="aq-section-title">Notas gerais sobre a configuração</h2>
-    <textarea id="c-notes" class="aq-phase-notes" style="min-height:80px;" placeholder="Histórico de mudanças no sistema, ajustes de hidráulica, problemas resolvidos, etc."></textarea>
+    <div id="aq-struct-tasks-list"></div>
+    <div class="aq-criteria-add" style="margin-top:16px;">
+      <input type="text" id="f-struct-task-new" placeholder="Adicionar ação própria..." />
+      <button class="aq-btn" id="btn-struct-task-add">Adicionar</button>
+    </div>
+  </section>
+
+  <section class="aq-card aq-chapter">
+    <div class="aq-chapter-head">
+      <span class="aq-chapter-num">?</span>
+      <div>
+        <div class="aq-eyebrow">Dados pendentes</div>
+        <h2 class="aq-chapter-title">Seis números que transformam estimativa em medida</h2>
+      </div>
+    </div>
+    <p class="aq-lede">Todo valor marcado <strong>[EST]</strong> na aba Configurações depende de um destes seis. Com eles, as tabelas de vazão, folga anti-transbordo e carga estrutural deixam de ser projeção.</p>
+    <div id="aq-pending-list" class="aq-check-list"></div>
   </section>
 
   </div>
@@ -1096,25 +1763,116 @@
   };
 
   var DEFAULT_STRUCT_TASKS = [
-    { label: "Furar tubo de recalque (furo anti-sifão 3–4mm abaixo da linha d'água)", priority: "critica", checked: false },
-    { label: "Corrigir KH de 0 para 3 dKH com bicarbonato (protocolo de 7 dias)", priority: "critica", checked: false },
-    { label: "Medir diâmetro da descida e instalar registro de esfera no recalque se < 50mm", priority: "critica", checked: false },
-    { label: "Instalar 2× 300W + termostato externo, subindo 0,5°C/dia", priority: "alta", checked: false },
-    { label: "Planejar realocação do Pangasius (6–12 meses)", priority: "alta", checked: false },
-    { label: "Expandir mídia biológica da C2 para 12–18L", priority: "media", checked: false },
-    { label: "Confirmar espessura de vidro e existência de travessas", priority: "media", checked: false },
-    { label: "Avaliar posicionamento sobre a laje (parede estrutural)", priority: "media", checked: false },
-    { label: "Adicionar 2–3 colunas de rocha para quebra de linha de visão", priority: "baixa", checked: false },
-    { label: "Fotoperíodo fixo de 8h com timer", priority: "baixa", checked: false },
-    { label: "Reduzir troca de perlon para 10–14 dias", priority: "baixa", checked: false }
+    { id: "anti-sifao", group: "acao", priority: "critica", cost: "R$ 0", costValue: 0,
+      label: "Furar o tubo de recalque — anti-sifão de 3–4 mm",
+      impact: "Sem ele, uma queda de energia põe ~22 L no chão. Custo zero, cinco minutos, maior impacto da lista." },
+    { id: "kh-bicarbonato", group: "acao", priority: "critica", cost: "R$ 15", costValue: 15,
+      label: "Subir o KH de 0 para 3 dKH com bicarbonato",
+      impact: "61 g em três doses (dias 1, 3 e 5). Sem tampão o pH despenca e a nitrificação para com os peixes dentro." },
+    { id: "descida-registro", group: "acao", priority: "critica", cost: "R$ 60", costValue: 60,
+      label: "Medir a descida e pôr registro no recalque se Ø < 50 mm",
+      impact: "A bomba não pode empurrar mais do que o dreno escoa. Hoje só não transborda por folga acidental." },
+    { id: "aquecimento", group: "acao", priority: "alta", cost: "R$ 400", costValue: 400,
+      label: "Instalar 2 × 300 W + termostato externo, subindo 0,5 °C/dia",
+      impact: "Fecha o déficit de 3 °C com redundância. Um único 1.000 W travado ligado cozinha 682 L." },
+    { id: "pangasius", group: "acao", priority: "alta", cost: "—", costValue: 0,
+      label: "Planejar a realocação do Pangasius (6–12 meses)",
+      impact: "Remove 90% da carga orgânica futura e o risco de vidro trincado por peixe em pânico." },
+    { id: "midia-bio", group: "acao", priority: "media", cost: "R$ 250", costValue: 250,
+      label: "Expandir a mídia biológica para 12–18 L",
+      impact: "A C2 comporta 8,5 L. Cesto suspenso na C1 resolve sem obra, antes de o Oscar dobrar de tamanho." },
+    { id: "vidro", group: "acao", priority: "media", cost: "—", costValue: 0,
+      label: "Confirmar espessura do vidro e existência de travessas",
+      impact: "200 × 70 cm em 15 mm sem contraventamento trabalha no limite. Observe abaulamento central." },
+    { id: "laje", group: "acao", priority: "media", cost: "—", costValue: 0,
+      label: "Avaliar o posicionamento sobre a laje",
+      impact: "951 kg/m² em prédio de orla pede parede estrutural e eixo perpendicular ao vão." },
+    { id: "rochas", group: "acao", priority: "baixa", cost: "R$ 150", costValue: 150,
+      label: "Erguer 2–3 colunas de rocha para quebrar a linha de visão",
+      impact: "Cria três territórios e um sítio de desova sem abrir mão da estética de galeria." },
+    { id: "fotoperiodo", group: "acao", priority: "baixa", cost: "R$ 50", costValue: 50,
+      label: "Fotoperíodo fixo de 8 h no timer",
+      impact: "Estabiliza o ritmo circadiano dos ciclídeos e tira das algas a luz extra." },
+    { id: "perlon", group: "acao", priority: "baixa", cost: "—", costValue: 0,
+      label: "Reduzir a troca de perlon para 10–14 dias",
+      impact: "Passou disso, a manta deixa de remover sólidos e vira fonte de nitrato." },
+
+    { id: "med-descida", group: "medicao", priority: "medicao",
+      label: "Diâmetro interno da descida (mm)",
+      impact: "Define o teto real de vazão de todo o sistema." },
+    { id: "med-vidro", group: "medicao", priority: "medicao",
+      label: "Espessura do vidro do display (mm) e travessas",
+      impact: "Fecha a verificação estrutural do painel frontal." },
+    { id: "med-lamina", group: "medicao", priority: "medicao",
+      label: "Altura real da lâmina d'água no display (cm)",
+      impact: "Corrige o volume líquido — e com ele toda dosagem." },
+    { id: "med-sump", group: "medicao", priority: "medicao",
+      label: "Nível real de operação no sump (cm)",
+      impact: "Define a folga anti-transbordo verdadeira." },
+    { id: "med-desnivel", group: "medicao", priority: "medicao",
+      label: "Desnível entre o sump e o bocal de retorno (m)",
+      impact: "Corrige a altura manométrica e a vazão real da bomba." },
+    { id: "med-blackout", group: "medicao", priority: "medicao",
+      label: "Teste de queda de energia — onde o nível estabiliza",
+      impact: "Único jeito de validar os cálculos de cheia do capítulo 4." }
+  ];
+
+  // rótulos da versão anterior, para não perder o que já foi marcado
+  var LEGACY_TASK_IDS = {
+    "Furar tubo de recalque (furo anti-sifão 3–4mm abaixo da linha d'água)": "anti-sifao",
+    "Corrigir KH de 0 para 3 dKH com bicarbonato (protocolo de 7 dias)": "kh-bicarbonato",
+    "Medir diâmetro da descida e instalar registro de esfera no recalque se < 50mm": "descida-registro",
+    "Instalar 2× 300W + termostato externo, subindo 0,5°C/dia": "aquecimento",
+    "Planejar realocação do Pangasius (6–12 meses)": "pangasius",
+    "Expandir mídia biológica da C2 para 12–18L": "midia-bio",
+    "Confirmar espessura de vidro e existência de travessas": "vidro",
+    "Avaliar posicionamento sobre a laje (parede estrutural)": "laje",
+    "Adicionar 2–3 colunas de rocha para quebra de linha de visão": "rochas",
+    "Fotoperíodo fixo de 8h com timer": "fotoperiodo",
+    "Reduzir troca de perlon para 10–14 dias": "perlon"
+  };
+
+  var PRIORITY_GROUPS = [
+    { key: "critica", label: "Críticas", intro: "Risco de inundação, colapso de pH ou transbordo. Nenhuma delas depende de orçamento." },
+    { key: "alta", label: "Altas", intro: "Não são emergência hoje, mas definem se o sistema aguenta os peixes adultos." },
+    { key: "media", label: "Médias", intro: "Preparo e verificação — o que evita ter de desmontar depois." },
+    { key: "baixa", label: "Baixas", intro: "Refino de bem-estar e rotina. Baratas, e o peixe percebe." }
   ];
 
   var PRIORITY_META = {
     critica: { label: "Crítica", color: "var(--bad)", bg: "var(--bad-soft)" },
     alta: { label: "Alta", color: "var(--warn)", bg: "var(--warn-soft)" },
     media: { label: "Média", color: "var(--accent)", bg: "var(--accent-soft)" },
-    baixa: { label: "Baixa", color: "var(--text-muted)", bg: "var(--surface-2)" }
+    baixa: { label: "Baixa", color: "var(--text-muted)", bg: "var(--surface-2)" },
+    medicao: { label: "Medição", color: "var(--text-muted)", bg: "var(--surface-2)" }
   };
+
+  function migrateStructTasks(stored) {
+    var checkedById = {};
+    var customs = [];
+    if (Array.isArray(stored)) {
+      stored.forEach(function (t) {
+        if (!t || typeof t !== "object" || !t.label) return;
+        var id = t.id || LEGACY_TASK_IDS[t.label];
+        if (id) { checkedById[id] = !!t.checked; return; }
+        customs.push({
+          id: t.id || ("custom-" + t.label),
+          group: "acao",
+          priority: PRIORITY_META[t.priority] ? t.priority : "baixa",
+          label: t.label,
+          checked: !!t.checked,
+          custom: true
+        });
+      });
+    }
+    var merged = DEFAULT_STRUCT_TASKS.map(function (def) {
+      var copy = {};
+      Object.keys(def).forEach(function (k) { copy[k] = def[k]; });
+      copy.checked = checkedById[def.id] === true;
+      return copy;
+    });
+    return merged.concat(customs);
+  }
 
   var CORE_PARAMS = ["temp", "ph", "kh", "nh3", "no2", "no3"];
 
@@ -1181,8 +1939,14 @@
     phases: loadJSON(STORAGE_KEYS.phases, DEFAULT_PHASES),
     criteria: loadJSON(STORAGE_KEYS.criteria, []),
     config: loadJSON(STORAGE_KEYS.config, DEFAULT_CONFIG),
-    structTasks: loadJSON(STORAGE_KEYS.structTasks, DEFAULT_STRUCT_TASKS)
+    structTasks: migrateStructTasks(loadJSON(STORAGE_KEYS.structTasks, null))
   };
+
+  function esc(value) {
+    return String(value === null || value === undefined ? "" : value)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
 
   var editingDate = null;
 
@@ -1498,7 +2262,7 @@
       return '<div class="aq-phase-item" data-id="' + phase.id + '">' +
         '<div class="aq-phase-head"><span class="aq-phase-title">' + phase.label + '</span>' +
         '<select class="aq-phase-status" data-id="' + phase.id + '">' + options + "</select></div>" +
-        '<textarea class="aq-phase-notes" data-id="' + phase.id + '" placeholder="Notas desta fase...">' + (phase.notes || "") + "</textarea>" +
+        '<textarea class="aq-phase-notes" data-id="' + phase.id + '" placeholder="Notas desta fase...">' + esc(phase.notes || "") + "</textarea>" +
         "</div>";
     }).join("");
   }
@@ -1511,22 +2275,82 @@
     }
     list.innerHTML = state.criteria.map(function (c, i) {
       return '<li class="aq-criteria-item"><input type="checkbox" data-idx="' + i + '" ' + (c.checked ? "checked" : "") + " />" +
-        '<span class="aq-task-label">' + c.label + '</span><button class="aq-icon-btn" data-action="remove-criteria" data-idx="' + i + '" title="Remover">✕</button></li>';
+        '<span class="aq-task-label">' + esc(c.label) + '</span><button class="aq-icon-btn" data-action="remove-criteria" data-idx="' + i + '" title="Remover">✕</button></li>';
     }).join("");
   }
 
+  function taskHTML(entry) {
+    var t = entry.task;
+    return '<label class="aq-task" data-checked="' + (t.checked ? "true" : "false") + '">' +
+      '<input type="checkbox" data-idx="' + entry.idx + '"' + (t.checked ? " checked" : "") + " />" +
+      '<span class="aq-task-main">' +
+        '<span class="aq-task-title">' + esc(t.label) + "</span>" +
+        (t.impact ? '<span class="aq-task-impact">' + esc(t.impact) + "</span>" : "") +
+      "</span>" +
+      (t.cost ? '<span class="aq-task-cost">' + esc(t.cost) + "</span>" : "") +
+      (t.custom ? '<button type="button" class="aq-icon-btn" data-action="remove-struct-task" data-idx="' + entry.idx + '" title="Remover">✕</button>' : "") +
+      "</label>";
+  }
+
   function renderStructTasks() {
+    var acoes = [], medicoes = [];
+    state.structTasks.forEach(function (t, i) {
+      (t.group === "medicao" ? medicoes : acoes).push({ task: t, idx: i });
+    });
+
     var list = document.getElementById("aq-struct-tasks-list");
-    if (state.structTasks.length === 0) {
-      list.innerHTML = '<li class="aq-empty-note">Nenhuma ação pendente.</li>';
-      return;
-    }
-    list.innerHTML = state.structTasks.map(function (t, i) {
-      var meta = PRIORITY_META[t.priority];
-      var badge = meta ? '<span class="aq-priority-badge" style="color:' + meta.color + '; background:' + meta.bg + ';">' + meta.label + "</span>" : "";
-      return '<li class="aq-criteria-item"><input type="checkbox" data-idx="' + i + '" ' + (t.checked ? "checked" : "") + " />" +
-        badge + '<span class="aq-task-label">' + t.label + '</span><button class="aq-icon-btn" data-action="remove-struct-task" data-idx="' + i + '" title="Remover">✕</button></li>';
+    var html = PRIORITY_GROUPS.map(function (g) {
+      var entries = acoes.filter(function (e) { return !e.task.custom && e.task.priority === g.key; });
+      if (entries.length === 0) return "";
+      var done = entries.filter(function (e) { return e.task.checked; }).length;
+      var meta = PRIORITY_META[g.key];
+      return '<div class="aq-check-group">' +
+        '<div class="aq-check-head">' +
+          '<span class="aq-priority-badge" style="color:' + meta.color + "; background:" + meta.bg + ';">' + meta.label + "</span>" +
+          "<h3>" + g.label + "</h3>" +
+          '<span class="aq-check-meta">' + done + "/" + entries.length + "</span>" +
+        "</div>" +
+        '<p class="aq-check-intro">' + g.intro + "</p>" +
+        '<div class="aq-check-list">' + entries.map(taskHTML).join("") + "</div>" +
+        "</div>";
     }).join("");
+
+    var customs = acoes.filter(function (e) { return e.task.custom; });
+    if (customs.length > 0) {
+      html += '<div class="aq-check-group">' +
+        '<div class="aq-check-head"><h3>Ações próprias</h3>' +
+        '<span class="aq-check-meta">' + customs.filter(function (e) { return e.task.checked; }).length + "/" + customs.length + "</span></div>" +
+        '<div class="aq-check-list">' + customs.map(taskHTML).join("") + "</div>" +
+        "</div>";
+    }
+    list.innerHTML = html || '<div class="aq-empty">Nenhuma ação na lista.</div>';
+
+    var pendingEl = document.getElementById("aq-pending-list");
+    pendingEl.innerHTML = medicoes.length
+      ? medicoes.map(taskHTML).join("")
+      : '<div class="aq-empty">Nenhuma medição pendente.</div>';
+
+    // painel de progresso
+    var reportAcoes = acoes.filter(function (e) { return !e.task.custom; });
+    var doneCount = reportAcoes.filter(function (e) { return e.task.checked; }).length;
+    var pct = reportAcoes.length ? Math.round(doneCount / reportAcoes.length * 100) : 0;
+    var criticalOpen = reportAcoes.filter(function (e) { return e.task.priority === "critica" && !e.task.checked; }).length;
+    var costOpen = reportAcoes.reduce(function (sum, e) { return e.task.checked ? sum : sum + (e.task.costValue || 0); }, 0);
+    var pendingOpen = medicoes.filter(function (e) { return !e.task.checked; }).length;
+
+    document.getElementById("aq-check-count").textContent = doneCount + " / " + reportAcoes.length;
+    document.getElementById("aq-check-pct").textContent = doneCount === 0
+      ? "nenhuma ação riscada ainda"
+      : pct + "% do relatório resolvido";
+    document.getElementById("aq-check-critical").textContent = String(criticalOpen);
+    document.getElementById("aq-check-critical-stat").setAttribute("data-tone", criticalOpen > 0 ? "bad" : "good");
+    document.getElementById("aq-check-cost").textContent = "R$ " + costOpen.toLocaleString("pt-BR");
+    document.getElementById("aq-check-pending").textContent = String(pendingOpen);
+
+    var fill = document.getElementById("aq-check-progress-fill");
+    fill.style.width = pct + "%";
+    fill.style.background = criticalOpen > 0 ? "var(--bad)" : pct === 100 ? "var(--good)" : "var(--accent)";
+    document.getElementById("aq-check-progress").setAttribute("aria-valuenow", String(pct));
   }
 
   function renderAll() {
@@ -1636,7 +2460,8 @@
 
   var tabs = [
     { btn: "tab-btn-params", panel: "tab-panel-params" },
-    { btn: "tab-btn-config", panel: "tab-panel-config" }
+    { btn: "tab-btn-config", panel: "tab-panel-config" },
+    { btn: "tab-btn-check", panel: "tab-panel-check" }
   ];
 
   function activateTab(activeBtnId) {
@@ -1759,26 +2584,27 @@
     var input = document.getElementById("f-struct-task-new");
     var label = input.value.trim();
     if (!label) return;
-    state.structTasks.push({ label: label, checked: false });
+    state.structTasks.push({ id: "custom-" + label, group: "acao", priority: "baixa", label: label, checked: false, custom: true });
     saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
     input.value = "";
     renderStructTasks();
   });
 
-  document.getElementById("aq-struct-tasks-list").addEventListener("click", function (e) {
+  document.getElementById("tab-panel-check").addEventListener("click", function (e) {
     var removeBtn = e.target.closest('[data-action="remove-struct-task"]');
-    if (removeBtn) {
-      state.structTasks.splice(Number(removeBtn.getAttribute("data-idx")), 1);
-      saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
-      renderStructTasks();
-    }
+    if (!removeBtn) return;
+    e.preventDefault();
+    state.structTasks.splice(Number(removeBtn.getAttribute("data-idx")), 1);
+    saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
+    renderStructTasks();
   });
-  document.getElementById("aq-struct-tasks-list").addEventListener("change", function (e) {
-    if (e.target.type === "checkbox") {
-      var idx = Number(e.target.getAttribute("data-idx"));
-      state.structTasks[idx].checked = e.target.checked;
-      saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
-    }
+  document.getElementById("tab-panel-check").addEventListener("change", function (e) {
+    if (e.target.type !== "checkbox") return;
+    var idx = Number(e.target.getAttribute("data-idx"));
+    if (!state.structTasks[idx]) return;
+    state.structTasks[idx].checked = e.target.checked;
+    saveJSON(STORAGE_KEYS.structTasks, state.structTasks);
+    renderStructTasks();
   });
 
   document.getElementById("btn-export").addEventListener("click", function () {
@@ -1812,7 +2638,7 @@
             state.phases = Array.isArray(data.phases) ? data.phases : state.phases;
             state.criteria = Array.isArray(data.criteria) ? data.criteria : state.criteria;
             state.config = data.config && typeof data.config === "object" ? data.config : state.config;
-            state.structTasks = Array.isArray(data.structTasks) ? data.structTasks : state.structTasks;
+            state.structTasks = Array.isArray(data.structTasks) ? migrateStructTasks(data.structTasks) : state.structTasks;
             saveJSON(STORAGE_KEYS.readings, state.readings);
             saveJSON(STORAGE_KEYS.phases, state.phases);
             saveJSON(STORAGE_KEYS.criteria, state.criteria);

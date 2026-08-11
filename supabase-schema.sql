@@ -83,10 +83,17 @@ create table tank_config (
   updated_at timestamptz default now()
 );
 
--- checklist de ações prioritárias vindas do relatório técnico-estrutural
+-- checklist da aba "Checklist": ações prioritárias e medições pendentes do relatório
 create table struct_tasks (
-  id uuid primary key default gen_random_uuid(),
+  id text primary key,                    -- slug estável ('anti-sifao', 'med-descida', 'custom-...')
+  task_group text not null default 'acao' check (task_group in ('acao', 'medicao')),
+  priority text not null default 'baixa'
+    check (priority in ('critica', 'alta', 'media', 'baixa', 'medicao')),
   label text not null,
+  impact text,                            -- por que importa, exibido abaixo do título
+  cost text,                              -- rótulo exibido ('R$ 60', '—')
+  cost_value numeric default 0,           -- valor somado em "custo em aberto"
+  custom boolean default false,           -- true = criada pelo usuário, não vem do relatório
   checked boolean default false,
   checked_at timestamptz
 );
