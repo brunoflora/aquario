@@ -6,6 +6,15 @@ A interface usa uma analogia de rio amazônico que não é decorativa — ela ma
 
 Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`). Ver `HANDOFF.md` para o histórico completo do porquê da migração, e `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Configurações.
 
+## Sistema de design
+
+A interface segue o **sistema do MUI** implementado nativamente em CSS — sem React e sem build, para o arquivo continuar autocontido:
+
+- **Campos no padrão MUI TextField**: o label acima traz só o título; a unidade vira *adornment* de sufixo dentro do campo; toda informação de apoio (faixa ideal, `[EST]`, `MEDIR`) desce para o *helper text* abaixo. Nos parâmetros de água o helper é reativo — digite 31 °C e ele fica vermelho explicando o que fazer, usando a mesma função `paramStatus` do score.
+- **Escala de espaçamento de 8px**, breakpoints do MUI (600 / 900 / 1200 px), curvas de transição `cubic-bezier(0.4, 0, 0.2, 1)` e escala tipográfica caption/body2/body1/h6/h5.
+- **Padrões do MUI Dashboard**: cards `outlined` (borda de 1px, sem sombra), faixas de estatística, app bar fixa que ganha elevação ao descolar do topo, abas roláveis no mobile.
+- A ficha técnica é gerada de um **spec declarativo** (`CONFIG_SPEC`), o que garante anatomia idêntica em todos os 43 campos.
+
 ## Como usar
 
 Abra `index.html` diretamente no navegador — não há build, não há dependências, não há servidor. É uma única página autocontida (HTML + CSS + JavaScript vanilla).
@@ -39,7 +48,11 @@ O sistema contado como infográfico escaneável, em oito capítulos, cada um com
 | 07 | **Os habitantes** (fauna) | Tamanho atual vs. adulto de cada espécie, medido contra os 200 cm do aquário — o Pangasius ocupa 65% da barra |
 | 08 | **O calendário das águas** | Volumes e frequências de manutenção já calculados para 682 L |
 
-Ao final, **Ficha técnica editável**: todos os campos do relatório (display, sump, hidráulica, equipamentos, substrato, manutenção, carga estrutural, fauna e notas), pré-preenchidos, com salvamento automático e inclusão no export/import JSON.
+**Os capítulos são calculados, não escritos.** A ficha técnica alimenta o infográfico: mude o volume líquido e o turnover, a TPA e a dose de bicarbonato se recalculam; informe o diâmetro da descida e o capítulo 3 emite o veredito na hora (com quantos L/h faltam de escoamento); marque o furo anti-sifão como instalado e as barras do capítulo 4 mudam de cenário. O KH registrado na aba Parâmetros atravessa para o capítulo 5 e define a dose exata de bicarbonato para o volume real do sistema.
+
+Ao final, **Ficha técnica editável**: 43 campos (display, sump, hidráulica, equipamentos, substrato, manutenção, carga estrutural, fauna e notas), pré-preenchidos, com salvamento automático e inclusão no export/import JSON.
+
+> **Divergência conhecida com o relatório:** a seção 10 indica repor 6,8 g de bicarbonato por TPA. Essa conta usa 1 dKH, mas uma troca de 33% a 3 dKH derruba o tampão em ~1 dKH *no sistema inteiro* — a reposição correta é `3 × 30 mg/L × volume trocado`, cerca de 20 g. O painel calcula o valor correto e sinaliza a divergência no capítulo 8.
 
 ### Aba Checklist
 

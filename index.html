@@ -37,8 +37,33 @@
     --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", "Georgia", serif;
     --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Consolas", monospace;
+
+    /* escala de espaçamento do MUI System (base 8px) */
+    --sp-05: 4px;
+    --sp-1: 8px;
+    --sp-15: 12px;
+    --sp-2: 16px;
+    --sp-3: 24px;
+    --sp-4: 32px;
+    --sp-6: 48px;
+
+    /* curvas e durações de transição do MUI */
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+    --dur-short: 150ms;
+    --dur-standard: 250ms;
+
+    /* escala tipográfica do MUI */
+    --fs-caption: 0.75rem;
+    --fs-body2: 0.875rem;
+    --fs-body1: 1rem;
+    --fs-h6: 1.125rem;
+    --fs-h5: 1.375rem;
+
     color-scheme: light;
   }
+
+  /* breakpoints MUI: xs 0 · sm 600 · md 900 · lg 1200 · xl 1536 */
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -169,11 +194,45 @@
     font-weight: 600;
   }
 
+  /* app bar fixa no padrão MUI: as abas seguem alcançáveis ao rolar */
+  .aq-appbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    margin: 0 -20px var(--sp-2);
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    box-shadow: none;
+    transition: box-shadow var(--dur-standard) var(--ease-standard);
+  }
+  .aq-appbar[data-stuck="true"] { box-shadow: var(--elevation-2); }
+
+  @supports (backdrop-filter: blur(8px)) {
+    .aq-appbar[data-stuck="true"] { background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(8px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) { .aq-appbar { transition: none; } }
+
   .aq-tabs {
     display: flex;
     gap: 4px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .aq-tabs::-webkit-scrollbar { display: none; }
+
+  .aq-field-inline { max-width: 380px; }
+
+  .aq-visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .aq-panel {
@@ -374,65 +433,133 @@
 
   .aq-form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px 14px;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--sp-2) var(--sp-15);
   }
 
-  .aq-field { display: flex; flex-direction: column; gap: 5px; }
+  /* ficha técnica: grid responsivo no padrão MUI Grid (md = 2 colunas) */
+  .aq-ficha-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); align-items: start; }
+  .aq-ficha-grid > section { display: flex; flex-direction: column; gap: var(--sp-15); }
+  .aq-ficha-grid .aq-eyebrow + .aq-section-title { margin: -8px 0 0; }
+  .aq-ficha-grid > section:nth-child(1),
+  .aq-ficha-grid > section:nth-child(2) { grid-column: span 1; }
+  .aq-ficha-grid > section:nth-last-child(-n + 2) { grid-column: 1 / -1; }
+
+  @media (max-width: 900px) {
+    .aq-ficha-grid { grid-template-columns: 1fr; }
+    .aq-ficha-grid > section { grid-column: 1 / -1 !important; }
+  }
+
+  /* ---------- campo no padrão MUI TextField: label · input (+adornment) · helper ---------- */
+
+  .aq-field { display: flex; flex-direction: column; gap: var(--sp-05); min-width: 0; }
   .aq-field.aq-field-wide { grid-column: 1 / -1; }
 
-  .aq-field label {
-    font-size: 0.74rem;
+  .aq-field > label {
+    font-size: var(--fs-caption);
     color: var(--text-muted);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
   }
-
-  .aq-field .aq-hint { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
 
   input, textarea, select, button {
     font-family: inherit;
     color: inherit;
   }
 
+  .aq-input-wrap { position: relative; display: flex; align-items: stretch; min-width: 0; }
+
   .aq-field input[type="date"],
   .aq-field input[type="number"],
   .aq-field input[type="text"],
+  .aq-field select,
   .aq-field textarea {
     font-family: var(--font-mono);
-    font-size: 0.92rem;
-    padding: 8px 10px;
+    font-size: var(--fs-body2);
+    padding: 10px var(--sp-15);
     border-radius: var(--shape-xs);
-    border: 1px solid var(--outline);
-    background: var(--surface-2);
+    border: 1px solid var(--outline-variant);
+    background: var(--surface);
     color: var(--text);
     width: 100%;
-    transition: border-color 0.15s ease, border-width 0.15s ease;
+    min-width: 0;
+    transition: border-color var(--dur-short) var(--ease-standard),
+                box-shadow var(--dur-short) var(--ease-standard);
   }
 
-  .aq-field textarea { font-family: var(--font-body); resize: vertical; min-height: 56px; }
+  .aq-field textarea { font-family: var(--font-body); resize: vertical; min-height: 64px; line-height: 1.5; }
+  .aq-field select { font-family: var(--font-body); cursor: pointer; }
 
-  .aq-field input[type="date"]:focus,
-  .aq-field input[type="number"]:focus,
-  .aq-field input[type="text"]:focus,
-  .aq-field textarea:focus {
+  .aq-field :is(input, textarea, select):hover { border-color: var(--outline); }
+
+  /* foco no padrão MUI: anel de 1px sobre a borda, sem deslocar o layout */
+  .aq-field :is(input, textarea, select):focus {
     border-color: var(--accent);
-    border-width: 2px;
-    padding: 7px 9px;
+    box-shadow: 0 0 0 1px var(--accent);
     outline: none;
   }
 
-  .aq-field input:focus-visible,
-  .aq-field textarea:focus-visible,
+  .aq-input-wrap:has(input[data-state="bad"]) input,
+  .aq-field textarea[data-state="bad"] { border-color: var(--bad); }
+  .aq-input-wrap:has(input[data-state="bad"]) input:focus { box-shadow: 0 0 0 1px var(--bad); }
+  .aq-input-wrap:has(input[data-state="warn"]) input { border-color: var(--warn); }
+  .aq-input-wrap:has(input[data-state="warn"]) input:focus { box-shadow: 0 0 0 1px var(--warn); }
+
+  /* adornment de sufixo (unidade), como o InputAdornment do MUI */
+  .aq-input-wrap:has(.aq-adornment) input { padding-right: 48px; }
+
+  /* o spinner nativo disputaria espaço com a unidade */
+  .aq-input-wrap:has(.aq-adornment) input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+  .aq-input-wrap:has(.aq-adornment) input[type="number"]::-webkit-outer-spin-button,
+  .aq-input-wrap:has(.aq-adornment) input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .aq-adornment {
+    position: absolute;
+    right: var(--sp-15);
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .aq-helper {
+    margin: 0;
+    font-size: var(--fs-caption);
+    line-height: 1.45;
+    color: var(--text-muted);
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+  .aq-helper[data-state="bad"] { color: var(--bad); font-weight: 600; }
+  .aq-helper[data-state="warn"] { color: var(--warn); font-weight: 600; }
+  .aq-helper[data-state="good"] { color: var(--good); }
+  .aq-helper .aq-helper-tag {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 1px 5px;
+    border-radius: var(--shape-xs);
+    background: var(--warn-soft);
+    color: var(--warn);
+    flex: none;
+  }
+
+  .aq-field :is(input, textarea, select):focus-visible,
   button:focus-visible,
-  .aq-icon-btn:focus-visible {
+  .aq-icon-btn:focus-visible,
+  summary:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .aq-field input, .aq-field textarea { transition: none; }
+    .aq-field :is(input, textarea, select) { transition: none; }
   }
 
   .aq-checkbox-row {
@@ -894,10 +1021,12 @@
     </div>
   </header>
 
+  <div class="aq-appbar" id="aq-appbar">
   <div class="aq-tabs" role="tablist" aria-label="Seções do painel">
     <button type="button" class="aq-tab" id="tab-btn-params" role="tab" aria-selected="true" aria-controls="tab-panel-params">Parâmetros</button>
     <button type="button" class="aq-tab" id="tab-btn-config" role="tab" aria-selected="false" aria-controls="tab-panel-config" tabindex="-1">Configurações</button>
     <button type="button" class="aq-tab" id="tab-btn-check" role="tab" aria-selected="false" aria-controls="tab-panel-check" tabindex="-1">Checklist</button>
+  </div>
   </div>
 
   <div id="tab-panel-params" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-params">
@@ -925,42 +1054,51 @@
       <div class="aq-form-grid">
         <div class="aq-field">
           <label for="f-date">Data</label>
-          <input type="date" id="f-date" />
+          <div class="aq-input-wrap"><input type="date" id="f-date" aria-describedby="h-f-date" /></div>
+          <p class="aq-helper" id="h-f-date">Um registro por dia. Reabrir a mesma data edita o registro.</p>
         </div>
         <div class="aq-field">
-          <label for="f-temp">Temperatura (°C) <span class="aq-hint">ideal 25–28</span></label>
-          <input type="number" id="f-temp" step="0.1" placeholder="26.5" />
+          <label for="f-temp">Temperatura</label>
+          <div class="aq-input-wrap"><input type="number" id="f-temp" step="0.1" placeholder="26,5" aria-describedby="h-f-temp" /><span class="aq-adornment">°C</span></div>
+          <p class="aq-helper" id="h-f-temp">Faixa ideal 25–28.</p>
         </div>
         <div class="aq-field">
-          <label for="f-ph">pH <span class="aq-hint">ideal 6,5–7,6</span></label>
-          <input type="number" id="f-ph" step="0.1" placeholder="7.0" />
+          <label for="f-ph">pH</label>
+          <div class="aq-input-wrap"><input type="number" id="f-ph" step="0.1" placeholder="7,0" aria-describedby="h-f-ph" /></div>
+          <p class="aq-helper" id="h-f-ph">Faixa ideal 6,5–7,6.</p>
         </div>
         <div class="aq-field">
-          <label for="f-kh">KH (dKH) <span class="aq-hint">ideal 4–8</span></label>
-          <input type="number" id="f-kh" step="0.1" placeholder="6" />
+          <label for="f-kh">Dureza de carbonatos</label>
+          <div class="aq-input-wrap"><input type="number" id="f-kh" step="0.1" placeholder="6" aria-describedby="h-f-kh" /><span class="aq-adornment">dKH</span></div>
+          <p class="aq-helper" id="h-f-kh">Faixa ideal 4–8. É o tampão que segura o pH.</p>
         </div>
         <div class="aq-field">
-          <label for="f-nh3">Amônia NH₃ (ppm) <span class="aq-hint">ideal 0</span></label>
-          <input type="number" id="f-nh3" step="0.01" placeholder="0" />
+          <label for="f-nh3">Amônia</label>
+          <div class="aq-input-wrap"><input type="number" id="f-nh3" step="0.01" placeholder="0" aria-describedby="h-f-nh3" /><span class="aq-adornment">ppm</span></div>
+          <p class="aq-helper" id="h-f-nh3">Ideal zero. Acima de 0,25 é emergência.</p>
         </div>
         <div class="aq-field">
-          <label for="f-no2">Nitrito NO₂ (ppm) <span class="aq-hint">ideal 0</span></label>
-          <input type="number" id="f-no2" step="0.01" placeholder="0" />
+          <label for="f-no2">Nitrito</label>
+          <div class="aq-input-wrap"><input type="number" id="f-no2" step="0.01" placeholder="0" aria-describedby="h-f-no2" /><span class="aq-adornment">ppm</span></div>
+          <p class="aq-helper" id="h-f-no2">Ideal zero. Acima de 0,25 é emergência.</p>
         </div>
         <div class="aq-field">
-          <label for="f-no3">Nitrato NO₃ (ppm) <span class="aq-hint">ideal &lt; 20</span></label>
-          <input type="number" id="f-no3" step="1" placeholder="15" />
+          <label for="f-no3">Nitrato</label>
+          <div class="aq-input-wrap"><input type="number" id="f-no3" step="1" placeholder="15" aria-describedby="h-f-no3" /><span class="aq-adornment">ppm</span></div>
+          <p class="aq-helper" id="h-f-no3">Ideal abaixo de 20. Acima de 40, faça TPA.</p>
         </div>
         <div class="aq-field">
-          <label>&nbsp;</label>
+          <label for="f-turbidez">Turbidez</label>
           <div class="aq-checkbox-row">
-            <input type="checkbox" id="f-turbidez" />
+            <input type="checkbox" id="f-turbidez" aria-describedby="h-f-turbidez" />
             <label for="f-turbidez">Água turva hoje</label>
           </div>
+          <p class="aq-helper" id="h-f-turbidez">Deixe desmarcado se a água está clara.</p>
         </div>
         <div class="aq-field aq-field-wide">
-          <label for="f-notes">Notas</label>
-          <textarea id="f-notes" placeholder="Observações do dia: comportamento, alimentação, TPA feita, etc."></textarea>
+          <label for="f-notes">Notas do dia</label>
+          <textarea id="f-notes" placeholder="Comportamento, alimentação, TPA feita…" aria-describedby="h-f-notes"></textarea>
+          <p class="aq-helper" id="h-f-notes">Campo livre. Some ao histórico e ao export JSON.</p>
         </div>
       </div>
       <div class="aq-form-actions">
@@ -1015,6 +1153,7 @@
       <h2 class="aq-section-title">Critérios adicionais do gate</h2>
       <ul class="aq-criteria-list" id="aq-criteria-list"></ul>
       <div class="aq-criteria-add">
+        <label class="aq-visually-hidden" for="f-criteria-new">Novo critério do gate</label>
         <input type="text" id="f-criteria-new" placeholder="Ex: veterinário aprovou introdução" />
         <button class="aq-btn" id="btn-criteria-add">Adicionar</button>
       </div>
@@ -1036,28 +1175,28 @@
     <div class="aq-stat-row">
       <div class="aq-stat">
         <span class="aq-stat-label">Volume real</span>
-        <span class="aq-stat-value">598 L</span>
+        <span class="aq-stat-value" id="calc-volume-real">598 L</span>
         <span class="aq-stat-note">dose por este número, não por 700</span>
       </div>
       <div class="aq-stat">
         <span class="aq-stat-label">Em circulação</span>
-        <span class="aq-stat-value">682 L</span>
+        <span class="aq-stat-value" id="calc-volume-total">682 L</span>
         <span class="aq-stat-note">display + sump + tubulação</span>
       </div>
-      <div class="aq-stat" data-tone="good">
+      <div class="aq-stat" id="stat-turnover" data-tone="good">
         <span class="aq-stat-label">Turnover</span>
-        <span class="aq-stat-value">7,3×/h</span>
-        <span class="aq-stat-note">alvo 5–10×/h · dentro da faixa</span>
+        <span class="aq-stat-value" id="calc-turnover">7,3×/h</span>
+        <span class="aq-stat-note" id="calc-turnover-note">alvo 5–10×/h · dentro da faixa</span>
       </div>
       <div class="aq-stat" data-tone="bad">
         <span class="aq-stat-label">Sobre a laje</span>
         <span class="aq-stat-value">1.069 kg</span>
         <span class="aq-stat-note">951 kg/m² no footprint</span>
       </div>
-      <div class="aq-stat" data-tone="bad">
-        <span class="aq-stat-label">Tampão</span>
-        <span class="aq-stat-value">0 dKH</span>
-        <span class="aq-stat-note">pH sem nenhuma inércia</span>
+      <div class="aq-stat" id="stat-kh" data-tone="bad">
+        <span class="aq-stat-label">Tampão medido</span>
+        <span class="aq-stat-value" id="calc-kh">—</span>
+        <span class="aq-stat-note" id="calc-kh-note">sem medição de KH registrada ainda</span>
       </div>
     </div>
   </section>
@@ -1116,13 +1255,13 @@
       <div><dt>Coluna d'água a 65 cm <span class="aq-hint">[EST]</span></dt><dd>650,0 L</dd></div>
       <div><dt>− substrato (areia N00)</dt><dd>−32,5 L</dd></div>
       <div><dt>− rochas <span class="aq-hint">[EST]</span></dt><dd>−20,0 L</dd></div>
-      <div><dt>Volume líquido</dt><dd data-tone="warn">597,5 L</dd></div>
+      <div><dt>Volume líquido</dt><dd data-tone="warn" id="calc-ch1-net">597,5 L</dd></div>
       <div><dt>Área de superfície</dt><dd>1,00 m²</dd></div>
       <div><dt>Área total de vidro</dt><dd>4,50 m²</dd></div>
     </dl>
     <div class="aq-callout" data-tone="bad">
       <span class="aq-callout-icon">!</span>
-      <p><strong>Dosar por 700 L gera 17% de sobredose.</strong> Medicamento, declorador, bicarbonato, fertilizante: tudo se calcula sobre <strong>598 L</strong>. Num tratamento com metronidazol ou sal, essa diferença é a distância entre a dose terapêutica e a dose que danifica brânquia.</p>
+      <p><strong>Dosar por 700 L gera 17% de sobredose.</strong> Medicamento, declorador, bicarbonato, fertilizante: tudo se calcula sobre <strong><span id="calc-ch1-dose">598</span> L</strong>. Num tratamento com metronidazol ou sal, essa diferença é a distância entre a dose terapêutica e a dose que danifica brânquia.</p>
     </div>
   </section>
 
@@ -1173,17 +1312,16 @@
     </div>
     <p class="aq-lede">A Oceantech promete 9.000 L/h em papel — número medido com a bomba deitada no chão, sem cano. Depois de 1,3 m de altura e de uma mangueira flexível azul, entrega perto de <strong>5.000 L/h</strong>. Isso está ótimo: dá 7,3 renovações por hora, no terço superior da faixa ideal para ciclídeo grande.</p>
     <p class="aq-lede">Só que a bomba empurra por cima e a gravidade devolve por baixo. <strong>Se a descida não escoar os mesmos 5.000 L/h, o display transborda</strong> — e o diâmetro dela nunca foi medido.</p>
-    <div class="aq-scale" role="img" aria-label="Vazão segura por gravidade conforme o diâmetro da descida: 25 mm até 1.200 L/h, 32 mm até 2.500, 40 mm até 3.500, 50 mm até 5.500, 60 mm até 9.000 L/h.">
-      <div class="aq-scale-item" data-tone="bad"><b>25 mm</b><small>~800–1.200 L/h · insuficiente</small></div>
-      <div class="aq-scale-item" data-tone="bad"><b>32 mm</b><small>~1.500–2.500 L/h · insuficiente</small></div>
-      <div class="aq-scale-item" data-tone="bad"><b>40 mm</b><small>~2.500–3.500 L/h · insuficiente</small></div>
-      <div class="aq-scale-item" data-tone="good"><b>50 mm</b><small>~4.000–5.500 L/h · no limite</small></div>
-      <div class="aq-scale-item" data-tone="good"><b>60 mm</b><small>~7.000–9.000 L/h · folgado</small></div>
+    <div class="aq-scale" id="calc-downpipe-scale" role="img" aria-label="Vazão segura por gravidade conforme o diâmetro da descida: 25 mm até 1.200 L/h, 32 mm até 2.500, 40 mm até 3.500, 50 mm até 5.500, 60 mm até 9.000 L/h.">
+      <div class="aq-scale-item" data-mm="25" data-tone="bad"><b>25 mm</b><small>~800–1.200 L/h</small></div>
+      <div class="aq-scale-item" data-mm="32" data-tone="bad"><b>32 mm</b><small>~1.500–2.500 L/h</small></div>
+      <div class="aq-scale-item" data-mm="40" data-tone="bad"><b>40 mm</b><small>~2.500–3.500 L/h</small></div>
+      <div class="aq-scale-item" data-mm="50" data-tone="good"><b>50 mm</b><small>~4.000–5.500 L/h</small></div>
+      <div class="aq-scale-item" data-mm="60" data-tone="good"><b>60 mm</b><small>~7.000–9.000 L/h</small></div>
     </div>
-    <div class="aq-callout" data-tone="warn">
+    <div class="aq-callout" id="calc-downpipe-verdict" data-tone="warn">
       <span class="aq-callout-icon">?</span>
-      <p><strong>Pegue o paquímetro antes de qualquer outra coisa deste capítulo.</strong> Se a descida for menor que 50 mm, a bomba está superdimensionada e precisa de um registro de esfera no recalque para estrangular a vazão até o que o dreno aguenta.</p>
-      <p>Hoje o sistema só não transborda porque a altura manométrica já rouba metade da vazão da bomba. É uma folga acidental, não um projeto.</p>
+      <p><strong>A descida ainda não foi medida.</strong> Preencha o diâmetro interno na ficha técnica abaixo e este bloco calcula na hora se a bomba cabe no dreno.</p>
     </div>
     <p class="aq-lede">Somando o wave maker de fluxo cruzado (~6.000–9.000 L/h <span class="aq-hint">[EST]</span>), a movimentação interna chega a <strong>18–23× o volume por hora</strong> — o suficiente para não haver zona morta em 2 metros de comprimento. O fluxo cruzado é a escolha certa para esse formato.</p>
   </section>
@@ -1201,25 +1339,39 @@
       <div>
         <div class="aq-meter-head"><span>Sem furo anti-sifão</span><b>50,0 L descem</b></div>
         <div class="aq-meter-track">
-          <div class="aq-meter-fill" data-tone="bad" style="width:83.3%"></div>
-          <div class="aq-meter-limit" style="left:47.3%"></div>
+          <div class="aq-meter-fill" id="calc-cheia-sem-fill" data-tone="bad" style="width:83.3%"></div>
+          <div class="aq-meter-limit" id="calc-cheia-sem-limit" style="left:47.3%"></div>
         </div>
-        <div class="aq-meter-verdict" data-tone="bad">✕ Transborda ~22 L no chão</div>
+        <div class="aq-meter-verdict" id="calc-cheia-sem-verdict" data-tone="bad">✕ Transborda ~22 L no chão</div>
       </div>
       <div>
         <div class="aq-meter-head"><span>Com furo anti-sifão de 3 mm</span><b>20,0 L descem</b></div>
         <div class="aq-meter-track">
-          <div class="aq-meter-fill" data-tone="good" style="width:33.3%"></div>
-          <div class="aq-meter-limit" style="left:47.3%"></div>
+          <div class="aq-meter-fill" id="calc-cheia-com-fill" data-tone="good" style="width:33.3%"></div>
+          <div class="aq-meter-limit" id="calc-cheia-com-limit" style="left:47.3%"></div>
         </div>
-        <div class="aq-meter-verdict" data-tone="good">✓ Contém, com 8,4 L de margem</div>
+        <div class="aq-meter-verdict" id="calc-cheia-com-verdict" data-tone="good">✓ Contém, com 8,4 L de margem</div>
       </div>
-      <div class="aq-meter-legend">escala 0–60 L · linha tracejada = 28,4 L de folga no sump</div>
+      <div class="aq-meter-legend" id="calc-cheia-legend">escala 0–60 L · linha tracejada = 28,4 L de folga no sump</div>
     </div>
-    <div class="aq-callout" data-tone="good">
-      <span class="aq-callout-icon">✓</span>
-      <p><strong>Um furo de 3 mm, custo zero, transforma ✕ em ✓.</strong> Fure o tubo de recalque logo abaixo da linha d'água: assim que o nível chega ali, o furo suga ar e quebra o sifão na hora.</p>
-      <p>Complete com: bocal de retorno raso (1–2 cm submerso), nível de operação do sump baixado para 22–24 cm, e uma fita marcando a linha máxima na C3. Depois <strong>desligue a bomba na tomada e meça</strong> — é o único jeito de validar estes números.</p>
+    <div class="aq-field aq-field-inline">
+      <label for="c-hyd-antisiphon-done">Estado do furo anti-sifão</label>
+      <div class="aq-input-wrap">
+        <select id="c-hyd-antisiphon-done" aria-describedby="h-c-hyd-antisiphon-done">
+          <option value="nao">Pendente — ainda não furado</option>
+          <option value="sim">Instalado — furo feito e testado</option>
+        </select>
+      </div>
+      <p class="aq-helper" id="h-c-hyd-antisiphon-done">Muda o cenário calculado acima e fica salvo na ficha do sistema.</p>
+    </div>
+    <div class="aq-callout" id="calc-cheia-status" data-tone="bad">
+      <span class="aq-callout-icon">!</span>
+      <p>Calculando…</p>
+    </div>
+    <div class="aq-callout">
+      <span class="aq-callout-icon">◇</span>
+      <p><strong>Como fazer:</strong> fure o tubo de recalque logo abaixo da linha d'água — assim que o nível chega ali, o furo suga ar e quebra o sifão na hora. Complete com bocal de retorno raso (1–2 cm submerso), nível do sump em 22–24 cm e uma fita marcando a linha máxima na C3.</p>
+      <p>Depois <strong>desligue a bomba na tomada e meça</strong> onde o nível estabiliza. É o único jeito de validar estes números.</p>
     </div>
   </section>
 
@@ -1233,21 +1385,26 @@
     </div>
     <p class="aq-lede">Água preta amazônica é exatamente isto: ácida, escura, dureza quase nula. O aquário reproduziu o bioma bem demais — <strong>0 dKH</strong>. A diferença é de escala: o rio Negro tem bilhões de litros e um estoque contínuo de ácido húmico vindo da mata. Ele oscila devagar porque é <em>grande</em>.</p>
     <p class="aq-lede">598 litros não têm essa inércia. Sem tampão, o pH não tem freio: uma TPA, uma decomposição localizada ou o pico de CO₂ de uma madrugada derrubam de 6,6 para abaixo de 5,0 em horas. <strong>Abaixo de pH 6,0 a nitrificação para</strong> — e o filtro biológico que hoje funciona simplesmente desliga, com os peixes dentro.</p>
-    <div class="aq-timeline" role="img" aria-label="Protocolo de bicarbonato em 7 dias: 20 g no dia 1, 20 g no dia 3, 20 g no dia 5, medição no dia 7.">
+    <dl class="aq-facts">
+      <div><dt>KH medido hoje</dt><dd id="calc-kh-atual">não medido</dd></div>
+      <div><dt>Meta</dt><dd>3,0 dKH</dd></div>
+      <div><dt>Bicarbonato necessário</dt><dd id="calc-bic-total">—</dd></div>
+    </dl>
+    <div class="aq-timeline" role="img" aria-label="Protocolo de bicarbonato fracionado em três doses nos dias 1, 3 e 5, com medição no dia 7.">
       <div class="aq-timeline-step">
         <span class="aq-timeline-day">Dia 1</span>
-        <span class="aq-timeline-dose">20 g</span>
-        <span class="aq-timeline-note">dissolvido na C3 → ~1 dKH</span>
+        <span class="aq-timeline-dose" id="calc-bic-dia1">—</span>
+        <span class="aq-timeline-note">dissolvido na C3</span>
       </div>
       <div class="aq-timeline-step">
         <span class="aq-timeline-day">Dia 3</span>
-        <span class="aq-timeline-dose">20 g</span>
-        <span class="aq-timeline-note">→ ~2 dKH</span>
+        <span class="aq-timeline-dose" id="calc-bic-dia3">—</span>
+        <span class="aq-timeline-note">segunda dose</span>
       </div>
       <div class="aq-timeline-step">
         <span class="aq-timeline-day">Dia 5</span>
-        <span class="aq-timeline-dose">20 g</span>
-        <span class="aq-timeline-note">→ ~3 dKH</span>
+        <span class="aq-timeline-dose" id="calc-bic-dia5">—</span>
+        <span class="aq-timeline-note">terceira dose</span>
       </div>
       <div class="aq-timeline-step" data-tone="good">
         <span class="aq-timeline-day">Dia 7</span>
@@ -1255,10 +1412,9 @@
         <span class="aq-timeline-note">confirmar 2–4 dKH · pH 6,4–6,8</span>
       </div>
     </div>
-    <div class="aq-callout" data-tone="warn">
-      <span class="aq-callout-icon">!</span>
-      <p><strong>Nunca de uma vez só.</strong> 61 g de bicarbonato de sódio de grau alimentício levam de 0 a 3 dKH, mas jogados juntos deslocam o pH de golpe e causam choque osmótico. Fracionado em três doses, a subida é invisível para o peixe.</p>
-      <p>Depois: <strong>reponha ~6,8 g a cada TPA de 33%</strong>, senão o KH escorre pelo ralo junto com os 225 L.</p>
+    <div class="aq-callout" id="calc-bic-callout" data-tone="warn">
+      <span class="aq-callout-icon">?</span>
+      <p>Calculando…</p>
     </div>
     <div class="aq-callout">
       <span class="aq-callout-icon">◇</span>
@@ -1359,19 +1515,19 @@
     <p class="aq-lede">O ciclo que na Amazônia leva um ano — enchente, cheia, vazante, seca — aqui cabe numa semana e depende inteiramente de rotina. Estes são os volumes já calculados para <strong>682 L</strong>, prontos para virar lembrete no celular.</p>
     <div class="aq-stat-row">
       <div class="aq-stat">
-        <span class="aq-stat-label">TPA 33%</span>
-        <span class="aq-stat-value">225 L</span>
-        <span class="aq-stat-note">semanal ou quinzenal</span>
+        <span class="aq-stat-label">Troca parcial</span>
+        <span class="aq-stat-value" id="calc-tpa-litros">225 L</span>
+        <span class="aq-stat-note" id="calc-tpa-note">33% de 682 L</span>
       </div>
       <div class="aq-stat">
         <span class="aq-stat-label">Declorador</span>
-        <span class="aq-stat-value">23 mL</span>
-        <span class="aq-stat-note">a cada TPA</span>
+        <span class="aq-stat-value" id="calc-declorador">23 mL</span>
+        <span class="aq-stat-note">a cada TPA · 1 mL para 10 L</span>
       </div>
       <div class="aq-stat">
         <span class="aq-stat-label">Bicarbonato</span>
-        <span class="aq-stat-value">6,8 g</span>
-        <span class="aq-stat-note">reposição a cada TPA</span>
+        <span class="aq-stat-value" id="calc-bic-tpa">20,2 g</span>
+        <span class="aq-stat-note">repõe os 3 dKH levados na troca</span>
       </div>
       <div class="aq-stat" data-tone="warn">
         <span class="aq-stat-label">Perlon</span>
@@ -1393,6 +1549,10 @@
       <span class="aq-callout-icon">!</span>
       <p><strong>Perlon vencido inverte de função.</strong> Com peixe grande e ração carnívora, passar de 14 dias transforma a manta de removedor de sólidos em fonte de nitrato — ela continua segurando a sujeira, só que agora dissolvida.</p>
     </div>
+    <div class="aq-callout" data-tone="warn">
+      <span class="aq-callout-icon">!</span>
+      <p><strong>Correção sobre o relatório:</strong> ele indica 6,8 g de bicarbonato por TPA, mas essa conta usa 1 dKH em vez dos 3 dKH que a troca leva embora. Retirar 33% da água a 3 dKH derruba o tampão em ~1 dKH no sistema inteiro — repor exige <strong>3 × 30 mg/L × volume trocado</strong>. Este painel calcula o valor correto, cerca de três vezes maior.</p>
+    </div>
     <div class="aq-callout">
       <span class="aq-callout-icon">◇</span>
       <p><strong>225 L não saem da torneira direto para o aquário.</strong> Com KH 0 e água de rua, prepare em reservatório <strong>24 h antes</strong>: aeração, declorador e bicarbonato. Isso evita o choque duplo de temperatura e química — e é o que separa uma TPA de rotina de um susto de pH.</p>
@@ -1410,221 +1570,7 @@
     <p class="aq-lede">Tudo o que os capítulos acima resumem está aqui em formato editável, já pré-preenchido com o relatório. Salva sozinho e entra no export JSON. Atualize conforme medir o que ainda está como <strong>[EST]</strong>.</p>
   </section>
 
-  <section class="aq-grid-2">
-    <div class="aq-card">
-      <h2 class="aq-section-title">Aquário principal (display)</h2>
-      <div class="aq-form-grid">
-        <div class="aq-field">
-          <label for="c-tank-dims">Dimensões (C×L×A cm)</label>
-          <input type="text" id="c-tank-dims" placeholder="200 × 50 × 70" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-volume-gross">Volume bruto (L)</label>
-          <input type="number" id="c-tank-volume-gross" step="0.1" placeholder="700" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-volume-net">Volume líquido estimado (L) <span class="aq-hint">descontando substrato e rocha</span></label>
-          <input type="number" id="c-tank-volume-net" step="0.1" placeholder="597.5" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-water-level">Lâmina d'água útil (cm) <span class="aq-hint">[EST]</span></label>
-          <input type="number" id="c-tank-water-level" step="0.5" placeholder="65" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-material">Material</label>
-          <input type="text" id="c-tank-material" placeholder="Vidro" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-glass-thickness">Espessura do vidro (mm) <span class="aq-hint">[EST]</span></label>
-          <input type="number" id="c-tank-glass-thickness" step="0.5" placeholder="15" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-brand">Fabricante / marca</label>
-          <input type="text" id="c-tank-brand" placeholder="" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-setup-date">Início do projeto</label>
-          <input type="text" id="c-tank-setup-date" placeholder="Nov/2025" />
-        </div>
-        <div class="aq-field">
-          <label for="c-tank-cycling-date">Início da ciclagem</label>
-          <input type="text" id="c-tank-cycling-date" placeholder="Dez/2025" />
-        </div>
-      </div>
-    </div>
-
-    <div class="aq-card">
-      <h2 class="aq-section-title">Sump</h2>
-      <div class="aq-form-grid">
-        <div class="aq-field">
-          <label for="c-sump-dims">Dimensões externas (C×L×A cm)</label>
-          <input type="text" id="c-sump-dims" placeholder="94 × 34 × 34" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-volume">Volume bruto (L)</label>
-          <input type="number" id="c-sump-volume" step="0.1" placeholder="108.7" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-volume-operation">Volume em operação @25cm (L)</label>
-          <input type="number" id="c-sump-volume-operation" step="0.1" placeholder="79.1" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-chambers">Câmaras</label>
-          <input type="number" id="c-sump-chambers" step="1" placeholder="3" />
-        </div>
-        <div class="aq-field aq-field-wide">
-          <label for="c-sump-chamber-detail">Detalhe das câmaras</label>
-          <input type="text" id="c-sump-chamber-detail" placeholder="C1 Decantação 39cm (33,2L) · C2 Biológica 10cm (8,5L) · C3 Retorno 44cm (37,4L)" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-glass-thickness">Espessura do vidro (mm) <span class="aq-hint">[EST]</span></label>
-          <input type="number" id="c-sump-glass-thickness" step="0.5" placeholder="8" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-pump-model">Bomba de retorno (modelo)</label>
-          <input type="text" id="c-sump-pump-model" placeholder="Oceantech 9000 L/h" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-pump-flow">Vazão nominal (L/h)</label>
-          <input type="number" id="c-sump-pump-flow" step="1" placeholder="9000" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-pump-flow-real">Vazão real estimada (L/h)</label>
-          <input type="number" id="c-sump-pump-flow-real" step="1" placeholder="5000" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-mech-media">Mídia mecânica</label>
-          <input type="text" id="c-sump-mech-media" placeholder="Manta de perlon (34×39cm)" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sump-bio-media">Mídia biológica</label>
-          <input type="text" id="c-sump-bio-media" placeholder="Quartzite Glass 10L + cerâmicas" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="aq-grid-2">
-    <div class="aq-card">
-      <h2 class="aq-section-title">Hidráulica &amp; segurança anti-transbordo</h2>
-      <div class="aq-form-grid">
-        <div class="aq-field aq-field-wide">
-          <label for="c-hyd-downpipe-diameter">Diâmetro da descida (overflow) <span class="aq-hint">dado crítico pendente de medição</span></label>
-          <input type="text" id="c-hyd-downpipe-diameter" placeholder="medir — define o teto real de vazão" />
-        </div>
-        <div class="aq-field">
-          <label for="c-hyd-return-head">Altura manométrica do retorno (m) <span class="aq-hint">[EST]</span></label>
-          <input type="text" id="c-hyd-return-head" placeholder="1,2–1,4" />
-        </div>
-        <div class="aq-field">
-          <label for="c-hyd-turnover">Turnover pelo sump</label>
-          <input type="text" id="c-hyd-turnover" placeholder="7,3–8,4×/h" />
-        </div>
-        <div class="aq-field aq-field-wide">
-          <label for="c-hyd-wavemaker">Wave maker / circulação cruzada</label>
-          <input type="text" id="c-hyd-wavemaker" placeholder="15W, fluxo cruzado [EST] 6.000–9.000 L/h" />
-        </div>
-        <div class="aq-field aq-field-wide">
-          <label for="c-hyd-antisiphon">Furo anti-sifão no recalque</label>
-          <input type="text" id="c-hyd-antisiphon" placeholder="Pendente — furar 3–4mm abaixo da linha d'água" />
-        </div>
-        <div class="aq-field aq-field-wide">
-          <label for="c-hyd-notes">Teste de queda de energia</label>
-          <textarea id="c-hyd-notes" placeholder="Resultado do teste (bomba desligada na tomada, medir onde o nível estabiliza no sump)."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <div class="aq-card">
-      <h2 class="aq-section-title">Equipamentos</h2>
-      <div class="aq-form-grid">
-        <div class="aq-field aq-field-wide">
-          <label for="c-eq-heater">Aquecedor</label>
-          <input type="text" id="c-eq-heater" placeholder="Nenhum instalado — recomendado 2× 300W em C3 + termostato externo" />
-        </div>
-        <div class="aq-field">
-          <label for="c-eq-lighting">Iluminação (modelo e fotoperíodo)</label>
-          <input type="text" id="c-eq-lighting" placeholder="LED full spectrum, 8h/dia" />
-        </div>
-        <div class="aq-field">
-          <label for="c-eq-extra-pumps">Bombas adicionais / circulação</label>
-          <input type="text" id="c-eq-extra-pumps" placeholder="Wave maker 15W (fluxo cruzado)" />
-        </div>
-        <div class="aq-field">
-          <label for="c-eq-co2">CO₂</label>
-          <input type="text" id="c-eq-co2" placeholder="Não utilizado" />
-        </div>
-        <div class="aq-field">
-          <label for="c-eq-controller">Controlador / timer</label>
-          <input type="text" id="c-eq-controller" placeholder="Termostato externo (recomendado, ainda não instalado)" />
-        </div>
-        <div class="aq-field">
-          <label for="c-eq-other">Outros equipamentos</label>
-          <input type="text" id="c-eq-other" placeholder="" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="aq-grid-2">
-    <div class="aq-card">
-      <h2 class="aq-section-title">Substrato, decoração e manutenção</h2>
-      <div class="aq-form-grid">
-        <div class="aq-field">
-          <label for="c-sub-substrate">Substrato</label>
-          <input type="text" id="c-sub-substrate" placeholder="Areia N00 (~50L)" />
-        </div>
-        <div class="aq-field">
-          <label for="c-sub-hardscape">Rochas / troncos</label>
-          <input type="text" id="c-sub-hardscape" placeholder="MixRock + Sansibar (~20L)" />
-        </div>
-        <div class="aq-field aq-field-wide">
-          <label for="c-sub-plants">Plantas</label>
-          <input type="text" id="c-sub-plants" placeholder="" />
-        </div>
-        <div class="aq-field">
-          <label for="c-maint-percent">TPA — % por troca</label>
-          <input type="number" id="c-maint-percent" step="1" placeholder="33" />
-        </div>
-        <div class="aq-field">
-          <label for="c-maint-frequency">TPA — frequência</label>
-          <input type="text" id="c-maint-frequency" placeholder="Semanal ou quinzenal (33% = 225L)" />
-        </div>
-        <div class="aq-field">
-          <label for="c-maint-media-frequency">Troca de mídia filtrante</label>
-          <input type="text" id="c-maint-media-frequency" placeholder="Perlon 10–14 dias · carvão 4–6 semanas · Purigen 4–6 meses" />
-        </div>
-      </div>
-    </div>
-
-    <div class="aq-card">
-      <h2 class="aq-section-title">Carga estrutural</h2>
-      <div class="aq-form-grid">
-        <div class="aq-field aq-field-wide">
-          <label for="c-struct-weight">Peso total do sistema</label>
-          <input type="text" id="c-struct-weight" placeholder="≈ 1.069 kg (display 951 kg + sump 118 kg)" />
-        </div>
-        <div class="aq-field aq-field-wide">
-          <label for="c-struct-load">Carga por m² (footprint do display)</label>
-          <input type="text" id="c-struct-load" placeholder="≈ 951 kg/m² — acima do limite NBR 6120 (150–200 kg/m²)" />
-        </div>
-        <div class="aq-field aq-field-wide">
-          <label for="c-struct-notes">Notas estruturais</label>
-          <textarea id="c-struct-notes" placeholder="Posicionamento sobre parede estrutural, orientação do eixo, avaliação de engenheiro, regimento do condomínio."></textarea>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="aq-card">
-    <h2 class="aq-section-title">Fauna atual</h2>
-    <textarea id="c-fauna-notes" class="aq-phase-notes" style="min-height:90px;" placeholder="Espécies, quantidade, tamanho atual/adulto e observações de compatibilidade."></textarea>
-  </section>
-
-  <section class="aq-card">
-    <h2 class="aq-section-title">Notas gerais sobre a configuração</h2>
-    <textarea id="c-notes" class="aq-phase-notes" style="min-height:80px;" placeholder="Histórico de mudanças no sistema, ajustes de hidráulica, problemas resolvidos, etc."></textarea>
-  </section>
+  <div id="aq-config-fields" class="aq-ficha-grid"></div>
 
   </div>
 
@@ -1668,6 +1614,7 @@
   <section class="aq-card">
     <div id="aq-struct-tasks-list"></div>
     <div class="aq-criteria-add" style="margin-top:16px;">
+      <label class="aq-visually-hidden" for="f-struct-task-new">Nova ação própria</label>
       <input type="text" id="f-struct-task-new" placeholder="Adicionar ação própria..." />
       <button class="aq-btn" id="btn-struct-task-add">Adicionar</button>
     </div>
@@ -1713,8 +1660,106 @@
     "maint-percent", "maint-frequency", "maint-media-frequency",
     "struct-weight", "struct-load", "struct-notes",
     "fauna-notes",
-    "notes"
+    "notes",
+    "hyd-antisiphon-done"
   ];
+
+  // Ficha técnica declarativa: label = só o título, unidade vira adornment,
+  // toda informação de apoio desce para o helper text (padrão MUI TextField).
+  var CONFIG_SPEC = [
+    { title: "Aquário principal", eyebrow: "Display", fields: [
+      { id: "tank-dims", label: "Dimensões", type: "text", ph: "200 × 50 × 70", helper: "Comprimento × largura × altura, em centímetros." },
+      { id: "tank-volume-gross", label: "Volume bruto", type: "number", step: "0.1", unit: "L", ph: "700", helper: "C × L × A. É o número do catálogo — não use para dosagem." },
+      { id: "tank-volume-net", label: "Volume líquido", type: "number", step: "0.1", unit: "L", ph: "597,5", helper: "Já descontando substrato, rochas e borda livre. É por este que se dosa." },
+      { id: "tank-water-level", label: "Lâmina d'água", type: "number", step: "0.5", unit: "cm", ph: "65", helper: "Da base até a superfície.", est: true },
+      { id: "tank-material", label: "Material", type: "text", ph: "Vidro", helper: "Vidro comum, temperado ou acrílico." },
+      { id: "tank-glass-thickness", label: "Espessura do vidro", type: "number", step: "0.5", unit: "mm", ph: "15", helper: "Para 70 cm de coluna, o recomendado é 15–19 mm.", est: true },
+      { id: "tank-brand", label: "Fabricante", type: "text", ph: "—", helper: "Útil para garantia e para revenda." },
+      { id: "tank-setup-date", label: "Início do projeto", type: "text", ph: "Nov/2025", helper: "Quando o aquário foi montado." },
+      { id: "tank-cycling-date", label: "Início da ciclagem", type: "text", ph: "Dez/2025", helper: "Quando a colônia bacteriana começou a se formar." }
+    ]},
+    { title: "Sump", eyebrow: "A várzea", fields: [
+      { id: "sump-dims", label: "Dimensões externas", type: "text", ph: "94 × 34 × 34", helper: "Comprimento × largura × altura, em centímetros." },
+      { id: "sump-volume", label: "Volume bruto", type: "number", step: "0.1", unit: "L", ph: "108,7", helper: "Capacidade total até a borda." },
+      { id: "sump-volume-operation", label: "Volume em operação", type: "number", step: "0.1", unit: "L", ph: "79,1", helper: "No nível de trabalho de 25 cm. A diferença é a folga anti-transbordo." },
+      { id: "sump-chambers", label: "Número de câmaras", type: "number", step: "1", ph: "3", helper: "Decantação, biológica e retorno." },
+      { id: "sump-chamber-detail", label: "Detalhe das câmaras", type: "text", wide: true, ph: "C1 Decantação 39cm · C2 Biológica 10cm · C3 Retorno 44cm", helper: "Comprimento e volume útil de cada câmara." },
+      { id: "sump-glass-thickness", label: "Espessura do vidro", type: "number", step: "0.5", unit: "mm", ph: "8", helper: "Sump raso exige menos que o display.", est: true },
+      { id: "sump-pump-model", label: "Bomba de retorno", type: "text", ph: "Oceantech 9000 L/h", helper: "Marca e modelo." },
+      { id: "sump-pump-flow", label: "Vazão nominal", type: "number", step: "1", unit: "L/h", ph: "9000", helper: "Valor de catálogo, medido sem altura nem tubulação." },
+      { id: "sump-pump-flow-real", label: "Vazão real", type: "number", step: "1", unit: "L/h", ph: "5000", helper: "Depois das perdas de altura e curvas. É o que define o turnover." },
+      { id: "sump-mech-media", label: "Mídia mecânica", type: "text", ph: "Manta de perlon (34 × 39 cm)", helper: "Retém sólidos. Trocar a cada 10–14 dias." },
+      { id: "sump-bio-media", label: "Mídia biológica", type: "text", ph: "Quartzite Glass 10 L + cerâmicas", helper: "Abriga a colônia. Alvo para a carga adulta: 12–18 L." }
+    ]},
+    { title: "Hidráulica e segurança", eyebrow: "A correnteza", fields: [
+      { id: "hyd-downpipe-diameter", label: "Diâmetro da descida", type: "text", wide: true, ph: "medir", helper: "Diâmetro interno em mm. Define o teto real de vazão de todo o sistema — abaixo de 50 mm a bomba precisa de registro.", critical: true },
+      { id: "hyd-return-head", label: "Altura manométrica", type: "text", unit: "m", ph: "1,2–1,4", helper: "Desnível do sump até o bocal de retorno.", est: true },
+      { id: "hyd-turnover", label: "Turnover", type: "text", ph: "7,3×/h", helper: "Renovações por hora. Faixa ideal para ciclídeo grande: 5–10×/h." },
+      { id: "hyd-wavemaker", label: "Wave maker", type: "text", wide: true, ph: "15 W, fluxo cruzado", helper: "Circulação interna, somada ao retorno. Evita zona morta em 2 m de comprimento." },
+      { id: "hyd-antisiphon", label: "Furo anti-sifão", type: "text", wide: true, ph: "Pendente", helper: "Observações sobre a execução. O estado atual é definido no capítulo 4." },
+      { id: "hyd-notes", label: "Teste de queda de energia", type: "textarea", wide: true, ph: "Desligue a bomba na tomada e anote onde o nível estabiliza no sump.", helper: "É o único jeito de validar os cálculos de cheia." }
+    ]},
+    { title: "Equipamentos", eyebrow: "Instalado", fields: [
+      { id: "eq-heater", label: "Aquecedor", type: "text", wide: true, ph: "Nenhum instalado", helper: "Recomendado: 2 × 300 W na C3 com termostato externo. Nunca um único 1.000 W." },
+      { id: "eq-lighting", label: "Iluminação", type: "text", ph: "LED full spectrum", helper: "Modelo e fotoperíodo. O alvo é 8 h fixas no timer." },
+      { id: "eq-extra-pumps", label: "Bombas adicionais", type: "text", ph: "Wave maker 15 W", helper: "Tudo que movimenta água além do retorno." },
+      { id: "eq-co2", label: "CO₂", type: "text", ph: "Não utilizado", helper: "Injeção de CO₂ derruba o pH — atenção redobrada com KH baixo." },
+      { id: "eq-controller", label: "Controlador", type: "text", ph: "Termostato externo", helper: "Sensor no display, não no sump." },
+      { id: "eq-other", label: "Outros", type: "text", ph: "—", helper: "UV, ozônio, doseadora, o que mais houver." }
+    ]},
+    { title: "Substrato e decoração", eyebrow: "O leito", fields: [
+      { id: "sub-substrate", label: "Substrato", type: "text", ph: "Areia N00 (~50 L)", helper: "Tipo e volume. Desloca cerca de 65% do próprio volume em água." },
+      { id: "sub-hardscape", label: "Rochas e troncos", type: "text", ph: "MixRock + Sansibar (~20 L)", helper: "Colunas verticais quebram a linha de visão entre territórios." },
+      { id: "sub-plants", label: "Plantas", type: "text", wide: true, ph: "—", helper: "Espécies e localização. Ciclídeos grandes costumam desenterrar." }
+    ]},
+    { title: "Manutenção", eyebrow: "O calendário das águas", fields: [
+      { id: "maint-percent", label: "TPA por troca", type: "number", step: "1", unit: "%", ph: "33", helper: "Percentual do volume do sistema trocado de cada vez." },
+      { id: "maint-frequency", label: "Frequência da TPA", type: "text", ph: "Semanal ou quinzenal", helper: "Prepare a água 24 h antes: aeração, declorador e bicarbonato." },
+      { id: "maint-media-frequency", label: "Troca de mídia", type: "text", wide: true, ph: "Perlon 10–14 dias · carvão 4–6 semanas", helper: "Perlon vencido deixa de remover sólidos e vira fonte de nitrato." }
+    ]},
+    { title: "Carga estrutural", eyebrow: "Sobre a laje", fields: [
+      { id: "struct-weight", label: "Peso total do sistema", type: "text", wide: true, ph: "≈ 1.069 kg", helper: "Água, substrato, rocha, vidro e móvel somados." },
+      { id: "struct-load", label: "Carga por m²", type: "text", wide: true, ph: "≈ 951 kg/m²", helper: "A NBR 6120 prevê 150–200 kg/m² para piso residencial." },
+      { id: "struct-notes", label: "Notas estruturais", type: "textarea", wide: true, ph: "Posicionamento, orientação do eixo, avaliação de engenheiro, regimento do condomínio.", helper: "Encostar em parede estrutural e deixar o eixo perpendicular ao vão da laje." }
+    ]},
+    { title: "Fauna", eyebrow: "Os habitantes", fields: [
+      { id: "fauna-notes", label: "Espécies e biometria", type: "textarea", wide: true, rows: 5, ph: "Espécie, quantidade, tamanho atual e adulto, observações de compatibilidade.", helper: "Some o tamanho adulto, não o atual — é ele que define se o sistema cabe." }
+    ]},
+    { title: "Notas gerais", eyebrow: "Diário do sistema", fields: [
+      { id: "notes", label: "Histórico de mudanças", type: "textarea", wide: true, rows: 4, ph: "Ajustes de hidráulica, problemas resolvidos, trocas de equipamento…", helper: "Campo livre. Entra no export JSON junto com o resto." }
+    ]}
+  ];
+
+  function fieldHTML(f) {
+    var id = "c-" + f.id;
+    var hid = "h-" + id;
+    var helper = '<p class="aq-helper" id="' + hid + '">' +
+      (f.est ? '<span class="aq-helper-tag">EST</span>' : "") +
+      (f.critical ? '<span class="aq-helper-tag" style="background:var(--bad-soft);color:var(--bad)">MEDIR</span>' : "") +
+      "<span>" + esc(f.helper) + "</span></p>";
+    var control;
+    if (f.type === "textarea") {
+      control = '<textarea id="' + id + '" placeholder="' + esc(f.ph) + '" aria-describedby="' + hid + '"' +
+        (f.rows ? ' style="min-height:' + (f.rows * 22 + 20) + 'px"' : "") + "></textarea>";
+    } else {
+      control = '<div class="aq-input-wrap"><input type="' + f.type + '" id="' + id + '"' +
+        (f.step ? ' step="' + f.step + '"' : "") +
+        ' placeholder="' + esc(f.ph) + '" aria-describedby="' + hid + '" />' +
+        (f.unit ? '<span class="aq-adornment">' + f.unit + "</span>" : "") + "</div>";
+    }
+    return '<div class="aq-field' + (f.wide ? " aq-field-wide" : "") + '">' +
+      '<label for="' + id + '">' + esc(f.label) + "</label>" + control + helper + "</div>";
+  }
+
+  function renderConfigFields() {
+    document.getElementById("aq-config-fields").innerHTML = CONFIG_SPEC.map(function (g) {
+      return '<section class="aq-card">' +
+        '<div class="aq-eyebrow">' + esc(g.eyebrow) + "</div>" +
+        '<h3 class="aq-section-title">' + esc(g.title) + "</h3>" +
+        '<div class="aq-form-grid">' + g.fields.map(fieldHTML).join("") + "</div>" +
+        "</section>";
+    }).join("");
+  }
 
   var DEFAULT_CONFIG = {
     "tank-dims": "200 × 50 × 70",
@@ -1758,6 +1803,7 @@
     "struct-weight": "≈ 1.069 kg (display 951 kg + sump 118 kg)",
     "struct-load": "≈ 951 kg/m² — acima do limite NBR 6120 (150–200 kg/m²)",
     "struct-notes": "Encostar em parede estrutural, eixo de 2m perpendicular ao vão da laje, avaliar com engenheiro se houver dúvida, verificar regimento do condomínio.",
+    "hyd-antisiphon-done": "nao",
     "fauna-notes": "Oscar Bronze 1× (15cm → 30–38cm adulto) · Jack Dempsey Blue 1× (10cm → 20–25cm) · Severum Gold 2× (10 e 6cm → 20–25cm cada) · Lambaris 6× (~5cm → 10–12cm) · Pangasius Albino 1× (10cm → 100–130cm adulto — incompatível com o sistema, planejar realocação em 6–12 meses).",
     "notes": ""
   };
@@ -2353,12 +2399,57 @@
     document.getElementById("aq-check-progress").setAttribute("aria-valuenow", String(pct));
   }
 
+  // helper text que reage ao valor digitado, como o par error/helperText do MUI
+  var HELPER_BASE = {
+    temp: "Faixa ideal 25–28.",
+    ph: "Faixa ideal 6,5–7,6.",
+    kh: "Faixa ideal 4–8. É o tampão que segura o pH.",
+    nh3: "Ideal zero. Acima de 0,25 é emergência.",
+    no2: "Ideal zero. Acima de 0,25 é emergência.",
+    no3: "Ideal abaixo de 20. Acima de 40, faça TPA."
+  };
+
+  var HELPER_FEEDBACK = {
+    temp: { warn: "No limite da faixa. Acompanhe de perto.", bad: "Fora da faixa segura — ajuste o aquecimento." },
+    ph: { warn: "Perto do limite. Observe a tendência.", bad: "Fora da faixa. Verifique o KH antes de corrigir o pH." },
+    kh: { warn: "Tampão fraco. O pH oscila com facilidade.", bad: "Sem tampão. Risco de colapso de pH — ver capítulo 5." },
+    nh3: { warn: "Amônia detectada. Reforce a atenção à filtragem.", bad: "Nível crítico. TPA agora e revise o filtro biológico." },
+    no2: { warn: "Nitrito presente. Monitore diariamente.", bad: "Nível crítico. TPA imediata." },
+    no3: { warn: "Acumulando. Planeje uma TPA.", bad: "Acima de 40 ppm. Faça TPA para reduzir." }
+  };
+
+  function renderFieldFeedback() {
+    CORE_PARAMS.forEach(function (key) {
+      var input = document.getElementById("f-" + key);
+      var helper = document.getElementById("h-f-" + key);
+      if (!input || !helper) return;
+      var raw = input.value;
+      if (raw === "") {
+        input.removeAttribute("data-state");
+        helper.removeAttribute("data-state");
+        helper.textContent = HELPER_BASE[key];
+        return;
+      }
+      var status = paramStatus(key, Number(raw));
+      input.setAttribute("data-state", status);
+      if (status === "good") {
+        helper.setAttribute("data-state", "good");
+        helper.textContent = "Dentro da faixa ideal.";
+      } else {
+        helper.setAttribute("data-state", status);
+        helper.textContent = (HELPER_FEEDBACK[key] && HELPER_FEEDBACK[key][status]) || HELPER_BASE[key];
+      }
+    });
+  }
+
   function renderAll() {
     var summary = renderSummary();
     renderHistory(summary.sorted);
     renderPhases();
     renderCriteria();
     renderStructTasks();
+    renderFieldFeedback();
+    renderConfigInfographic();
   }
 
   // ---------- form <-> data ----------
@@ -2387,6 +2478,7 @@
       if (key === "turbidez") { el.checked = !!reading.turbidez; return; }
       el.value = reading[key] === undefined || reading[key] === null ? "" : reading[key];
     });
+    renderFieldFeedback();
   }
 
   function upsertReading(reading) {
@@ -2433,11 +2525,216 @@
     });
   }
 
+  // ---------- infográfico reativo: a ficha alimenta os capítulos ----------
+
+  // Aceita "597.5" (input number) e "1.234,5" (digitado à brasileira).
+  // Só trata o ponto como separador de milhar quando há vírgula decimal presente.
+  function num(value, fallback) {
+    if (value === null || value === undefined || value === "") return fallback;
+    var str = String(value).trim();
+    if (str.indexOf(",") >= 0) str = str.replace(/\./g, "").replace(",", ".");
+    var n = parseFloat(str);
+    return isFinite(n) ? n : fallback;
+  }
+
+  function fmtBR(n, digits) {
+    return Number(n).toLocaleString("pt-BR", { minimumFractionDigits: digits || 0, maximumFractionDigits: digits || 0 });
+  }
+
+  function setText(id, text) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  // vazão segura por gravidade, por diâmetro interno da descida
+  var DOWNPIPE_TABLE = [
+    { mm: 25, max: 1200 }, { mm: 32, max: 2500 }, { mm: 40, max: 3500 },
+    { mm: 50, max: 5500 }, { mm: 60, max: 9000 }
+  ];
+
+  function computeSystem() {
+    var c = state.config || {};
+    var netTank = num(c["tank-volume-net"], 597.5);
+    var sumpOp = num(c["sump-volume-operation"], 79.1);
+    var sumpGross = num(c["sump-volume"], 108.7);
+    var totalSystem = netTank + sumpOp + 5; // +5 L de tubulação
+    var flowReal = num(c["sump-pump-flow-real"], 5000);
+    var turnover = totalSystem > 0 ? flowReal / totalSystem : 0;
+    var tpaPct = num(c["maint-percent"], 33);
+    var tpaLitros = totalSystem * tpaPct / 100;
+    // as divisórias (1 cm de vidro) ocupam ~1,2 L do volume bruto do sump
+    var headroom = Math.max(0, sumpGross - 1.2 - sumpOp);
+
+    // KH medido hoje e dose de bicarbonato para chegar a 3 dKH
+    var sorted = sortedReadings();
+    var lastKh = null;
+    for (var i = sorted.length - 1; i >= 0; i--) {
+      var v = sorted[i].kh;
+      if (v !== null && v !== undefined && v !== "") { lastKh = Number(v); break; }
+    }
+    var khTarget = 3;
+    var khGap = Math.max(0, khTarget - (lastKh === null ? 0 : lastKh));
+    var bicTotal = khGap * 30 * totalSystem / 1000;   // ~30 mg/L de NaHCO₃ por dKH
+    var bicReposicao = khTarget * 30 * tpaLitros / 1000;
+
+    // descida
+    var dMm = num(c["hyd-downpipe-diameter"], null);
+    var downpipe = { measured: dMm !== null && dMm > 0, mm: dMm, capacity: null, ok: null };
+    if (downpipe.measured) {
+      var row = null;
+      for (var k = 0; k < DOWNPIPE_TABLE.length; k++) {
+        if (dMm >= DOWNPIPE_TABLE[k].mm) row = DOWNPIPE_TABLE[k];
+      }
+      downpipe.capacity = row ? row.max : 600;
+      downpipe.ok = downpipe.capacity >= flowReal;
+    }
+
+    // cheia: volume que desce numa queda de energia
+    var antiSiphon = String(c["hyd-antisiphon-done"] || "nao") === "sim";
+    var descidaOverflow = 20; // água acima da entrada do overflow
+    var descidaSifao = 30;    // sifonagem pelo bocal de retorno
+    var descidaTotal = antiSiphon ? descidaOverflow : descidaOverflow + descidaSifao;
+    var contem = descidaTotal <= headroom;
+
+    return {
+      netTank: netTank, sumpOp: sumpOp, totalSystem: totalSystem, flowReal: flowReal,
+      turnover: turnover, tpaPct: tpaPct, tpaLitros: tpaLitros, headroom: headroom,
+      lastKh: lastKh, khGap: khGap, bicTotal: bicTotal, bicReposicao: bicReposicao,
+      downpipe: downpipe, antiSiphon: antiSiphon, descidaTotal: descidaTotal, contem: contem,
+      declorador: tpaLitros / 10
+    };
+  }
+
+  function renderConfigInfographic() {
+    var s = computeSystem();
+
+    // faixa de estatísticas do topo
+    setText("calc-volume-real", fmtBR(s.netTank, 0) + " L");
+    setText("calc-volume-total", fmtBR(s.totalSystem, 0) + " L");
+    setText("calc-turnover", fmtBR(s.turnover, 1).replace(".", ",") + "×/h");
+    var turnEl = document.getElementById("stat-turnover");
+    if (turnEl) turnEl.setAttribute("data-tone", s.turnover >= 5 && s.turnover <= 10 ? "good" : "warn");
+    setText("calc-turnover-note", s.turnover >= 5 && s.turnover <= 10 ? "alvo 5–10×/h · dentro da faixa" : "alvo 5–10×/h · fora da faixa");
+
+    var khEl = document.getElementById("calc-kh");
+    var khStat = document.getElementById("stat-kh");
+    if (khEl) {
+      khEl.textContent = s.lastKh === null ? "—" : fmtBR(s.lastKh, 1).replace(".", ",") + " dKH";
+      setText("calc-kh-note", s.lastKh === null
+        ? "sem medição de KH registrada ainda"
+        : s.lastKh >= 2 ? "tampão presente · pH com inércia" : "pH sem nenhuma inércia");
+      if (khStat) khStat.setAttribute("data-tone", s.lastKh !== null && s.lastKh >= 2 ? "good" : "bad");
+    }
+
+    // capítulo 01
+    setText("calc-ch1-net", fmtBR(s.netTank, 1).replace(".", ",") + " L");
+    setText("calc-ch1-dose", fmtBR(s.netTank, 0));
+
+    // capítulo 03 — veredito da descida
+    var dpEl = document.getElementById("calc-downpipe-verdict");
+    if (dpEl) {
+      var d = s.downpipe;
+      if (!d.measured) {
+        dpEl.setAttribute("data-tone", "warn");
+        dpEl.innerHTML = '<span class="aq-callout-icon">?</span><p><strong>A descida ainda não foi medida.</strong> ' +
+          "Preencha o diâmetro interno na ficha técnica abaixo e este bloco calcula na hora se a bomba de " +
+          fmtBR(s.flowReal, 0) + " L/h cabe no dreno.</p>";
+      } else if (d.ok) {
+        dpEl.setAttribute("data-tone", "good");
+        dpEl.innerHTML = '<span class="aq-callout-icon">✓</span><p><strong>Descida de ' + fmtBR(d.mm, 0) +
+          " mm escoa até ~" + fmtBR(d.capacity, 0) + " L/h</strong> e a bomba entrega " + fmtBR(s.flowReal, 0) +
+          " L/h. O dreno dá conta — sem necessidade de registro no recalque.</p>";
+      } else {
+        dpEl.setAttribute("data-tone", "bad");
+        dpEl.innerHTML = '<span class="aq-callout-icon">!</span><p><strong>Descida de ' + fmtBR(d.mm, 0) +
+          " mm escoa só ~" + fmtBR(d.capacity, 0) + " L/h, e a bomba empurra " + fmtBR(s.flowReal, 0) +
+          " L/h.</strong> Faltam " + fmtBR(s.flowReal - d.capacity, 0) +
+          " L/h de escoamento: instale registro de esfera no recalque e estrangule a vazão até o limite do dreno.</p>";
+      }
+    }
+    var scaleItems = document.querySelectorAll("#calc-downpipe-scale .aq-scale-item");
+    for (var i = 0; i < scaleItems.length; i++) {
+      var mm = Number(scaleItems[i].getAttribute("data-mm"));
+      var row = DOWNPIPE_TABLE[i];
+      scaleItems[i].setAttribute("data-tone", row.max >= s.flowReal ? "good" : "bad");
+      scaleItems[i].setAttribute("data-current", String(s.downpipe.measured && s.downpipe.mm >= mm &&
+        (i === DOWNPIPE_TABLE.length - 1 || s.downpipe.mm < DOWNPIPE_TABLE[i + 1].mm)));
+    }
+
+    // capítulo 04 — cheia
+    var scale = 60;
+    var semFuro = 50, comFuro = 20;
+    var limitPct = Math.min(100, s.headroom / scale * 100);
+    ["sem", "com"].forEach(function (key) {
+      var vol = key === "sem" ? semFuro : comFuro;
+      var fill = document.getElementById("calc-cheia-" + key + "-fill");
+      var lim = document.getElementById("calc-cheia-" + key + "-limit");
+      var verd = document.getElementById("calc-cheia-" + key + "-verdict");
+      if (!fill) return;
+      fill.style.width = Math.min(100, vol / scale * 100) + "%";
+      fill.setAttribute("data-tone", vol <= s.headroom ? "good" : "bad");
+      lim.style.left = limitPct + "%";
+      var sobra = vol - s.headroom;
+      verd.setAttribute("data-tone", vol <= s.headroom ? "good" : "bad");
+      verd.textContent = vol <= s.headroom
+        ? "✓ Contém, com " + fmtBR(s.headroom - vol, 1).replace(".", ",") + " L de margem"
+        : "✕ Transborda ~" + fmtBR(sobra, 0) + " L no chão";
+    });
+    setText("calc-cheia-legend", "escala 0–60 L · linha tracejada = " + fmtBR(s.headroom, 1).replace(".", ",") + " L de folga no sump");
+    var statusEl = document.getElementById("calc-cheia-status");
+    if (statusEl) {
+      statusEl.setAttribute("data-tone", s.contem ? "good" : "bad");
+      statusEl.innerHTML = s.antiSiphon
+        ? '<span class="aq-callout-icon">✓</span><p><strong>Furo anti-sifão marcado como instalado.</strong> Numa queda de energia descem ~' +
+          fmtBR(s.descidaTotal, 0) + " L, contra " + fmtBR(s.headroom, 1).replace(".", ",") +
+          " L de folga. O sistema se contém. Confirme com o teste real de tomada.</p>"
+        : '<span class="aq-callout-icon">!</span><p><strong>Sem o furo, descem ~' + fmtBR(s.descidaTotal, 0) +
+          " L contra " + fmtBR(s.headroom, 1).replace(".", ",") + " L de folga.</strong> Um furo de 3 mm no recalque, " +
+          "custo zero, corta os 30 L de sifonagem e resolve. Marque como instalado ao lado assim que fizer.</p>";
+    }
+
+    // capítulo 05 — dose de bicarbonato
+    setText("calc-kh-atual", s.lastKh === null ? "não medido" : fmtBR(s.lastKh, 1).replace(".", ",") + " dKH");
+    setText("calc-bic-total", s.khGap <= 0 ? "0 g" : fmtBR(Math.round(s.bicTotal), 0) + " g");
+    var doseEach = s.khGap <= 0 ? 0 : Math.round(s.bicTotal / 3);
+    ["1", "3", "5"].forEach(function (day) {
+      setText("calc-bic-dia" + day, s.khGap <= 0 ? "—" : fmtBR(doseEach, 0) + " g");
+    });
+    var bicEl = document.getElementById("calc-bic-callout");
+    if (bicEl) {
+      if (s.lastKh === null) {
+        bicEl.setAttribute("data-tone", "warn");
+        bicEl.innerHTML = '<span class="aq-callout-icon">?</span><p><strong>Registre o KH de hoje na aba Parâmetros</strong> ' +
+          "e esta seção calcula a dose exata para o volume real de " + fmtBR(s.totalSystem, 0) + " L.</p>";
+      } else if (s.khGap <= 0) {
+        bicEl.setAttribute("data-tone", "good");
+        bicEl.innerHTML = '<span class="aq-callout-icon">✓</span><p><strong>KH em ' + fmtBR(s.lastKh, 1).replace(".", ",") +
+          " dKH — o tampão já está na faixa.</strong> Não há dose a fazer; apenas reponha ~" +
+          fmtBR(s.bicReposicao, 1).replace(".", ",") + " g de bicarbonato a cada TPA para não perder o que conquistou.</p>";
+      } else {
+        bicEl.setAttribute("data-tone", "warn");
+        bicEl.innerHTML = '<span class="aq-callout-icon">!</span><p><strong>Faltam ' + fmtBR(s.khGap, 1).replace(".", ",") +
+          " dKH para chegar a 3.</strong> São " + fmtBR(Math.round(s.bicTotal), 0) + " g de bicarbonato para " +
+          fmtBR(s.totalSystem, 0) + " L, fracionados em três doses de " + fmtBR(doseEach, 0) +
+          " g. Nunca de uma vez — subida brusca desloca o pH e causa choque osmótico.</p>" +
+          "<p>Depois, reponha ~" + fmtBR(s.bicReposicao, 1).replace(".", ",") + " g a cada TPA de " +
+          fmtBR(s.tpaPct, 0) + "%.</p>";
+      }
+    }
+
+    // capítulo 08 — manutenção
+    setText("calc-tpa-litros", fmtBR(s.tpaLitros, 0) + " L");
+    setText("calc-tpa-note", fmtBR(s.tpaPct, 0) + "% de " + fmtBR(s.totalSystem, 0) + " L");
+    setText("calc-declorador", fmtBR(s.declorador, 0) + " mL");
+    setText("calc-bic-tpa", fmtBR(s.bicReposicao, 1).replace(".", ",") + " g");
+  }
+
   var configSaveTimer = null;
   function scheduleConfigSave() {
     clearTimeout(configSaveTimer);
+    state.config = readConfigForm();
+    renderConfigInfographic();
     configSaveTimer = setTimeout(function () {
-      state.config = readConfigForm();
       saveJSON(STORAGE_KEYS.config, state.config);
       renderSaveIndicator("configuração salva automaticamente às " + new Date().toLocaleTimeString("pt-BR"));
     }, 300);
@@ -2492,6 +2789,7 @@
 
   document.getElementById("aq-app").addEventListener("input", function (e) {
     if (e.target.closest("#f-date, #f-temp, #f-ph, #f-kh, #f-nh3, #f-no2, #f-no3, #f-turbidez, #f-notes")) {
+      renderFieldFeedback();
       scheduleAutosave();
     }
   });
@@ -2661,6 +2959,19 @@
 
   window.addEventListener("resize", function () { renderSparkline(sortedReadings()); });
 
+  // elevação da app bar ao descolar do topo (padrão MUI useScrollTrigger)
+  (function () {
+    var appbar = document.getElementById("aq-appbar");
+    if (!appbar || typeof IntersectionObserver !== "function") return;
+    var sentinel = document.createElement("div");
+    sentinel.setAttribute("aria-hidden", "true");
+    sentinel.style.cssText = "position:absolute;top:0;height:1px;width:1px;";
+    document.getElementById("aq-app").prepend(sentinel);
+    new IntersectionObserver(function (entries) {
+      appbar.setAttribute("data-stuck", String(!entries[0].isIntersecting));
+    }, { threshold: 0 }).observe(sentinel);
+  })();
+
   // ---------- init ----------
 
   (function init() {
@@ -2668,6 +2979,7 @@
     var existing = state.readings.find(function (r) { return r.date === today; });
     var sorted = sortedReadings();
     var mostRecent = sorted.length ? sorted[sorted.length - 1] : null;
+    renderConfigFields();
     loadForm(existing || { date: today, temp: "", ph: "", kh: "", nh3: "", no2: "", no3: "", turbidez: false, notes: "" });
     loadConfigForm(state.config);
     if (!storageAvailable) {
