@@ -381,6 +381,61 @@
 
   .aq-chart-caption { margin: var(--sp-1) 0 0; font-size: var(--fs-caption); color: var(--text-muted); }
 
+  /* ---------- mapa de cadência (calendário) ----------
+     Os gates contam dias CONSECUTIVOS, então o dia sem medição é um dado —
+     ele quebra a sequência. Nenhum outro gráfico do painel mostra ausência:
+     a linha do score só desenha os dias que existem. */
+
+  .aq-cal { --cal-cell: 14px; display: grid; grid-template-columns: auto 1fr; gap: 4px 6px; }
+  @media (min-width: 900px) { .aq-cal { --cal-cell: 18px; } }
+
+  .aq-cal-months, .aq-cal-grid { display: grid; gap: 3px; }
+  .aq-cal-months {
+    grid-auto-flow: column;
+    grid-auto-columns: var(--cal-cell);
+    font-size: 0.62rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    height: 12px;
+    align-items: end;
+  }
+  .aq-cal-months span { white-space: nowrap; overflow: visible; }
+
+  .aq-cal-daylabels {
+    display: grid;
+    grid-template-rows: repeat(7, var(--cal-cell));
+    gap: 3px;
+    font-size: 0.58rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    align-items: center;
+    justify-items: end;
+  }
+
+  .aq-cal-grid {
+    grid-template-rows: repeat(7, var(--cal-cell));
+    grid-auto-flow: column;
+    grid-auto-columns: var(--cal-cell);
+  }
+
+  .aq-cal-cell {
+    border-radius: 3px;
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    cursor: default;
+  }
+  .aq-cal-cell[data-s="none"] { background: transparent; border-color: var(--outline-variant); }
+  .aq-cal-cell[data-s="partial"] { background: var(--surface-3); }
+  .aq-cal-cell[data-s="bad"] { background: var(--bad); }
+  .aq-cal-cell[data-s="warn"] { background: var(--warn); }
+  .aq-cal-cell[data-s="good"] { background: var(--good); }
+  .aq-cal-cell[data-future="true"] { background: transparent; border-color: transparent; }
+  .aq-cal-cell:hover:not([data-future="true"]) { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .aq-cal-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: var(--fs-caption); color: var(--text-muted); margin-top: var(--sp-2); }
+  .aq-cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .aq-cal-legend i { width: 11px; height: 11px; border-radius: 3px; display: block; border: 1px solid transparent; }
+
   /* small multiples: um mini-gráfico por parâmetro */
   .aq-trend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--sp-2); }
   .aq-trend { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
@@ -636,6 +691,18 @@
   .aq-gate-chip[data-met="true"] { background: var(--good-soft); border-color: transparent; color: var(--good); }
   .aq-gate-chip[data-met="true"]::before { background: var(--good); }
   .aq-gate-chip[data-met="true"] .aq-chip-count { color: var(--good); }
+
+  /* O gate exige dias CONSECUTIVOS: um número sozinho ("3/5") não mostra
+     que faltam 2 seguidos e que uma falha zera tudo. Os segmentos mostram. */
+  .aq-gate-segs { display: inline-flex; gap: 3px; flex: none; }
+  .aq-gate-seg {
+    width: 12px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--outline-variant);
+  }
+  .aq-gate-seg[data-on="true"] { background: var(--accent); }
+  .aq-gate-chip[data-met="true"] .aq-gate-seg[data-on="true"] { background: var(--good); }
 
   .aq-grid-2 {
     display: grid;
@@ -1361,6 +1428,23 @@
       </table>
     </div>
     <div class="aq-empty" id="aq-history-empty" style="display:none;">Nenhum registro ainda. Preencha o formulário acima para começar.</div>
+  </section>
+
+  <section class="aq-card">
+    <h2 class="aq-section-title">Cadência de medição</h2>
+    <p class="aq-sub" style="margin:-6px 0 16px;">Os gates contam dias <strong>consecutivos</strong> — um dia sem medir zera a contagem. A linha do score só desenha os dias que existem; aqui aparecem também os que faltaram.</p>
+    <div class="aq-chart-wrap" id="aq-cadence-wrap">
+      <div id="aq-cadence"></div>
+      <div class="aq-chart-tip" id="aq-cadence-tip" hidden></div>
+    </div>
+    <div class="aq-cal-legend">
+      <span><i style="border-color:var(--outline-variant)"></i> sem medição</span>
+      <span><i style="background:var(--surface-3)"></i> incompleto</span>
+      <span><i style="background:var(--bad)"></i> ruim (&lt; 50)</span>
+      <span><i style="background:var(--warn)"></i> alerta (50–79)</span>
+      <span><i style="background:var(--good)"></i> bom (≥ 80)</span>
+    </div>
+    <p class="aq-chart-caption" id="aq-cadence-caption"></p>
   </section>
 
   <section class="aq-card">
@@ -3075,9 +3159,19 @@
 
     var gates = evaluateGates();
     var gatesEl = document.getElementById("aq-gates");
+    function gateChip(label, streak, target, met) {
+      var segs = "";
+      for (var i = 0; i < target; i++) {
+        segs += '<span class="aq-gate-seg" data-on="' + (i < streak) + '"></span>';
+      }
+      return '<div class="aq-gate-chip" data-met="' + met + '" role="group" aria-label="' +
+        esc(label + ": " + streak + " de " + target + " dias consecutivos") + '">' +
+        esc(label) + ' <span class="aq-gate-segs" aria-hidden="true">' + segs + "</span>" +
+        '<span class="aq-chip-count">' + streak + "/" + target + "</span></div>";
+    }
     gatesEl.innerHTML =
-      '<div class="aq-gate-chip" data-met="' + gates.clearMet + '">Água clara <span class="aq-chip-count">' + gates.clearStreak + "/" + gates.clearTarget + "</span></div>" +
-      '<div class="aq-gate-chip" data-met="' + gates.bioMet + '">Biologia zerada <span class="aq-chip-count">' + gates.bioStreak + "/" + gates.bioTarget + "</span></div>" +
+      gateChip("Água clara", gates.clearStreak, gates.clearTarget, gates.clearMet) +
+      gateChip("Biologia zerada", gates.bioStreak, gates.bioTarget, gates.bioMet) +
       '<div class="aq-gate-chip" data-met="' + gates.ready + '">Pronto p/ Green Terror <span class="aq-chip-count">' + (gates.ready ? "sim" : "não") + "</span></div>";
 
     renderActionPlan(last, gates);
@@ -3090,6 +3184,13 @@
 
   function brDate(iso) { return iso.split("-").reverse().join("/"); }
   function shortDate(iso) { var p = iso.split("-"); return p[2] + "/" + p[1]; }
+
+  function fromDayIndex(idx) {
+    var d = new Date(idx * 86400000);
+    return d.getUTCFullYear() + "-" +
+      String(d.getUTCMonth() + 1).padStart(2, "0") + "-" +
+      String(d.getUTCDate()).padStart(2, "0");
+  }
 
   function scoreSeries() {
     var sorted = sortedReadings();
@@ -3191,13 +3292,28 @@
     // extremidade destacada + rótulo direto (só nela)
     var lastP = complete[complete.length - 1];
     svg.push('<circle class="aq-chart-dot" cx="' + x(lastP).toFixed(1) + '" cy="' + y(lastP.score).toFixed(1) + '" r="5" />');
+    // com score no topo (100) não há espaço acima — o rótulo desce para não
+    // ficar em cima da própria linha
+    var lastY = y(lastP.score);
+    var labelY = lastY - 11 >= padT + 9 ? lastY - 11 : lastY + 17;
     svg.push('<text class="aq-chart-endlabel" x="' + x(lastP).toFixed(1) + '" y="' +
-      Math.max(padT + 9, y(lastP.score) - 11) + '" text-anchor="middle">' + lastP.score + "</text>");
+      labelY.toFixed(1) + '" text-anchor="middle">' + lastP.score + "</text>");
 
-    // eixo X: primeira e última data
-    svg.push('<text class="aq-chart-axis-text" x="' + padL + '" y="' + (h - 6) + '">' + shortDate(pts[0].date) + "</text>");
-    if (pts.length > 1) {
-      svg.push('<text class="aq-chart-axis-text" x="' + (w - padR) + '" y="' + (h - 6) + '" text-anchor="end">' + shortDate(pts[pts.length - 1].date) + "</text>");
+    // Eixo X datado ao longo de todo o período. Antes só as pontas eram
+    // rotuladas, então num intervalo de 30 dias não dava para saber QUANDO
+    // foi a queda — só que houve uma.
+    if (pts.length === 1) {
+      svg.push('<text class="aq-chart-axis-text" x="' + (padL + innerW / 2) + '" y="' + (h - 6) + '" text-anchor="middle">' + shortDate(pts[0].date) + "</text>");
+    } else {
+      var tickCount = w < 420 ? 2 : w < 700 ? 3 : 5;
+      for (var ti = 0; ti < tickCount; ti++) {
+        var frac = ti / (tickCount - 1);
+        var tx = padL + frac * innerW;
+        var tDay = Math.round(minDay + frac * span);
+        var anchor = ti === 0 ? "start" : ti === tickCount - 1 ? "end" : "middle";
+        svg.push('<line class="aq-chart-grid" x1="' + tx.toFixed(1) + '" y1="' + (padT + innerH) + '" x2="' + tx.toFixed(1) + '" y2="' + (padT + innerH + 3) + '" />');
+        svg.push('<text class="aq-chart-axis-text" x="' + tx.toFixed(1) + '" y="' + (h - 6) + '" text-anchor="' + anchor + '">' + shortDate(fromDayIndex(tDay)) + "</text>");
+      }
     }
 
     svg.push('<line class="aq-chart-cursor" id="aq-chart-cursor" x1="0" y1="' + padT + '" x2="0" y2="' + (padT + innerH) + '" style="display:none" />');
@@ -3215,6 +3331,116 @@
       "Gráfico do score de água: " + complete.length + " dias medidos, média " +
       Math.round(media) + " de 100, último valor " + lastP.score + " em " + brDate(lastP.date) +
       ". Use as setas para percorrer os registros.");
+  }
+
+  // ---------- mapa de cadência: presença e ausência de medição ----------
+
+  var CAL_WEEKS = 18;
+  var CAL_DAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
+  var CAL_MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+  function cellStateFor(reading) {
+    if (!reading) return "none";
+    if (countOpenFields(reading) > 0) return "partial";
+    var s = computeWaterScore(reading);
+    return s >= 80 ? "good" : s >= 50 ? "warn" : "bad";
+  }
+
+  function renderCadence() {
+    var host = document.getElementById("aq-cadence");
+    if (!host) return;
+
+    var byDate = {};
+    state.readings.forEach(function (r) { byDate[r.date] = r; });
+
+    var todayIdx = toDayIndex(todayStr());
+    var todayWeekday = ((todayIdx + 4) % 7 + 7) % 7; // 0 = domingo
+    var endIdx = todayIdx + (6 - todayWeekday);      // fecha o sábado da semana atual
+    var startIdx = endIdx - (CAL_WEEKS * 7 - 1);
+
+    var monthCells = [], gridCells = [];
+    var lastMonth = -1;
+
+    for (var col = 0; col < CAL_WEEKS; col++) {
+      // rótulo do mês na coluna em que ele começa
+      var colStart = startIdx + col * 7;
+      var d = new Date(colStart * 86400000);
+      var m = d.getUTCMonth();
+      var isNew = m !== lastMonth && d.getUTCDate() <= 7;
+      monthCells.push("<span>" + (isNew ? CAL_MONTHS[m] : "") + "</span>");
+      if (isNew) lastMonth = m;
+    }
+
+    // grid-auto-flow: column preenche por coluna, então emitimos na mesma ordem
+    for (var c = 0; c < CAL_WEEKS; c++) {
+      for (var row = 0; row < 7; row++) {
+        var idx = startIdx + c * 7 + row;
+        var iso = fromDayIndex(idx);
+        if (idx > todayIdx) {
+          gridCells.push('<div class="aq-cal-cell" data-future="true"></div>');
+          continue;
+        }
+        var reading = byDate[iso];
+        var st = cellStateFor(reading);
+        var label = brDate(iso) + " · " + (
+          st === "none" ? "sem medição" :
+          st === "partial" ? countOpenFields(reading) + " de 6 campos em aberto" :
+          "score " + computeWaterScore(reading) + "/100"
+        );
+        gridCells.push('<div class="aq-cal-cell" data-s="' + st + '" data-label="' + esc(label) + '"></div>');
+      }
+    }
+
+    host.innerHTML =
+      '<div class="aq-cal">' +
+        '<div></div>' +
+        '<div class="aq-cal-months">' + monthCells.join("") + "</div>" +
+        '<div class="aq-cal-daylabels">' + CAL_DAYS.map(function (x, i) {
+          return "<span>" + (i % 2 === 1 ? x : "") + "</span>";
+        }).join("") + "</div>" +
+        '<div class="aq-cal-grid" role="img" aria-label="' + esc(cadenceSummary(byDate, startIdx, todayIdx).aria) + '">' +
+          gridCells.join("") + "</div>" +
+      "</div>";
+
+    var sum = cadenceSummary(byDate, startIdx, todayIdx);
+    document.getElementById("aq-cadence-caption").textContent = sum.caption;
+  }
+
+  function cadenceSummary(byDate, startIdx, todayIdx) {
+    // Conta a partir da primeira medição, não do início da janela: senão os
+    // meses anteriores ao começo do diário viram "dias não medidos" e a taxa
+    // de adesão fica artificialmente péssima.
+    var firstMeasured = null;
+    for (var f = startIdx; f <= todayIdx; f++) {
+      if (byDate[fromDayIndex(f)]) { firstMeasured = f; break; }
+    }
+    if (firstMeasured === null) {
+      return {
+        caption: "Nenhuma medição nas últimas " + CAL_WEEKS + " semanas.",
+        aria: "Mapa de cadência das últimas " + CAL_WEEKS + " semanas: nenhuma medição registrada."
+      };
+    }
+    startIdx = firstMeasured;
+    var total = todayIdx - startIdx + 1;
+    var measured = 0, longestGap = 0, gap = 0, longestRun = 0, run = 0;
+    for (var i = startIdx; i <= todayIdx; i++) {
+      if (byDate[fromDayIndex(i)]) {
+        measured++; run++; gap = 0;
+        if (run > longestRun) longestRun = run;
+      } else {
+        gap++; run = 0;
+        if (gap > longestGap) longestGap = gap;
+      }
+    }
+    var pct = Math.round(measured / total * 100);
+    return {
+      caption: "Desde a primeira medição (" + brDate(fromDayIndex(startIdx)) + "): " +
+        measured + " de " + total + " dias medidos (" + pct + "%) · maior sequência sem falhar: " +
+        longestRun + " dia(s) · maior intervalo sem medir: " + longestGap + " dia(s)",
+      aria: "Mapa de cadência: " + measured + " de " + total +
+        " dias com medição desde " + brDate(fromDayIndex(startIdx)) +
+        ", maior sequência de " + longestRun + " dias consecutivos."
+    };
   }
 
   // ---------- small multiples: um mini-gráfico por parâmetro ----------
@@ -3356,6 +3582,7 @@
     var empty = document.getElementById("aq-history-empty");
     renderScoreChart();
     renderParamTrends();
+    renderCadence();
     var descending = sorted.slice().reverse();
     if (descending.length === 0) {
       body.innerHTML = "";
@@ -4249,6 +4476,27 @@
       e.preventDefault();
       showChartPoint(i);
     });
+
+    // tooltip do calendário: reaproveita o mesmo balão do gráfico de score
+    var cadHost = document.getElementById("aq-cadence");
+    if (cadHost) {
+      cadHost.addEventListener("pointerover", function (e) {
+        var cell = e.target.closest(".aq-cal-cell[data-label]");
+        var tip = document.getElementById("aq-cadence-tip");
+        if (!cell || !tip) return;
+        var parts = cell.getAttribute("data-label").split(" · ");
+        tip.hidden = false;
+        tip.innerHTML = "<b>" + esc(parts[0]) + "</b>" + esc(parts[1] || "");
+        var wrapBox = document.getElementById("aq-cadence-wrap").getBoundingClientRect();
+        var cellBox = cell.getBoundingClientRect();
+        tip.style.left = (cellBox.left - wrapBox.left + cellBox.width / 2) + "px";
+        tip.style.top = (cellBox.top - wrapBox.top) + "px";
+      });
+      cadHost.addEventListener("pointerleave", function () {
+        var tip = document.getElementById("aq-cadence-tip");
+        if (tip) tip.hidden = true;
+      });
+    }
 
     document.getElementById("aq-range-group").addEventListener("click", function (e) {
       var btn = e.target.closest("[data-range]");
