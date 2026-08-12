@@ -416,6 +416,36 @@
   .aq-chart-tip b { display: block; font-family: var(--font-mono); font-size: var(--fs-body2); }
   .aq-chart-tip span { color: var(--snack-action); }
 
+  /* ---------- sincronização na nuvem ---------- */
+
+  .aq-cloud-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--shape-full);
+    padding: 5px 11px 5px 9px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .aq-cloud-pill:hover { border-color: var(--outline); color: var(--text); }
+  .aq-cloud-pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .aq-cloud-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); flex: none; }
+  .aq-cloud-pill[data-state="synced"] .aq-cloud-dot { background: var(--good); }
+  .aq-cloud-pill[data-state="syncing"] .aq-cloud-dot { background: var(--accent); animation: aq-pulse 1s ease-in-out infinite; }
+  .aq-cloud-pill[data-state="error"] .aq-cloud-dot { background: var(--bad); }
+  .aq-cloud-pill[data-state="blocked"] .aq-cloud-dot { background: var(--warn); }
+  @keyframes aq-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @media (prefers-reduced-motion: reduce) { .aq-cloud-pill[data-state="syncing"] .aq-cloud-dot { animation: none; } }
+
+  .aq-cloud-form { display: flex; flex-direction: column; gap: var(--sp-2); max-width: 560px; }
+  .aq-cloud-actions { display: flex; gap: var(--sp-1); flex-wrap: wrap; align-items: center; }
+  .aq-cloud-log { font-size: var(--fs-caption); color: var(--text-muted); font-family: var(--font-mono); }
+
   .aq-visually-hidden {
     position: absolute;
     width: 1px; height: 1px;
@@ -1243,9 +1273,15 @@
       <h1>Um trecho de rio amazônico, medido todo dia</h1>
       <div class="aq-sub">598 litros de água preta em 2 metros de leito. O painel mostra como a água está hoje; as outras abas registram o parâmetro do dia, explicam a ficha do sistema e riscam o que ainda falta consertar.</div>
     </div>
-    <div class="aq-save-indicator" id="aq-save-indicator">
-      <span class="aq-save-dot"></span>
-      <span id="aq-save-text" aria-live="polite" aria-atomic="true">aguardando primeiro registro</span>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+      <div class="aq-save-indicator" id="aq-save-indicator">
+        <span class="aq-save-dot"></span>
+        <span id="aq-save-text" aria-live="polite" aria-atomic="true">aguardando primeiro registro</span>
+      </div>
+      <button type="button" class="aq-cloud-pill" id="aq-cloud-pill" data-state="off" aria-describedby="aq-cloud-status-text">
+        <span class="aq-cloud-dot"></span>
+        <span id="aq-cloud-status-text">nuvem: não configurada</span>
+      </button>
     </div>
   </header>
 
@@ -1424,6 +1460,42 @@
   </div>
 
   <div id="tab-panel-config" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-config" hidden>
+
+  <section class="aq-card" id="aq-cloud-card">
+    <div class="aq-eyebrow" style="margin-bottom:6px;">Onde os dados ficam salvos</div>
+    <h2 class="aq-section-title" style="margin-bottom:10px;">Sincronização na nuvem</h2>
+
+    <div id="aq-cloud-sandbox-notice" class="aq-callout" data-tone="warn" hidden>
+      <span class="aq-callout-icon">!</span>
+      <p><strong>Esta é a página publicada no claude.ai — ela roda dentro de um sandbox que bloqueia qualquer conexão de rede</strong>, então a sincronização abaixo nunca vai funcionar aqui, com ou sem projeto configurado. Para sincronizar de verdade entre aparelhos, abra o arquivo <code>index.html</code> direto no navegador ou publique-o em GitHub Pages/Vercel/Netlify — aí a conexão com o Supabase funciona normalmente. Este link do artefato continua útil para visualizar e compartilhar o painel, só não grava na nuvem.</p>
+    </div>
+
+    <p class="aq-lede" id="aq-cloud-intro">Sem configurar nada abaixo, os dados ficam apenas neste navegador (localStorage) — não somem, mas também não aparecem em outro aparelho. Preencha os dois campos de um projeto <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> gratuito para os mesmos dados aparecerem em qualquer dispositivo que abrir esta página com as mesmas credenciais.</p>
+
+    <div class="aq-cloud-form">
+      <div class="aq-field">
+        <label for="f-cloud-url">URL do projeto Supabase</label>
+        <div class="aq-input-wrap"><input type="text" id="f-cloud-url" placeholder="https://xxxxxxxxxxxx.supabase.co" autocomplete="off" spellcheck="false" aria-describedby="h-f-cloud-url" /></div>
+        <p class="aq-helper" id="h-f-cloud-url">Em Project Settings → API, campo "Project URL".</p>
+      </div>
+      <div class="aq-field">
+        <label for="f-cloud-key">Chave anon/public</label>
+        <div class="aq-input-wrap"><input type="password" id="f-cloud-key" placeholder="eyJhbGciOi..." autocomplete="off" spellcheck="false" aria-describedby="h-f-cloud-key" /></div>
+        <p class="aq-helper" id="h-f-cloud-key">Mesma tela, campo "anon public". <strong>Nunca use a "service_role"</strong> aqui — ela tem acesso total e não deve rodar no navegador.</p>
+      </div>
+      <div class="aq-cloud-actions">
+        <button type="button" class="aq-btn aq-btn-primary" id="btn-cloud-save">Salvar e conectar</button>
+        <button type="button" class="aq-btn" id="btn-cloud-sync-now">Sincronizar agora</button>
+        <button type="button" class="aq-btn aq-btn-danger" id="btn-cloud-disconnect">Desconectar</button>
+        <span class="aq-cloud-log" id="aq-cloud-log"></span>
+      </div>
+    </div>
+
+    <div class="aq-callout" style="margin-top:14px;">
+      <span class="aq-callout-icon">◇</span>
+      <p><strong>Modelo de confiança:</strong> a chave anon fica salva só no localStorage deste navegador, nunca entra no "Exportar JSON". Mas ela não é secreta como uma senha — qualquer pessoa com a URL e a chave lê e escreve nesses dados, do mesmo jeito que um link do Google Sheets "qualquer pessoa com o link pode editar". Trate as duas como um link privado, não como uma senha forte.</p>
+    </div>
+  </section>
 
   <section class="aq-card aq-chapter">
     <div>
@@ -1917,7 +1989,7 @@
   <div class="aq-snackbar-host" id="aq-snackbar-host" aria-live="polite" aria-atomic="true"></div>
 
   <div class="aq-footnote">
-    <strong>Onde isto está salvo:</strong> os dados ficam no armazenamento local deste navegador (localStorage), vinculados a este dispositivo/navegador específico — não mais presos a uma conversa do Claude, mas também ainda sem sincronização entre dispositivos. Use "Exportar JSON" regularmente para backup. Para acesso multi-dispositivo com link compartilhável e histórico agregado (médias móveis, gráficos), veja o schema Supabase incluído no repositório (<code>supabase-schema.sql</code>) e o <code>README.md</code>.
+    <strong>Onde isto está salvo:</strong> por padrão, os dados ficam no armazenamento local deste navegador (localStorage), vinculados a este dispositivo/navegador específico. Configurando um projeto Supabase gratuito em <strong>Configurações → Sincronização na nuvem</strong> (credenciais, schema pronto em <code>supabase-schema.sql</code>), os mesmos dados passam a aparecer em qualquer aparelho que abrir esta página com as mesmas credenciais — sem servidor próprio, sem login. Use "Exportar JSON" de vez em quando de qualquer forma; é o backup que sobrevive mesmo se você perder acesso ao projeto na nuvem. <strong>Importante:</strong> se você está lendo isto na página publicada no claude.ai, a sincronização não funciona aqui — o sandbox do artefato bloqueia conexões de rede. Abra o <code>index.html</code> fora do claude.ai (localmente ou publicado em GitHub Pages/Vercel/Netlify) para sincronizar de verdade. Veja o <code>README.md</code> para o passo a passo.
   </div>
 </div>
 
@@ -2258,6 +2330,9 @@
     } catch (e) {
       memoryFallback[key] = value;
     }
+    // toda escrita local passa por aqui (persistAll/doUndoable/upsertReading
+    // incluídos) — ponto único para acionar a sincronização com a nuvem
+    if (typeof markCloudDirty === "function") markCloudDirty(key);
   }
 
   // ---------- state ----------
@@ -2368,6 +2443,428 @@
     return String(value === null || value === undefined ? "" : value)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // ---------- sincronização na nuvem (Supabase / PostgREST via fetch) ----------
+  //
+  // Este arquivo roda em dois contextos: como página autocontida (aberta direto
+  // ou publicada em GitHub Pages/Vercel/etc.) e como fragmento publicado no
+  // claude.ai/code/artifact. O segundo roda num sandbox com CSP que bloqueia
+  // toda rede externa — então este módulo detecta esse contexto e desliga a
+  // sincronização com um aviso explícito, em vez de falhar em silêncio.
+
+  var CLOUD_KEYS = { url: "aq_cloud_url_v1", key: "aq_cloud_key_v1" };
+  var CLOUD_TIMEOUT_MS = 12000;
+  var CLOUD_DEBOUNCE_MS = 900;
+  var CLOUD_RETRY_MS = 15000;
+
+  function isArtifactSandbox() {
+    try {
+      if (window.__FRAME_PREAMBLE) return true;
+      return window.top !== window.self;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function cloudUUID() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0, v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  function numOrNull(v) {
+    if (v === "" || v === null || v === undefined) return null;
+    var n = Number(v);
+    return isFinite(n) ? n : null;
+  }
+
+  function getCloudConfig() {
+    var url = loadJSON(CLOUD_KEYS.url, "");
+    var key = loadJSON(CLOUD_KEYS.key, "");
+    if (!url || !key) return null;
+    return { url: url.replace(/\/+$/, ""), key: key };
+  }
+
+  function setCloudConfigValues(url, key) {
+    saveJSON(CLOUD_KEYS.url, url.trim());
+    saveJSON(CLOUD_KEYS.key, key.trim());
+  }
+
+  function clearCloudConfigValues() {
+    try { window.localStorage.removeItem(CLOUD_KEYS.url); window.localStorage.removeItem(CLOUD_KEYS.key); } catch (e) {}
+  }
+
+  function describeCloudError(err) {
+    if (!err) return "Erro desconhecido.";
+    if (err.code === "not_configured") return "Nuvem não configurada.";
+    if (err.code === "sandboxed") return "Bloqueado pelo sandbox do artefato — abra o index.html fora do claude.ai.";
+    if (err.code === "timeout") return "Sem resposta do servidor (tempo esgotado). Verifique a URL do projeto.";
+    if (err.code === "network") return "Não foi possível conectar. Verifique a URL do projeto e sua internet.";
+    if (err.code === "http_401" || err.code === "http_403") return "Chave rejeitada pelo Supabase. Confira se copiou a chave \"anon public\" correta.";
+    if (err.code === "http_404") return "Projeto não encontrado, ou as tabelas ainda não existem (rode o supabase-schema.sql).";
+    if (err.code && err.code.indexOf("http_") === 0) return "O Supabase respondeu com erro (" + err.code.replace("http_", "") + ").";
+    return err.message || "Erro ao sincronizar.";
+  }
+
+  // ---------- adaptadores: estado local <-> linhas do Postgres ----------
+
+  var CONFIG_NUMERIC_FIELDS = {};
+  CONFIG_SPEC.forEach(function (g) {
+    g.fields.forEach(function (f) { if (f.type === "number") CONFIG_NUMERIC_FIELDS[f.id] = true; });
+  });
+
+  function configToRow(config) {
+    var row = { id: true };
+    CONFIG_FIELDS.forEach(function (key) {
+      var col = key.replace(/-/g, "_");
+      var v = config[key];
+      row[col] = CONFIG_NUMERIC_FIELDS[key] ? numOrNull(v) : (v === "" || v === undefined ? null : v);
+    });
+    return row;
+  }
+
+  function configFromRow(row) {
+    var config = {};
+    CONFIG_FIELDS.forEach(function (key) {
+      var col = key.replace(/-/g, "_");
+      var v = row[col];
+      config[key] = v === null || v === undefined ? "" : String(v);
+    });
+    return config;
+  }
+
+  function reconcilePhases(remoteRows) {
+    var byId = {};
+    (remoteRows || []).forEach(function (r) { byId[r.id] = r; });
+    return DEFAULT_PHASES.map(function (def) {
+      var r = byId[def.id];
+      return r ? { id: def.id, label: def.label, status: r.status || "pendente", notes: r.notes || "" } : def;
+    });
+  }
+
+  var CLOUD_TABLES = {
+    readings: {
+      table: "readings", conflictCol: "date",
+      idOf: function (row) { return row.date; },
+      toRow: function (r) {
+        return { date: r.date, temp: numOrNull(r.temp), ph: numOrNull(r.ph), kh: numOrNull(r.kh),
+          nh3: numOrNull(r.nh3), no2: numOrNull(r.no2), no3: numOrNull(r.no3),
+          turbidez: !!r.turbidez, notes: r.notes || null };
+      },
+      fromRow: function (row) {
+        return { date: row.date, temp: row.temp, ph: row.ph, kh: row.kh, nh3: row.nh3, no2: row.no2, no3: row.no3,
+          turbidez: !!row.turbidez, notes: row.notes || "" };
+      },
+      getLocal: function () { return state.readings; },
+      setLocal: function (rows) { state.readings = rows; }
+    },
+    phases: {
+      table: "phase_data", conflictCol: "id", noDelete: true,
+      idOf: function (row) { return row.id; },
+      toRow: function (p) { return { id: p.id, label: p.label, status: p.status, notes: p.notes || null }; },
+      fromRow: function (row) { return row; }, // tratado via reconcilePhases, não linha a linha
+      getLocal: function () { return state.phases; },
+      setLocal: function (rows) { state.phases = reconcilePhases(rows); }
+    },
+    criteria: {
+      table: "gate_criteria", conflictCol: "id",
+      idOf: function (row) { return row.id; },
+      ensureIds: function (arr) { arr.forEach(function (c) { if (!c.id) c.id = cloudUUID(); }); },
+      toRow: function (c) { return { id: c.id, label: c.label, checked: !!c.checked }; },
+      fromRow: function (row) { return { id: row.id, label: row.label, checked: !!row.checked }; },
+      getLocal: function () { return state.criteria; },
+      setLocal: function (rows) { state.criteria = rows; }
+    },
+    structTasks: {
+      table: "struct_tasks", conflictCol: "id",
+      idOf: function (row) { return row.id; },
+      toRow: function (t) {
+        return { id: t.id, task_group: t.group || "acao", priority: t.priority || "baixa", label: t.label,
+          impact: t.impact || null, cost: t.cost || null, cost_value: t.costValue || 0,
+          custom: !!t.custom, checked: !!t.checked };
+      },
+      fromRow: function (row) {
+        return { id: row.id, group: row.task_group, priority: row.priority, label: row.label,
+          impact: row.impact || "", cost: row.cost || "", costValue: row.cost_value || 0,
+          custom: !!row.custom, checked: !!row.checked };
+      },
+      getLocal: function () { return state.structTasks; },
+      setLocal: function (rows) { state.structTasks = rows.length ? rows : state.structTasks; }
+    },
+    config: {
+      table: "tank_config", conflictCol: "id", single: true,
+      toRow: configToRow,
+      fromRow: configFromRow,
+      getLocal: function () { return state.config; },
+      setLocal: function (c) { state.config = c; }
+    }
+  };
+
+  // ---------- cliente REST (PostgREST) ----------
+
+  function cloudFetch(path, opts) {
+    var cfg = getCloudConfig();
+    if (!cfg) return Promise.reject({ code: "not_configured" });
+    if (isArtifactSandbox()) return Promise.reject({ code: "sandboxed" });
+    opts = opts || {};
+    var headers = { "apikey": cfg.key, "Authorization": "Bearer " + cfg.key, "Content-Type": "application/json" };
+    Object.keys(opts.headers || {}).forEach(function (k) { headers[k] = opts.headers[k]; });
+    var hasAbort = typeof AbortController === "function";
+    var controller = hasAbort ? new AbortController() : null;
+    var timeoutId = controller ? setTimeout(function () { controller.abort(); }, CLOUD_TIMEOUT_MS) : null;
+    return fetch(cfg.url + "/rest/v1/" + path, {
+      method: opts.method || "GET",
+      headers: headers,
+      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+      signal: controller ? controller.signal : undefined
+    }).then(function (res) {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (!res.ok) {
+        return res.text().then(function (t) {
+          var e = { code: "http_" + res.status, status: res.status, message: t };
+          throw e;
+        });
+      }
+      if (res.status === 204) return null;
+      return res.text().then(function (t) { return t ? JSON.parse(t) : null; });
+    }, function (err) {
+      if (timeoutId) clearTimeout(timeoutId);
+      throw { code: err.name === "AbortError" ? "timeout" : "network", message: err.message };
+    });
+  }
+
+  function cloudPushTable(key) {
+    var a = CLOUD_TABLES[key];
+    if (!a) return Promise.resolve();
+    if (a.single) {
+      var row = a.toRow(a.getLocal());
+      return cloudFetch(a.table + "?on_conflict=" + a.conflictCol, {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: [row]
+      });
+    }
+    var localRows = a.getLocal();
+    if (a.ensureIds) { a.ensureIds(localRows); saveJSON(STORAGE_KEYS[key], localRows); }
+    var rows = localRows.map(a.toRow);
+    var localIds = rows.map(a.idOf);
+    var push = rows.length
+      ? cloudFetch(a.table + "?on_conflict=" + a.conflictCol, {
+          method: "POST",
+          headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+          body: rows
+        })
+      : Promise.resolve();
+    if (a.noDelete) return push;
+    return push.then(function () { return cloudFetch(a.table + "?select=" + a.conflictCol); })
+      .then(function (serverRows) {
+        var extra = (serverRows || []).filter(function (r) { return localIds.indexOf(r[a.conflictCol]) === -1; });
+        if (!extra.length) return null;
+        return Promise.all(extra.map(function (r) {
+          return cloudFetch(a.table + "?" + a.conflictCol + "=eq." + encodeURIComponent(r[a.conflictCol]), { method: "DELETE" });
+        }));
+      });
+  }
+
+  function cloudPushAll() {
+    return Object.keys(CLOUD_TABLES).reduce(function (p, key) {
+      return p.then(function () { return cloudPushTable(key); });
+    }, Promise.resolve());
+  }
+
+  function cloudPullAll() {
+    return Promise.all(Object.keys(CLOUD_TABLES).map(function (key) {
+      var a = CLOUD_TABLES[key];
+      return cloudFetch(a.table + "?select=*").then(function (rows) { return { key: key, rows: rows || [] }; });
+    })).then(function (results) {
+      var out = {};
+      results.forEach(function (r) {
+        var a = CLOUD_TABLES[r.key];
+        out[r.key] = a.single ? (r.rows.length ? a.fromRow(r.rows[0]) : null) : r.rows.map(a.fromRow);
+      });
+      return out;
+    });
+  }
+
+  // assinatura estável (independente de ordem) pra comparar local x nuvem sem
+  // precisar de coluna de versão — suficiente pro uso de um usuário só
+  function stateSignature(readings, criteria, structTasks, config) {
+    var r = readings.map(function (x) { return [x.date, x.temp, x.ph, x.kh, x.nh3, x.no2, x.no3, !!x.turbidez, x.notes || ""].join("|"); }).sort();
+    var c = criteria.map(function (x) { return [x.id || x.label, x.label, !!x.checked].join("|"); }).sort();
+    var t = structTasks.map(function (x) { return [x.id, !!x.checked].join("|"); }).sort();
+    return JSON.stringify({ r: r, c: c, t: t, cfg: config });
+  }
+
+  function localIsEmpty() {
+    var noChecks = !state.structTasks.some(function (t) { return t.checked; });
+    var configDefault = Object.keys(DEFAULT_CONFIG).every(function (k) {
+      return String(state.config[k] || "") === String(DEFAULT_CONFIG[k] || "");
+    });
+    return state.readings.length === 0 && state.criteria.length === 0 && noChecks && configDefault;
+  }
+
+  function remoteIsEmpty(remote) {
+    var noChecks = !remote.structTasks.some(function (t) { return t.checked; });
+    var configDefault = !remote.config || Object.keys(DEFAULT_CONFIG).every(function (k) {
+      return String(remote.config[k] || "") === String(DEFAULT_CONFIG[k] || "");
+    });
+    return remote.readings.length === 0 && remote.criteria.length === 0 && noChecks && configDefault;
+  }
+
+  function cloudAdoptRemote(remote) {
+    doUndoable(
+      "Dados da nuvem aplicados: " + remote.readings.length + " leitura(s), " + remote.criteria.length + " critério(s).",
+      function () {
+        state.readings = remote.readings;
+        state.phases = reconcilePhases(remote.phases);
+        state.criteria = remote.criteria;
+        state.config = remote.config || state.config;
+        state.structTasks = remote.structTasks.length ? remote.structTasks : state.structTasks;
+      }
+    );
+    loadConfigForm(state.config);
+  }
+
+  // ---------- indicador de status ----------
+
+  var cloudPushTimer = null, cloudRetryTimer = null;
+  var CLOUD_DIRTY = {};
+
+  function setCloudState(kind, detail) {
+    var pill = document.getElementById("aq-cloud-pill");
+    var text = document.getElementById("aq-cloud-status-text");
+    var log = document.getElementById("aq-cloud-log");
+    if (!pill) return;
+    pill.setAttribute("data-state", kind);
+    var labels = {
+      off: "nuvem: não configurada",
+      blocked: "nuvem: bloqueada neste sandbox",
+      syncing: "nuvem: sincronizando…",
+      synced: "nuvem: sincronizado",
+      error: "nuvem: erro ao sincronizar",
+      diverge: "nuvem: dados diferentes — clique para revisar"
+    };
+    text.textContent = labels[kind] || "nuvem";
+    if (log) log.textContent = detail || "";
+  }
+
+  function markCloudDirty(storageKey) {
+    var tableKey = null;
+    Object.keys(CLOUD_TABLES).forEach(function (k) { if (STORAGE_KEYS[k] === storageKey) tableKey = k; });
+    if (!tableKey) return;
+    if (isArtifactSandbox()) { setCloudState("blocked"); return; }
+    if (!getCloudConfig()) return;
+    CLOUD_DIRTY[tableKey] = true;
+    clearTimeout(cloudPushTimer);
+    cloudPushTimer = setTimeout(runCloudPush, CLOUD_DEBOUNCE_MS);
+  }
+
+  function runCloudPush() {
+    var keys = Object.keys(CLOUD_DIRTY).filter(function (k) { return CLOUD_DIRTY[k]; });
+    if (!keys.length) return;
+    keys.forEach(function (k) { CLOUD_DIRTY[k] = false; });
+    setCloudState("syncing");
+    keys.reduce(function (p, k) { return p.then(function () { return cloudPushTable(k); }); }, Promise.resolve())
+      .then(function () { setCloudState("synced"); })
+      .catch(function (err) {
+        keys.forEach(function (k) { CLOUD_DIRTY[k] = true; });
+        setCloudState("error", describeCloudError(err));
+        clearTimeout(cloudRetryTimer);
+        cloudRetryTimer = setTimeout(runCloudPush, CLOUD_RETRY_MS);
+      });
+  }
+
+  // Chamada ao conectar e a cada carregamento da página. Só aplica sozinho os
+  // casos sem ambiguidade (um lado vazio); quando os dois têm dado e diferem,
+  // sinaliza no indicador e deixa a decisão para "Sincronizar agora".
+  function cloudAutoReconcile() {
+    if (isArtifactSandbox()) { setCloudState("blocked"); return Promise.resolve(); }
+    if (!getCloudConfig()) { setCloudState("off"); return Promise.resolve(); }
+    setCloudState("syncing");
+    return cloudPullAll().then(function (remote) {
+      var lEmpty = localIsEmpty(), rEmpty = remoteIsEmpty(remote);
+      if (lEmpty && rEmpty) { setCloudState("synced"); return; }
+      if (lEmpty && !rEmpty) { cloudAdoptRemote(remote); setCloudState("synced"); return; }
+      if (!lEmpty && rEmpty) { return cloudPushAll().then(function () { setCloudState("synced"); }); }
+      var sig = stateSignature(state.readings, state.criteria, state.structTasks, state.config);
+      var rSig = stateSignature(remote.readings, remote.criteria, remote.structTasks, remote.config);
+      if (sig === rSig) { setCloudState("synced"); return; }
+      setCloudState("diverge", "toque em \"Sincronizar agora\" na aba Configurações para revisar");
+    }).catch(function (err) {
+      setCloudState("error", describeCloudError(err));
+    });
+  }
+
+  // Chamada pelo botão "Sincronizar agora": sempre visível, sempre com resultado.
+  function cloudManualSync() {
+    if (isArtifactSandbox()) { showSnackbar("Sincronização bloqueada dentro do artefato do claude.ai — abra o index.html fora daqui.", { variant: "error" }); return; }
+    if (!getCloudConfig()) { showSnackbar("Configure a URL e a chave do projeto antes de sincronizar.", { variant: "error" }); return; }
+    setCloudState("syncing");
+    cloudPullAll().then(function (remote) {
+      var lEmpty = localIsEmpty(), rEmpty = remoteIsEmpty(remote);
+      if (lEmpty && rEmpty) { setCloudState("synced"); showSnackbar("Nada para sincronizar ainda — nem aqui, nem na nuvem."); return; }
+      if (rEmpty) { return cloudPushAll().then(function () { setCloudState("synced"); showSnackbar("Dados deste aparelho enviados para a nuvem."); }); }
+      var sig = stateSignature(state.readings, state.criteria, state.structTasks, state.config);
+      var rSig = stateSignature(remote.readings, remote.criteria, remote.structTasks, remote.config);
+      if (sig === rSig) { setCloudState("synced"); showSnackbar("Já está tudo sincronizado."); return; }
+      var ok = window.confirm(
+        "A nuvem tem " + remote.readings.length + " leitura(s) e este aparelho tem " + state.readings.length + ".\n\n" +
+        "Adotar os dados da nuvem aqui? Isso substitui o que está neste navegador — dá para desfazer em seguida.\n" +
+        "Se preferir manter o que está aqui e sobrescrever a nuvem, cancele e edite qualquer campo para forçar o envio."
+      );
+      if (ok) { cloudAdoptRemote(remote); setCloudState("synced"); }
+      else { setCloudState("diverge"); }
+    }).catch(function (err) {
+      setCloudState("error", describeCloudError(err));
+      showSnackbar("Não foi possível sincronizar: " + describeCloudError(err), { variant: "error" });
+    });
+  }
+
+  function initCloudUI() {
+    var sandboxed = isArtifactSandbox();
+    var notice = document.getElementById("aq-cloud-sandbox-notice");
+    if (notice) notice.hidden = !sandboxed;
+    document.getElementById("aq-cloud-intro").style.opacity = sandboxed ? "0.6" : "";
+
+    var cfg = getCloudConfig();
+    if (cfg) {
+      document.getElementById("f-cloud-url").value = cfg.url;
+      document.getElementById("f-cloud-key").value = cfg.key;
+    }
+    if (sandboxed) { setCloudState("blocked"); }
+    else if (!cfg) { setCloudState("off"); }
+    else { cloudAutoReconcile(); }
+
+    document.getElementById("aq-cloud-pill").addEventListener("click", function () {
+      if (sandboxed) { showSnackbar("Este link é o artefato publicado no claude.ai — a sincronização só funciona fora dele. Veja o aviso na aba Configurações."); return; }
+      var tabBtn = document.getElementById("tab-btn-config");
+      tabBtn.click();
+      document.getElementById("aq-cloud-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("f-cloud-url").focus();
+    });
+
+    document.getElementById("btn-cloud-save").addEventListener("click", function () {
+      var url = document.getElementById("f-cloud-url").value.trim();
+      var key = document.getElementById("f-cloud-key").value.trim();
+      if (!url || !key) { showSnackbar("Preencha a URL e a chave antes de conectar.", { variant: "error" }); return; }
+      if (!/^https:\/\//.test(url)) { showSnackbar("A URL do projeto deve começar com https://", { variant: "error" }); return; }
+      setCloudConfigValues(url, key);
+      showSnackbar("Credenciais salvas. Conectando…");
+      cloudAutoReconcile();
+    });
+
+    document.getElementById("btn-cloud-sync-now").addEventListener("click", cloudManualSync);
+
+    document.getElementById("btn-cloud-disconnect").addEventListener("click", function () {
+      clearCloudConfigValues();
+      document.getElementById("f-cloud-url").value = "";
+      document.getElementById("f-cloud-key").value = "";
+      setCloudState("off");
+      showSnackbar("Desconectado. Os dados continuam salvos neste navegador.");
+    });
   }
 
   var editingDate = null;
@@ -3817,6 +4314,7 @@
       renderSaveIndicator("carregado — último registro em " + mostRecent.date.split("-").reverse().join("/"));
     }
     renderAll();
+    initCloudUI();
   })();
 })();
 </script>

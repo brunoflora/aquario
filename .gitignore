@@ -1,0 +1,3 @@
+# certificado local gerado para rodar scripts/cloud-sync-test.js (ver cabeçalho do arquivo)
+scripts/mock-cert.pem
+scripts/mock-key.pem

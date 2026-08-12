@@ -17,6 +17,15 @@ A interface segue o **sistema do MUI** implementado nativamente em CSS — sem R
 - **Padrões do MUI Dashboard**: cards `outlined` (borda de 1px, sem sombra), faixas de estatística, app bar fixa que ganha elevação ao descolar do topo, abas roláveis no mobile.
 - A ficha técnica é gerada de um **spec declarativo** (`CONFIG_SPEC`), o que garante anatomia idêntica em todos os 43 campos.
 
+## Sincronização na nuvem — como foi construída
+
+Toda escrita local passa por uma única função (`saveJSON`), que agora também marca a tabela correspondente como "suja" e agenda um envio (debounce de 900 ms) para o Supabase via `fetch` direto — sem SDK, sem build. Isso significa que `doUndoable`, o fluxo de importar JSON e cada mutação isolada (registrar leitura, marcar checklist, editar a ficha) já propagam para a nuvem automaticamente, sem precisar tocar em cada callback.
+
+- **Upsert + delete real**: cada envio faz upsert (`Prefer: resolution=merge-duplicates`) das linhas atuais e depois busca os ids que existem na nuvem mas não localmente, apagando-os — uma exclusão local vira exclusão na nuvem, não só "esquecer de enviar".
+- **Sem servidor, sem conflito de escrita concorrente de verdade**: o app assume um usuário só, em poucos dispositivos, não editando o mesmo dado ao mesmo tempo em dois aparelhos. A reconciliação usa uma assinatura determinística do estado (ids + valores, ordenados) para decidir se local e nuvem já são iguais, sem precisar de coluna de versão.
+- **Nunca sobrescreve sozinho quando os dois lados têm dados diferentes** — ver seção de segurança acima.
+- Testado com um **mock do protocolo PostgREST** (não é o Supabase real — não tenho como criar um projeto por você): dois "dispositivos" simulados trocando dados por push/pull, delete propagando, chave errada e URL inalcançável mostrando erro compreensível sem quebrar o uso local, e a detecção de sandbox validada dentro de um iframe real.
+
 ## Acessibilidade e contraste
 
 Todos os pares de cor que a interface realmente usa foram medidos (script em `scripts/contrast.js`), nos dois temas:
@@ -105,26 +114,31 @@ Ao final, **Ficha técnica editável**: 43 campos (display, sump, hidráulica, e
 
 - **Exportar/Importar JSON**: backup manual de tudo (leituras, fases, critérios, configuração do sistema e ações prioritárias) em um arquivo `.json`.
 
-## Onde os dados ficam guardados (limitação atual, honesta)
+## Onde os dados ficam guardados
 
-Tudo é salvo em `localStorage` do navegador — client-side, sem backend. Isso já resolve o problema do artefato original (dados presos a uma conversa específica do Claude, perdidos se a conversa fosse arquivada), mas ainda tem limitações reais:
+Por padrão, tudo é salvo em `localStorage` do navegador — client-side, sem backend, atrelado a este dispositivo específico. **A partir da aba Configurações → Sincronização na nuvem, dá para ligar sincronização real com Supabase** — os mesmos dados passam a aparecer em qualquer aparelho que abrir esta página com as mesmas credenciais, sem precisar editar código.
 
-- Os dados ficam **atrelados a este navegador/dispositivo específico**. Abrir em outro computador ou celular não traz o histórico junto.
-- Não há backup automático fora do navegador. **Use "Exportar JSON" periodicamente** e guarde o arquivo em algum lugar seguro (Drive, e-mail para si mesmo, etc.).
-- Limpar os dados do navegador (ou trocar de navegador/perfil) apaga o histórico local.
+### ⚠ Isto não funciona dentro do artefato publicado no claude.ai
 
-Para um projeto de 6+ meses ligado a decisões comerciais (timing de venda, formação de casais), a recomendação é migrar para um banco de dados real nas próximas semanas — ver seção abaixo.
+O link `claude.ai/code/artifact/...` roda a página dentro de um **sandbox com CSP que bloqueia qualquer conexão de rede** que não seja uma capability explicitamente concedida pela plataforma (hoje: downloads e MCP — nenhuma delas serve para falar com um banco de dados externo). Isso significa que:
 
-## Caminho de migração para produção (Supabase)
+- **A sincronização com Supabase nunca vai funcionar no link do artefato**, com ou sem projeto configurado. A própria página detecta esse contexto (`window.top !== window.self`) e mostra um aviso em vez de falhar em silêncio.
+- Para sincronização de verdade entre dispositivos, abra `index.html` **fora do claude.ai**: localmente (baixe o arquivo e abra no navegador) ou publicado em GitHub Pages / Vercel / Netlify. Fora do sandbox, a conexão com o Supabase funciona normalmente em qualquer navegador moderno.
+- O link do artefato continua útil pra visualizar e compartilhar o painel — só não grava nem lê da nuvem a partir dali.
 
-O arquivo `supabase-schema.sql` já traz o schema mínimo (tabelas `readings`, `phase_data`, `gate_criteria`, `tank_config` e `struct_tasks`). Para migrar:
+### Configurar a sincronização (fora do claude.ai)
 
-1. Criar um projeto no [Supabase](https://supabase.com) (tier gratuito é suficiente para este volume de dados).
-2. Rodar `supabase-schema.sql` no SQL editor do projeto.
-3. Trocar as funções `loadJSON`/`saveJSON` em `index.html` por chamadas à API REST do Supabase (`@supabase/supabase-js` ou `fetch` direto), mantendo intactas as funções puras `paramStatus`, `computeWaterScore`, `evaluateGates` e `deriveActionPlan` — elas não têm nenhuma dependência de armazenamento e podem ser reaproveitadas como estão.
-4. Hospedar em Vercel ou Netlify (deploy direto deste repositório), com as chaves do Supabase como variáveis de ambiente.
+1. Criar um projeto gratuito no [Supabase](https://supabase.com).
+2. Abrir o **SQL Editor** do projeto e rodar o conteúdo de `supabase-schema.sql` deste repositório — cria as 5 tabelas (`readings`, `phase_data`, `gate_criteria`, `tank_config`, `struct_tasks`) já com RLS habilitado e políticas de acesso para o papel `anon`.
+3. Em **Project Settings → API**, copiar o **Project URL** e a chave **anon public** (não a `service_role` — essa nunca deve rodar no navegador).
+4. Na aba **Configurações → Sincronização na nuvem** do app, colar os dois valores e clicar em **Salvar e conectar**.
+5. Repetir o passo 4 em cada dispositivo, com as mesmas credenciais.
 
-Isso destrava: link compartilhável de qualquer dispositivo, queries agregadas (médias móveis de 7/30 dias, gráficos de tendência), backup automático e, se um dia fizer sentido, acesso multiusuário (sócio, veterinário, comprador).
+O app decide sozinho a direção da primeira sincronização: se um lado está vazio e o outro tem dados, adota automaticamente o lado com dados; se os dois têm dados e são diferentes, **não sobrescreve nada sozinho** — mostra um aviso ("dados diferentes — clique para revisar") e só troca quando você confirma pelo botão **Sincronizar agora**. Dali em diante, toda alteração local é enviada para a nuvem alguns segundos depois, incluindo exclusões (não é só "enviar o que existe": o que foi apagado localmente é apagado na nuvem também).
+
+**Modelo de confiança:** não há login. Qualquer pessoa com a URL do projeto e a chave anon lê e escreve nesses dados — o mesmo modelo de um link do Google Sheets "qualquer pessoa com o link pode editar". Apropriado para um painel pessoal com poucos dispositivos de confiança; não reaproveite esse projeto Supabase para dados sensíveis. A chave fica só no `localStorage` do navegador e nunca entra no "Exportar JSON".
+
+**Use "Exportar JSON" de qualquer forma.** Sincronização não é backup: se você apagar o projeto Supabase, ou dois dispositivos brigarem por uma divergência mal resolvida, o `.json` exportado é a rede de segurança que não depende de nenhum serviço externo.
 
 ## Lógica de negócio (referência rápida)
 

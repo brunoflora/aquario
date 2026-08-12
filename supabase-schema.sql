@@ -63,6 +63,7 @@ create table tank_config (
   hyd_wavemaker text,
   hyd_antisiphon text,
   hyd_notes text,
+  hyd_antisiphon_done text default 'nao', -- 'sim'/'nao' — alimenta o cenário calculado do capítulo 4
   eq_heater text,
   eq_lighting text,
   eq_extra_pumps text,
@@ -97,3 +98,35 @@ create table struct_tasks (
   checked boolean default false,
   checked_at timestamptz
 );
+
+-- ============================================================================
+-- Segurança (RLS) — leia antes de usar em produção
+-- ============================================================================
+-- Este app não tem login: ele usa a chave "anon public" do projeto direto no
+-- navegador (ver README.md § Sincronização na nuvem). Isso significa que
+-- QUALQUER PESSOA COM A URL DO PROJETO + A CHAVE ANON consegue ler e escrever
+-- nestas tabelas — não há usuário autenticado para uma política restringir.
+--
+-- O Supabase já nega tudo por padrão quando RLS está ligado e não há política
+-- (é o comportamento seguro). As políticas abaixo abrem, de propósito, acesso
+-- total ao papel "anon" — exatamente o modelo de um link do Google Sheets
+-- "qualquer pessoa com o link pode editar". Isso é apropriado para um painel
+-- pessoal de um aquário com poucos dispositivos de confiança; NÃO é apropriado
+-- se este projeto Supabase for reaproveitado para dados sensíveis ou multiuso.
+--
+-- Se um dia isto precisar de usuários de verdade (ex: sócio, comprador, com
+-- permissões diferentes), o caminho é: Supabase Auth + políticas com
+-- `auth.uid()` no lugar de `true` abaixo, e trocar a chave anon por sessão
+-- autenticada no index.html.
+
+alter table readings enable row level security;
+alter table phase_data enable row level security;
+alter table gate_criteria enable row level security;
+alter table tank_config enable row level security;
+alter table struct_tasks enable row level security;
+
+create policy "anon full access" on readings for all to anon using (true) with check (true);
+create policy "anon full access" on phase_data for all to anon using (true) with check (true);
+create policy "anon full access" on gate_criteria for all to anon using (true) with check (true);
+create policy "anon full access" on tank_config for all to anon using (true) with check (true);
+create policy "anon full access" on struct_tasks for all to anon using (true) with check (true);
