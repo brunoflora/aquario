@@ -478,8 +478,8 @@
 
   .aq-summary-strip {
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 22px;
+    grid-template-columns: auto 1fr;
+    gap: var(--sp-3);
     align-items: center;
   }
 
@@ -588,10 +588,6 @@
   .aq-gate-chip[data-met="true"] { background: var(--good-soft); border-color: transparent; color: var(--good); }
   .aq-gate-chip[data-met="true"]::before { background: var(--good); }
   .aq-gate-chip[data-met="true"] .aq-chip-count { color: var(--good); }
-
-  .aq-sparkline-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-  .aq-sparkline-wrap canvas { display: block; }
-  .aq-sparkline-caption { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); }
 
   .aq-grid-2 {
     display: grid;
@@ -1186,7 +1182,7 @@
     <div>
       <div class="aq-eyebrow">Aquário jumbo — Ciclídeos Nacionais</div>
       <h1>Um trecho de rio amazônico, medido todo dia</h1>
-      <div class="aq-sub">598 litros de água preta em 2 metros de leito. Aqui se registra o parâmetro do dia, se lê a ficha do sistema e se risca a lista do que ainda falta consertar.</div>
+      <div class="aq-sub">598 litros de água preta em 2 metros de leito. O painel mostra como a água está hoje; as outras abas registram o parâmetro do dia, explicam a ficha do sistema e riscam o que ainda falta consertar.</div>
     </div>
     <div class="aq-save-indicator" id="aq-save-indicator">
       <span class="aq-save-dot"></span>
@@ -1196,13 +1192,14 @@
 
   <div class="aq-appbar" id="aq-appbar">
   <div class="aq-tabs" role="tablist" aria-label="Seções do painel">
-    <button type="button" class="aq-tab" id="tab-btn-params" role="tab" aria-selected="true" aria-controls="tab-panel-params">Parâmetros</button>
+    <button type="button" class="aq-tab" id="tab-btn-painel" role="tab" aria-selected="true" aria-controls="tab-panel-painel">Painel</button>
+    <button type="button" class="aq-tab" id="tab-btn-params" role="tab" aria-selected="false" aria-controls="tab-panel-params" tabindex="-1">Parâmetros</button>
     <button type="button" class="aq-tab" id="tab-btn-config" role="tab" aria-selected="false" aria-controls="tab-panel-config" tabindex="-1">Configurações</button>
     <button type="button" class="aq-tab" id="tab-btn-check" role="tab" aria-selected="false" aria-controls="tab-panel-check" tabindex="-1">Checklist</button>
   </div>
   </div>
 
-  <div id="tab-panel-params" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-params">
+  <div id="tab-panel-painel" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-painel">
 
   <section class="aq-card aq-summary-strip" id="aq-summary-strip" aria-label="Resumo do estado da água">
     <div class="aq-gauge-wrap">
@@ -1215,11 +1212,66 @@
       </div>
     </div>
     <div class="aq-gates" id="aq-gates"></div>
-    <div class="aq-sparkline-wrap">
-      <canvas id="aq-sparkline" width="220" height="46" aria-label="Tendência do score de água"></canvas>
-      <span class="aq-sparkline-caption" id="aq-sparkline-caption">tendência do score</span>
-    </div>
   </section>
+
+  <section class="aq-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+      <h2 class="aq-section-title" style="margin:0;">Histórico de leituras</h2>
+      <div class="aq-tools-row">
+        <button class="aq-btn" id="btn-export">Exportar JSON</button>
+        <button class="aq-btn" id="btn-import">Importar JSON</button>
+        <input type="file" id="file-import" accept="application/json" style="display:none" />
+      </div>
+    </div>
+    <div class="aq-viewbar">
+      <div class="aq-segmented" role="group" aria-label="Formato do histórico">
+        <button type="button" class="aq-seg" id="btn-view-chart" aria-pressed="true">Gráfico do score</button>
+        <button type="button" class="aq-seg" id="btn-view-table" aria-pressed="false">Tabela completa</button>
+      </div>
+      <div class="aq-segmented" role="group" aria-label="Período do gráfico" id="aq-range-group">
+        <button type="button" class="aq-seg" data-range="7" aria-pressed="false">7 dias</button>
+        <button type="button" class="aq-seg" data-range="30" aria-pressed="true">30 dias</button>
+        <button type="button" class="aq-seg" data-range="0" aria-pressed="false">Tudo</button>
+      </div>
+    </div>
+
+    <div id="aq-chart-view">
+      <div class="aq-chart-wrap">
+        <div id="aq-score-chart" class="aq-chart"
+             tabindex="0" role="img"
+             aria-label="Gráfico do score de água ao longo do tempo. Use as setas para percorrer os registros."></div>
+        <div class="aq-chart-tip" id="aq-chart-tip" hidden></div>
+      </div>
+      <p class="aq-chart-caption" id="aq-chart-caption"></p>
+      <p class="aq-visually-hidden" id="aq-chart-live" aria-live="polite"></p>
+    </div>
+
+    <div class="aq-table-scroll" id="aq-table-view" hidden>
+      <table class="aq-history" id="aq-history-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Score</th>
+            <th>Temp</th>
+            <th>pH</th>
+            <th>KH</th>
+            <th>NH₃</th>
+            <th>NO₂</th>
+            <th>NO₃</th>
+            <th>Turbidez</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="aq-history-body"></tbody>
+      </table>
+    </div>
+    <div class="aq-empty" id="aq-history-empty" style="display:none;">Nenhum registro ainda. Preencha o formulário acima para começar.</div>
+  </section>
+
+  </div>
+
+  <div id="tab-panel-params" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-params" hidden>
+
 
   <section class="aq-grid-2">
     <div class="aq-card">
@@ -1287,59 +1339,6 @@
     </div>
   </section>
 
-  <section class="aq-card">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-      <h2 class="aq-section-title" style="margin:0;">Histórico de leituras</h2>
-      <div class="aq-tools-row">
-        <button class="aq-btn" id="btn-export">Exportar JSON</button>
-        <button class="aq-btn" id="btn-import">Importar JSON</button>
-        <input type="file" id="file-import" accept="application/json" style="display:none" />
-      </div>
-    </div>
-    <div class="aq-viewbar">
-      <div class="aq-segmented" role="group" aria-label="Formato do histórico">
-        <button type="button" class="aq-seg" id="btn-view-chart" aria-pressed="true">Gráfico do score</button>
-        <button type="button" class="aq-seg" id="btn-view-table" aria-pressed="false">Tabela completa</button>
-      </div>
-      <div class="aq-segmented" role="group" aria-label="Período do gráfico" id="aq-range-group">
-        <button type="button" class="aq-seg" data-range="7" aria-pressed="false">7 dias</button>
-        <button type="button" class="aq-seg" data-range="30" aria-pressed="true">30 dias</button>
-        <button type="button" class="aq-seg" data-range="0" aria-pressed="false">Tudo</button>
-      </div>
-    </div>
-
-    <div id="aq-chart-view">
-      <div class="aq-chart-wrap">
-        <div id="aq-score-chart" class="aq-chart"
-             tabindex="0" role="img"
-             aria-label="Gráfico do score de água ao longo do tempo. Use as setas para percorrer os registros."></div>
-        <div class="aq-chart-tip" id="aq-chart-tip" hidden></div>
-      </div>
-      <p class="aq-chart-caption" id="aq-chart-caption"></p>
-      <p class="aq-visually-hidden" id="aq-chart-live" aria-live="polite"></p>
-    </div>
-
-    <div class="aq-table-scroll" id="aq-table-view" hidden>
-      <table class="aq-history" id="aq-history-table">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Score</th>
-            <th>Temp</th>
-            <th>pH</th>
-            <th>KH</th>
-            <th>NH₃</th>
-            <th>NO₂</th>
-            <th>NO₃</th>
-            <th>Turbidez</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="aq-history-body"></tbody>
-      </table>
-    </div>
-    <div class="aq-empty" id="aq-history-empty" style="display:none;">Nenhum registro ainda. Preencha o formulário acima para começar.</div>
-  </section>
 
   <section class="aq-grid-2">
     <div class="aq-card">
@@ -2513,72 +2512,8 @@
       '<div class="aq-gate-chip" data-met="' + gates.bioMet + '">Biologia zerada <span class="aq-chip-count">' + gates.bioStreak + "/" + gates.bioTarget + "</span></div>" +
       '<div class="aq-gate-chip" data-met="' + gates.ready + '">Pronto p/ Green Terror <span class="aq-chip-count">' + (gates.ready ? "sim" : "não") + "</span></div>";
 
-    renderSparkline(sorted);
     renderActionPlan(last, gates);
     return { sorted: sorted, last: last, gates: gates };
-  }
-
-  function renderSparkline(sorted) {
-    var canvas = document.getElementById("aq-sparkline");
-    var ctx = canvas.getContext("2d");
-    var w = canvas.width, h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
-    var points = sorted.slice(-30).map(function (r) { return computeWaterScore(r); }).filter(function (v) { return v !== null; });
-    var styles = getComputedStyle(document.documentElement);
-    var accent = styles.getPropertyValue("--accent").trim();
-    var border = styles.getPropertyValue("--border").trim();
-
-    // faint grid
-    ctx.strokeStyle = border;
-    ctx.lineWidth = 1;
-    [0.25, 0.5, 0.75].forEach(function (f) {
-      var y = h - f * (h - 8) - 4;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-      ctx.stroke();
-    });
-
-    if (points.length < 2) {
-      document.getElementById("aq-sparkline-caption").textContent = points.length === 1 ? "score único registrado" : "sem dados suficientes";
-      return;
-    }
-
-    var max = 100, min = 0;
-    var stepX = w / (points.length - 1);
-    function xy(i) {
-      var x = i * stepX;
-      var y = h - 4 - ((points[i] - min) / (max - min)) * (h - 8);
-      return [x, y];
-    }
-
-    ctx.beginPath();
-    points.forEach(function (_, i) {
-      var p = xy(i);
-      if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
-    });
-    ctx.lineTo(xy(points.length - 1)[0], h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    ctx.fillStyle = accent + "26";
-    ctx.fill();
-
-    ctx.beginPath();
-    points.forEach(function (_, i) {
-      var p = xy(i);
-      if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
-    });
-    ctx.strokeStyle = accent;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    var last = xy(points.length - 1);
-    ctx.beginPath();
-    ctx.arc(last[0], last[1], 3, 0, Math.PI * 2);
-    ctx.fillStyle = accent;
-    ctx.fill();
-
-    document.getElementById("aq-sparkline-caption").textContent = "últimos " + points.length + " registros de score";
   }
 
   // ---------- histórico do score: gráfico de linha, série única ----------
@@ -3295,6 +3230,7 @@
   // ---------- tabs ----------
 
   var tabs = [
+    { btn: "tab-btn-painel", panel: "tab-panel-painel" },
     { btn: "tab-btn-params", panel: "tab-panel-params" },
     { btn: "tab-btn-config", panel: "tab-panel-config" },
     { btn: "tab-btn-check", panel: "tab-panel-check" }
@@ -3309,6 +3245,10 @@
       btn.tabIndex = active ? 0 : -1;
       panel.hidden = !active;
     });
+    // o gráfico é medido pela largura do container; oculto ele mede zero
+    if (activeBtnId === "tab-btn-painel" && !document.getElementById("aq-chart-view").hidden) {
+      renderScoreChart();
+    }
   }
 
   tabs.forEach(function (t, i) {
@@ -3574,8 +3514,6 @@
       }).observe(host);
     }
   })();
-
-  window.addEventListener("resize", function () { renderSparkline(sortedReadings()); });
 
   // elevação da app bar ao descolar do topo (padrão MUI useScrollTrigger)
   (function () {

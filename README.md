@@ -1,6 +1,6 @@
 # Parâmetros da Água do Aquário — Ciclídeos Nacionais
 
-Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em três abas: **Parâmetros** (registro diário, score ponderado da qualidade da água e os *gates* — critérios de liberação — para introdução de novas espécies, hoje especificamente o Green Terror), **Configurações** (o sistema explicado em formato de infográfico narrativo, com a ficha técnica editável ao final) e **Checklist** (as 11 ações prioritárias do relatório estrutural e as 6 medições pendentes, com progresso e custo em aberto).
+Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em quatro abas: **Painel** (visão do estado atual — score da água, *gates* de liberação de espécies e histórico), **Parâmetros** (registro diário, plano de ação, fases do projeto e critérios manuais do gate), **Configurações** (o sistema explicado em formato de infográfico narrativo, com a ficha técnica editável ao final) e **Checklist** (as 11 ações prioritárias do relatório estrutural e as 6 medições pendentes, com progresso e custo em aberto).
 
 A interface usa uma analogia de rio amazônico que não é decorativa — ela mapeia função: o display é *o rio*, o sump é *a várzea* (na Amazônia é a planície alagada que filtra o rio), a hidráulica é *a correnteza*, a queda de energia é *a cheia*, o KH 0 é *água preta*, a carga na laje é *o leito* e a manutenção é *o calendário das águas*.
 
@@ -52,13 +52,19 @@ Para publicar como site (ex: GitHub Pages), basta habilitar Pages apontando para
 
 ## O que o app faz
 
+### Aba Painel
+
+Visão de estado, sem formulário. É a aba que abre por padrão.
+
+- **Score de água (0–100)**, zerado até o dia estar completo: enquanto qualquer um dos 6 parâmetros numéricos estiver vazio, o score aparece como **0** (não uma média parcial otimista) e o medidor mostra quantos campos faltam. O medidor também informa a **idade da leitura** e fica âmbar a partir de 3 dias — um score de cinco dias atrás não descreve a água de hoje.
+- **Gates de liberação**: dias consecutivos com água clara (5) e biologia zerada (3).
+- **Histórico**, em duas visões: **Gráfico do score** (linha de série única, faixas de 7/30 dias ou tudo, limiares nomeados em 80 e 50, tooltip com crosshair e navegação por teclado) e **Tabela completa**. Dias incompletos não viram ponto zero na linha — aparecem como marca vazada na base.
+- **Exportar / Importar JSON**.
+
 ### Aba Parâmetros
 
 - **Registro diário**: temperatura, pH, KH, amônia (NH₃), nitrito (NO₂), nitrato (NO₃) e turbidez, com uma nota livre por dia. Salva automaticamente a cada alteração (sem botão "Salvar", sem risco de perder o que foi digitado).
-- **Score de água (0–100), zerado até completar o registro do dia**: enquanto qualquer um dos 6 parâmetros numéricos do dia estiver vazio, o score aparece como **0** (não uma média parcial otimista) e o painel mostra quantos campos ainda faltam (ex: "3 de 6 campos em aberto") — tanto no medidor quanto no plano de ação. Assim que os 6 estiverem preenchidos, o score real é calculado como média ponderada do status de cada parâmetro (bom/alerta/ruim). Pesos: temperatura 20, pH 15, KH 10, NH₃ 20, NO₂ 20, NO₃ 10, turbidez 5.
-- **Gates de liberação**: contagem de dias consecutivos (por data, não por ordem de digitação) com água clara (5 dias) e biologia zerada — NH₃/NO₂ ≈ 0 (3 dias). Quando os dois critérios são atendidos, o painel indica que o ambiente está pronto para o Green Terror.
-- **Histórico do score**: o card de histórico tem duas visões — **Gráfico do score** (linha de série única com faixas de 7/30 dias ou tudo) e **Tabela completa** (a tabela detalhada de sempre). O gráfico traz limiares nomeados em 80 (*pronto*) e 50 (*atenção*), tooltip com crosshair no hover e navegação por teclado (setas, Home/End) com anúncio em `aria-live`. Dias incompletos **não viram ponto zero na linha** — aparecem como marca vazada na base, porque um dia sem medição não é um dia de água ruim.
-- **A última leitura preenchida continua ativa**: ao abrir, o formulário carrega o registro mais recente, não um formulário em branco. Ele segue ativo até você iniciar e gravar o próximo. Como editar ali altera aquele dia, um aviso no topo do card diz de que data é a leitura, há quantos dias, e oferece o botão **Registrar hoje**. O medidor também informa a idade da medição e fica âmbar a partir de 3 dias.
+- **A última leitura preenchida continua ativa**: ao abrir, o formulário carrega o registro mais recente, não um formulário em branco. Ele segue ativo até você iniciar e gravar o próximo. Como editar ali altera aquele dia, um aviso no topo do card diz de que data é a leitura, há quantos dias, e oferece o botão **Registrar hoje**.
 - **Plano de ação**: recomendações geradas a partir do último registro e do progresso dos gates.
 - **Fases do projeto**: checklist livre (ciclagem, plantio/decoração, quarentena, estabilização, introdução, formação de casais, venda de excedentes) com status e notas por fase.
 - **Critérios adicionais do gate**: checklist manual para condições que não vêm de um parâmetro de água (ex: aprovação de um veterinário).
@@ -92,7 +98,7 @@ Ao final, **Ficha técnica editável**: 43 campos (display, sump, hidráulica, e
 - **Medições pendentes**: os 6 dados que substituem as estimativas `[EST]` e fecham o relatório.
 - **Ações próprias**: itens adicionados manualmente, separados dos do relatório (não entram na contagem de progresso do relatório e podem ser removidos; os do relatório não podem).
 
-### Comum às três abas
+### Comum a todas as abas
 
 - **Exportar/Importar JSON**: backup manual de tudo (leituras, fases, critérios, configuração do sistema e ações prioritárias) em um arquivo `.json`.
 
