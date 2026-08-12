@@ -381,6 +381,24 @@
 
   .aq-chart-caption { margin: var(--sp-1) 0 0; font-size: var(--fs-caption); color: var(--text-muted); }
 
+  /* small multiples: um mini-gráfico por parâmetro */
+  .aq-trend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--sp-2); }
+  .aq-trend { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .aq-trend-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-1); }
+  .aq-trend-name { font-size: var(--fs-caption); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+  .aq-trend-val { font-size: var(--fs-caption); color: var(--text-muted); white-space: nowrap; }
+  .aq-trend-val b { font-family: var(--font-mono); font-size: var(--fs-body2); color: var(--text); }
+  .aq-trend svg { display: block; width: 100%; height: 44px; border-radius: var(--shape-xs); background: var(--surface-2); }
+  .aq-trend-band { fill: var(--good); opacity: 0.16; }
+  .aq-trend-line { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .aq-trend-dot { stroke: var(--surface); stroke-width: 1.5; fill: var(--accent); }
+  .aq-trend-dot[data-status="warn"] { fill: var(--warn); }
+  .aq-trend-dot[data-status="bad"] { fill: var(--bad); }
+  .aq-trend-foot { font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono); }
+  .aq-trend-empty { font-size: var(--fs-caption); color: var(--text-muted); padding: 12px 0; }
+
+  .aq-chart-tip em { display: block; font-style: normal; opacity: 0.85; margin-top: 3px; white-space: normal; max-width: 240px; }
+
   .aq-chart-tip {
     position: absolute;
     z-index: 5;
@@ -693,6 +711,47 @@
     color: var(--text-muted);
     pointer-events: none;
     white-space: nowrap;
+  }
+
+  /* ---------- stepper numérico ----------
+     Anatomia e estados do Carbon (label · campo · botões acoplados · inválido),
+     mas com o dimensionamento da NN/g: alvos de toque grandes e lado a lado,
+     em vez das chevrons empilhadas de 20px do Carbon, pequenas demais no dedo. */
+
+  .aq-stepper { display: flex; align-items: stretch; gap: 0; min-width: 0; }
+  .aq-stepper .aq-input-wrap { flex: 1; min-width: 0; }
+  .aq-stepper .aq-input-wrap input { border-radius: 0; text-align: center; padding-left: var(--sp-05); padding-right: 26px; }
+  .aq-stepper .aq-adornment { right: 8px; }
+
+  .aq-step-btn {
+    flex: none;
+    width: 40px;
+    appearance: none;
+    background: var(--surface-2);
+    border: 1px solid var(--field-border);
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--dur-short) var(--ease-standard);
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  .aq-step-btn:first-child { border-radius: var(--shape-xs) 0 0 var(--shape-xs); border-right: none; }
+  .aq-step-btn:last-child { border-radius: 0 var(--shape-xs) var(--shape-xs) 0; border-left: none; }
+  .aq-step-btn:hover:not(:disabled) { background: var(--accent-soft); }
+  .aq-step-btn:active:not(:disabled) { background: var(--accent); color: var(--surface); }
+  .aq-step-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+  .aq-step-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; z-index: 1; }
+
+  /* NN/g: alvo mínimo de ~44px no toque */
+  @media (pointer: coarse) {
+    .aq-step-btn { width: 48px; min-height: 44px; }
   }
 
   .aq-helper {
@@ -1268,6 +1327,12 @@
     <div class="aq-empty" id="aq-history-empty" style="display:none;">Nenhum registro ainda. Preencha o formulário acima para começar.</div>
   </section>
 
+  <section class="aq-card">
+    <h2 class="aq-section-title">Por parâmetro</h2>
+    <p class="aq-sub" style="margin:-6px 0 16px;">O score é uma média ponderada. Aqui dá para ver qual série o está puxando — a faixa sombreada é o intervalo ideal de cada parâmetro.</p>
+    <div class="aq-trend-grid" id="aq-param-trends"></div>
+  </section>
+
   </div>
 
   <div id="tab-panel-params" class="aq-panel" role="tabpanel" aria-labelledby="tab-btn-params" hidden>
@@ -1285,32 +1350,32 @@
         </div>
         <div class="aq-field">
           <label for="f-temp">Temperatura</label>
-          <div class="aq-input-wrap"><input type="number" id="f-temp" step="0.1" placeholder="26,5" aria-describedby="h-f-temp" /><span class="aq-adornment">°C</span></div>
+          <div class="aq-stepper"><button type="button" class="aq-step-btn" data-step="f-temp" data-dir="-1" aria-label="Diminuir temperatura">−</button><div class="aq-input-wrap"><input type="number" id="f-temp" step="0.1" min="0" max="40" inputmode="decimal" autocomplete="off" placeholder="26,5" aria-describedby="h-f-temp" /><span class="aq-adornment">°C</span></div><button type="button" class="aq-step-btn" data-step="f-temp" data-dir="1" aria-label="Aumentar temperatura">+</button></div>
           <p class="aq-helper" id="h-f-temp">Faixa ideal 25–28.</p>
         </div>
         <div class="aq-field">
           <label for="f-ph">pH</label>
-          <div class="aq-input-wrap"><input type="number" id="f-ph" step="0.1" placeholder="7,0" aria-describedby="h-f-ph" /></div>
+          <div class="aq-stepper"><button type="button" class="aq-step-btn" data-step="f-ph" data-dir="-1" aria-label="Diminuir pH">−</button><div class="aq-input-wrap"><input type="number" id="f-ph" step="0.1" min="0" max="14" inputmode="decimal" autocomplete="off" placeholder="7,0" aria-describedby="h-f-ph" /></div><button type="button" class="aq-step-btn" data-step="f-ph" data-dir="1" aria-label="Aumentar pH">+</button></div>
           <p class="aq-helper" id="h-f-ph">Faixa ideal 6,5–7,6.</p>
         </div>
         <div class="aq-field">
           <label for="f-kh">Dureza de carbonatos</label>
-          <div class="aq-input-wrap"><input type="number" id="f-kh" step="0.1" placeholder="6" aria-describedby="h-f-kh" /><span class="aq-adornment">dKH</span></div>
+          <div class="aq-stepper"><button type="button" class="aq-step-btn" data-step="f-kh" data-dir="-1" aria-label="Diminuir KH">−</button><div class="aq-input-wrap"><input type="number" id="f-kh" step="0.5" min="0" max="30" inputmode="decimal" autocomplete="off" placeholder="6" aria-describedby="h-f-kh" /><span class="aq-adornment">dKH</span></div><button type="button" class="aq-step-btn" data-step="f-kh" data-dir="1" aria-label="Aumentar KH">+</button></div>
           <p class="aq-helper" id="h-f-kh">Faixa ideal 4–8. É o tampão que segura o pH.</p>
         </div>
         <div class="aq-field">
           <label for="f-nh3">Amônia</label>
-          <div class="aq-input-wrap"><input type="number" id="f-nh3" step="0.01" placeholder="0" aria-describedby="h-f-nh3" /><span class="aq-adornment">ppm</span></div>
+          <div class="aq-stepper"><button type="button" class="aq-step-btn" data-step="f-nh3" data-dir="-1" aria-label="Diminuir amônia">−</button><div class="aq-input-wrap"><input type="number" id="f-nh3" step="0.01" min="0" max="8" inputmode="decimal" autocomplete="off" placeholder="0" aria-describedby="h-f-nh3" /><span class="aq-adornment">ppm</span></div><button type="button" class="aq-step-btn" data-step="f-nh3" data-dir="1" aria-label="Aumentar amônia">+</button></div>
           <p class="aq-helper" id="h-f-nh3">Ideal zero. Acima de 0,25 é emergência.</p>
         </div>
         <div class="aq-field">
           <label for="f-no2">Nitrito</label>
-          <div class="aq-input-wrap"><input type="number" id="f-no2" step="0.01" placeholder="0" aria-describedby="h-f-no2" /><span class="aq-adornment">ppm</span></div>
+          <div class="aq-stepper"><button type="button" class="aq-step-btn" data-step="f-no2" data-dir="-1" aria-label="Diminuir nitrito">−</button><div class="aq-input-wrap"><input type="number" id="f-no2" step="0.01" min="0" max="8" inputmode="decimal" autocomplete="off" placeholder="0" aria-describedby="h-f-no2" /><span class="aq-adornment">ppm</span></div><button type="button" class="aq-step-btn" data-step="f-no2" data-dir="1" aria-label="Aumentar nitrito">+</button></div>
           <p class="aq-helper" id="h-f-no2">Ideal zero. Acima de 0,25 é emergência.</p>
         </div>
         <div class="aq-field">
           <label for="f-no3">Nitrato</label>
-          <div class="aq-input-wrap"><input type="number" id="f-no3" step="1" placeholder="15" aria-describedby="h-f-no3" /><span class="aq-adornment">ppm</span></div>
+          <div class="aq-stepper"><button type="button" class="aq-step-btn" data-step="f-no3" data-dir="-1" aria-label="Diminuir nitrato">−</button><div class="aq-input-wrap"><input type="number" id="f-no3" step="5" min="0" max="200" inputmode="decimal" autocomplete="off" placeholder="15" aria-describedby="h-f-no3" /><span class="aq-adornment">ppm</span></div><button type="button" class="aq-step-btn" data-step="f-no3" data-dir="1" aria-label="Aumentar nitrato">+</button></div>
           <p class="aq-helper" id="h-f-no3">Ideal abaixo de 20. Acima de 40, faça TPA.</p>
         </div>
         <div class="aq-field">
@@ -1821,6 +1886,12 @@
   </section>
 
   <section class="aq-card">
+    <div class="aq-viewbar">
+      <div class="aq-segmented" role="group" aria-label="Filtro da lista">
+        <button type="button" class="aq-seg" id="btn-tasks-all" aria-pressed="true">Todas</button>
+        <button type="button" class="aq-seg" id="btn-tasks-open" aria-pressed="false">Só as pendentes</button>
+      </div>
+    </div>
     <div id="aq-struct-tasks-list"></div>
     <div class="aq-criteria-add" style="margin-top:16px;">
       <label class="aq-visually-hidden" for="f-struct-task-new">Nova ação própria</label>
@@ -2535,9 +2606,20 @@
         date: r.date,
         day: toDayIndex(r.date),
         open: open,
+        reading: r,
         // dia incompleto não tem score real — não vira ponto 0 na linha
         score: open === 0 ? computeWaterScore(r) : null
       };
+    });
+  }
+
+  // quais parâmetros saíram da faixa naquele dia — responde "por que caiu"
+  function offendersOf(reading) {
+    return Object.keys(WEIGHTS).filter(function (key) {
+      var st = paramStatus(key, reading[key]);
+      return st === "bad" || st === "warn";
+    }).map(function (key) {
+      return PARAM_LABELS[key] + (paramStatus(key, reading[key]) === "bad" ? " (ruim)" : " (alerta)");
     });
   }
 
@@ -2638,6 +2720,81 @@
       ". Use as setas para percorrer os registros.");
   }
 
+  // ---------- small multiples: um mini-gráfico por parâmetro ----------
+  // O gráfico do score mostra o agregado. Estes mostram qual série o puxou,
+  // cada um com a própria faixa ideal desenhada como banda de referência.
+
+  var TREND_ORDER = ["temp", "ph", "kh", "nh3", "no2", "no3"];
+  var TREND_UNITS = { temp: "°C", ph: "", kh: "dKH", nh3: "ppm", no2: "ppm", no3: "ppm" };
+
+  function idealBand(key) {
+    var r = RANGES[key];
+    if (key === "nh3" || key === "no2" || key === "no3") return [0, r.goodMax];
+    return [r.goodMin, r.goodMax];
+  }
+
+  function renderParamTrends() {
+    var host = document.getElementById("aq-param-trends");
+    if (!host) return;
+    var pts = scoreSeries();
+
+    host.innerHTML = TREND_ORDER.map(function (key) {
+      var series = pts.filter(function (p) {
+        var v = p.reading[key];
+        return v !== null && v !== undefined && v !== "";
+      }).map(function (p) { return { day: p.day, v: Number(p.reading[key]), date: p.date }; });
+
+      var unit = TREND_UNITS[key];
+      var head = '<div class="aq-trend-head"><span class="aq-trend-name">' + PARAM_LABELS[key] + "</span>";
+
+      if (!series.length) {
+        return '<div class="aq-trend">' + head + '<span class="aq-trend-val">—</span></div>' +
+          '<div class="aq-trend-empty">sem medição no período</div></div>';
+      }
+
+      var last = series[series.length - 1];
+      var st = paramStatus(key, last.v);
+      var dec = key === "nh3" || key === "no2" ? 2 : key === "no3" ? 0 : 1;
+      head += '<span class="aq-trend-val"><b>' + last.v.toFixed(dec) + "</b> " + unit +
+        ' <span class="aq-pill" data-status="' + st + '">' + (st === "good" ? "bom" : st === "warn" ? "alerta" : "ruim") + "</span></span></div>";
+
+      var w = 260, h = 44, pad = 3;
+      var band = idealBand(key);
+      var vals = series.map(function (d) { return d.v; });
+      var lo = Math.min.apply(null, vals.concat([band[0]]));
+      var hi = Math.max.apply(null, vals.concat([band[1]]));
+      if (hi - lo < 1e-6) { hi = lo + 1; }
+      var padV = (hi - lo) * 0.12;
+      lo -= padV; hi += padV;
+
+      var minDay = pts.length ? pts[0].day : series[0].day;
+      var maxDay = pts.length ? pts[pts.length - 1].day : series[series.length - 1].day;
+      var spanD = Math.max(1, maxDay - minDay);
+      var X = function (d) { return series.length === 1 ? w / 2 : (d.day - minDay) / spanD * (w - 2 * pad) + pad; };
+      var Y = function (v) { return pad + (1 - (v - lo) / (hi - lo)) * (h - 2 * pad); };
+
+      var svg = '<svg viewBox="0 0 ' + w + " " + h + '" preserveAspectRatio="none" role="img" aria-label="' +
+        esc(PARAM_LABELS[key] + ": " + series.length + " medições, última " + last.v.toFixed(dec) + " " + unit + ", " +
+        (st === "good" ? "dentro da faixa ideal" : st === "warn" ? "em alerta" : "fora da faixa")) + '">';
+
+      // banda ideal como referência de fundo
+      var by1 = Y(Math.min(band[1], hi)), by2 = Y(Math.max(band[0], lo));
+      // altura mínima para a banda continuar perceptível quando é muito estreita
+      // em relação à excursão dos dados (o caso de NH₃/NO₂, com ideal ≤ 0,02)
+      svg += '<rect class="aq-trend-band" x="0" y="' + by1.toFixed(1) + '" width="' + w + '" height="' + Math.max(2.5, by2 - by1).toFixed(1) + '" />';
+
+      var d = series.map(function (s, i) { return (i ? "L" : "M") + X(s).toFixed(1) + " " + Y(s.v).toFixed(1); }).join(" ");
+      svg += '<path class="aq-trend-line" d="' + d + '" />';
+      svg += '<circle class="aq-trend-dot" data-status="' + st + '" cx="' + X(last).toFixed(1) + '" cy="' + Y(last.v).toFixed(1) + '" r="3" />';
+      svg += "</svg>";
+
+      return '<div class="aq-trend">' + head + svg +
+        '<div class="aq-trend-foot">faixa ideal ' +
+        (key === "nh3" || key === "no2" || key === "no3" ? "≤ " + band[1] : band[0] + "–" + band[1]) +
+        (unit ? " " + unit : "") + " · " + series.length + " medição(ões)</div></div>";
+    }).join("");
+  }
+
   function showChartPoint(idx) {
     var pts = chartState.points, g = chartState.geom;
     var tip = document.getElementById("aq-chart-tip");
@@ -2649,9 +2806,13 @@
     var py = p.score === null ? g.y(0) : g.y(p.score);
     if (cursor) { cursor.setAttribute("x1", px); cursor.setAttribute("x2", px); cursor.style.display = ""; }
     tip.hidden = false;
-    tip.innerHTML = p.score === null
-      ? "<b>" + brDate(p.date) + "</b>Incompleto · <span>" + p.open + " de 6 campos em aberto</span>"
-      : "<b>" + brDate(p.date) + "</b>Score " + p.score + "/100 · <span>" + scoreLabel(p.score) + "</span>";
+    if (p.score === null) {
+      tip.innerHTML = "<b>" + brDate(p.date) + "</b>Incompleto · <span>" + p.open + " de 6 campos em aberto</span>";
+    } else {
+      var bad = offendersOf(p.reading);
+      tip.innerHTML = "<b>" + brDate(p.date) + "</b>Score " + p.score + "/100 · <span>" + scoreLabel(p.score) + "</span>" +
+        (bad.length ? "<em>Fora da faixa: " + esc(bad.join(", ")) + "</em>" : "<em>Todos os parâmetros na faixa</em>");
+    }
     var host = document.getElementById("aq-score-chart");
     var scale = host.clientWidth / g.w || 1;
     tip.style.left = (px * scale) + "px";
@@ -2697,6 +2858,7 @@
     var body = document.getElementById("aq-history-body");
     var empty = document.getElementById("aq-history-empty");
     renderScoreChart();
+    renderParamTrends();
     var descending = sorted.slice().reverse();
     if (descending.length === 0) {
       body.innerHTML = "";
@@ -2748,6 +2910,8 @@
     }).join("");
   }
 
+  var tasksHideDone = false;
+
   function taskHTML(entry) {
     var t = entry.task;
     return '<label class="aq-task" data-checked="' + (t.checked ? "true" : "false") + '">' +
@@ -2770,6 +2934,8 @@
     var list = document.getElementById("aq-struct-tasks-list");
     var html = PRIORITY_GROUPS.map(function (g) {
       var entries = acoes.filter(function (e) { return !e.task.custom && e.task.priority === g.key; });
+      var shown = tasksHideDone ? entries.filter(function (e) { return !e.task.checked; }) : entries;
+      if (shown.length === 0 && tasksHideDone) return "";
       if (entries.length === 0) return "";
       var done = entries.filter(function (e) { return e.task.checked; }).length;
       var meta = PRIORITY_META[g.key];
@@ -2780,7 +2946,7 @@
           '<span class="aq-check-meta">' + done + "/" + entries.length + "</span>" +
         "</div>" +
         '<p class="aq-check-intro">' + g.intro + "</p>" +
-        '<div class="aq-check-list">' + entries.map(taskHTML).join("") + "</div>" +
+        '<div class="aq-check-list">' + shown.map(taskHTML).join("") + "</div>" +
         "</div>";
     }).join("");
 
@@ -2795,9 +2961,10 @@
     list.innerHTML = html || '<div class="aq-empty">Nenhuma ação na lista.</div>';
 
     var pendingEl = document.getElementById("aq-pending-list");
-    pendingEl.innerHTML = medicoes.length
-      ? medicoes.map(taskHTML).join("")
-      : '<div class="aq-empty">Nenhuma medição pendente.</div>';
+    var medShown = tasksHideDone ? medicoes.filter(function (x) { return !x.task.checked; }) : medicoes;
+    pendingEl.innerHTML = medShown.length
+      ? medShown.map(taskHTML).join("")
+      : '<div class="aq-empty">' + (tasksHideDone ? 'Todas as medições foram registradas.' : 'Nenhuma medição pendente.') + '</div>';
 
     // painel de progresso
     var reportAcoes = acoes.filter(function (e) { return !e.task.custom; });
@@ -2864,6 +3031,95 @@
       ' <button type="button" class="aq-btn aq-btn-ghost" id="btn-start-today" style="padding:4px 10px;margin-left:2px;">Registrar hoje</button></p>';
   }
 
+  // ---------- stepper: passo, limites e repetição ----------
+
+  // valor de partida quando o campo está vazio: a última medição daquele
+  // parâmetro. É de onde o aquarista realmente parte ("ontem deu 26,5").
+  var SEED_FALLBACK = { temp: 26, ph: 7, kh: 4, nh3: 0, no2: 0, no3: 15 };
+
+  function seedFor(key) {
+    var sorted = sortedReadings();
+    for (var i = sorted.length - 1; i >= 0; i--) {
+      var v = sorted[i][key];
+      if (v !== null && v !== undefined && v !== "") return Number(v);
+    }
+    return SEED_FALLBACK[key] !== undefined ? SEED_FALLBACK[key] : 0;
+  }
+
+  function decimalsOf(step) {
+    var parts = String(step).split(".");
+    return parts.length > 1 ? parts[1].length : 0;
+  }
+
+  function applyStep(input, dir) {
+    var step = parseFloat(input.step) || 1;
+    var min = input.min === "" ? -Infinity : parseFloat(input.min);
+    var max = input.max === "" ? Infinity : parseFloat(input.max);
+    var dec = decimalsOf(input.step);
+    var next;
+    if (input.value === "") {
+      // primeira ação num campo vazio: assume a última medição, sem somar passo
+      next = seedFor(input.id.replace(/^f-/, ""));
+    } else {
+      var cur = parseFloat(input.value);
+      if (!isFinite(cur)) cur = 0;
+      // arredonda para a casa do passo: evita 0.30000000000000004
+      next = Math.round((cur + dir * step) * Math.pow(10, dec)) / Math.pow(10, dec);
+    }
+    next = Math.min(max, Math.max(min, next));
+    input.value = next.toFixed(dec);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  // NN/g: o botão no limite precisa comunicar que chegou ao fim, não falhar em silêncio
+  function refreshStepBounds() {
+    [].forEach.call(document.querySelectorAll(".aq-step-btn"), function (btn) {
+      var input = document.getElementById(btn.getAttribute("data-step"));
+      if (!input) return;
+      var dir = Number(btn.getAttribute("data-dir"));
+      if (input.value === "") { btn.disabled = false; return; }
+      var v = parseFloat(input.value);
+      var lim = dir > 0 ? parseFloat(input.max) : parseFloat(input.min);
+      btn.disabled = isFinite(v) && isFinite(lim) && (dir > 0 ? v >= lim : v <= lim);
+    });
+  }
+
+  (function bindSteppers() {
+    var holdTimer = null, repeatTimer = null;
+
+    function stopHold() {
+      clearTimeout(holdTimer);
+      clearInterval(repeatTimer);
+      holdTimer = repeatTimer = null;
+    }
+
+    document.addEventListener("pointerdown", function (e) {
+      var btn = e.target.closest(".aq-step-btn");
+      if (!btn || btn.disabled) return;
+      var input = document.getElementById(btn.getAttribute("data-step"));
+      var dir = Number(btn.getAttribute("data-dir"));
+      if (!input) return;
+      applyStep(input, dir);
+      // pressionar e segurar acelera, para percorrer faixas maiores sem N toques
+      holdTimer = setTimeout(function () {
+        var tick = 0;
+        repeatTimer = setInterval(function () {
+          if (btn.disabled) { stopHold(); return; }
+          applyStep(input, dir);
+          if (++tick === 12) { clearInterval(repeatTimer); repeatTimer = setInterval(function () { applyStep(input, dir); }, 40); }
+        }, 110);
+      }, 450);
+    });
+
+    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(function (ev) {
+      document.addEventListener(ev, stopHold, true);
+    });
+    // o clique já foi tratado no pointerdown
+    document.addEventListener("click", function (e) {
+      if (e.target.closest(".aq-step-btn")) e.preventDefault();
+    });
+  })();
+
   function renderFieldFeedback() {
     CORE_PARAMS.forEach(function (key) {
       var input = document.getElementById("f-" + key);
@@ -2878,6 +3134,7 @@
       }
       var status = paramStatus(key, Number(raw));
       input.setAttribute("data-state", status);
+      helper.setAttribute("data-state", status);
       if (status === "good") {
         helper.setAttribute("data-state", "good");
         helper.textContent = "Dentro da faixa ideal.";
@@ -2886,6 +3143,7 @@
         helper.textContent = (HELPER_FEEDBACK[key] && HELPER_FEEDBACK[key][status]) || HELPER_BASE[key];
       }
     });
+    refreshStepBounds();
   }
 
   function renderAll() {
@@ -3373,6 +3631,19 @@
     renderStructTasks();
   });
 
+  (function bindTaskFilter() {
+    var all = document.getElementById("btn-tasks-all");
+    var open = document.getElementById("btn-tasks-open");
+    function set(hide) {
+      tasksHideDone = hide;
+      all.setAttribute("aria-pressed", String(!hide));
+      open.setAttribute("aria-pressed", String(hide));
+      renderStructTasks();
+    }
+    all.addEventListener("click", function () { set(false); });
+    open.addEventListener("click", function () { set(true); });
+  })();
+
   document.getElementById("tab-panel-check").addEventListener("click", function (e) {
     var removeBtn = e.target.closest('[data-action="remove-struct-task"]');
     if (!removeBtn) return;
@@ -3491,6 +3762,7 @@
       });
       hideChartPoint();
       renderScoreChart();
+      renderParamTrends();
     });
 
     function setView(showChart) {

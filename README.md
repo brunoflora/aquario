@@ -11,6 +11,8 @@ Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Cl
 A interface segue o **sistema do MUI** implementado nativamente em CSS — sem React e sem build, para o arquivo continuar autocontido:
 
 - **Campos no padrão MUI TextField**: o label acima traz só o título; a unidade vira *adornment* de sufixo dentro do campo; toda informação de apoio (faixa ideal, `[EST]`, `MEDIR`) desce para o *helper text* abaixo. Nos parâmetros de água o helper é reativo — digite 31 °C e ele fica vermelho explicando o que fazer, usando a mesma função `paramStatus` do score.
+- **Steppers numéricos** nos 6 parâmetros de água, com passo por grandeza (0,1 °C · 0,1 pH · 0,5 dKH · 0,01 ppm de NH₃/NO₂ · 5 ppm de NO₃), limites por grandeza e botão desabilitado ao atingi-los. Campo vazio parte da **última medição daquele parâmetro**, não de zero — é de onde o aquarista realmente parte. Pressionar e segurar acelera. Os incrementos são arredondados à casa do passo, então não aparece `0.30000000000000004`. `inputmode="decimal"` abre o teclado numérico no celular.
+  > Aqui as duas referências conflitam: o Carbon empilha chevrons de ~20px à direita do campo, e a NN/g pede alvo de ~44px no toque. Adotei a **anatomia e os estados do Carbon** (label, helper, inválido, min/max/step) com o **dimensionamento da NN/g** — botões lado a lado de 48×44px no ponteiro grosso.
 - **Escala de espaçamento de 8px**, breakpoints do MUI (600 / 900 / 1200 px), curvas de transição `cubic-bezier(0.4, 0, 0.2, 1)` e escala tipográfica caption/body2/body1/h6/h5.
 - **Padrões do MUI Dashboard**: cards `outlined` (borda de 1px, sem sombra), faixas de estatística, app bar fixa que ganha elevação ao descolar do topo, abas roláveis no mobile.
 - A ficha técnica é gerada de um **spec declarativo** (`CONFIG_SPEC`), o que garante anatomia idêntica em todos os 43 campos.
@@ -58,7 +60,8 @@ Visão de estado, sem formulário. É a aba que abre por padrão.
 
 - **Score de água (0–100)**, zerado até o dia estar completo: enquanto qualquer um dos 6 parâmetros numéricos estiver vazio, o score aparece como **0** (não uma média parcial otimista) e o medidor mostra quantos campos faltam. O medidor também informa a **idade da leitura** e fica âmbar a partir de 3 dias — um score de cinco dias atrás não descreve a água de hoje.
 - **Gates de liberação**: dias consecutivos com água clara (5) e biologia zerada (3).
-- **Histórico**, em duas visões: **Gráfico do score** (linha de série única, faixas de 7/30 dias ou tudo, limiares nomeados em 80 e 50, tooltip com crosshair e navegação por teclado) e **Tabela completa**. Dias incompletos não viram ponto zero na linha — aparecem como marca vazada na base.
+- **Por parâmetro** (*small multiples*): seis mini-gráficos, um por parâmetro, cada um com a própria faixa ideal sombreada. O score é uma média ponderada — estes mostram qual série o está puxando, que era exatamente o que faltava responder.
+- **Histórico**, em duas visões: **Gráfico do score** (linha de série única, faixas de 7/30 dias ou tudo, limiares nomeados em 80 e 50, tooltip com crosshair listando **quais parâmetros saíram da faixa naquele dia**, e navegação por teclado) e **Tabela completa**. Dias incompletos não viram ponto zero na linha — aparecem como marca vazada na base.
 - **Exportar / Importar JSON**.
 
 ### Aba Parâmetros
