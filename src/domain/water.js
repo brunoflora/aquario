@@ -54,9 +54,13 @@ export function countOpenFields(reading) {
   }).length;
 }
 
+// Devolve null quando o dia ainda está incompleto. Antes devolvia 0, o que
+// fazia "faltou digitar um campo" e "água catastrófica" exibirem o mesmo
+// número — dois estados opostos com a mesma cara (achado F4 da auditoria).
+// Quem exibe distingue os casos com countOpenFields().
 export function computeWaterScore(reading) {
   if (!reading) return null;
-  if (countOpenFields(reading) > 0) return 0;
+  if (countOpenFields(reading) > 0) return null;
   let total = 0;
   let totalWeight = 0;
   Object.keys(WEIGHTS).forEach((key) => {
@@ -122,15 +126,57 @@ export function evaluateGates(readings) {
     const no2 = r.no2 === null || r.no2 === undefined || r.no2 === "" ? null : Number(r.no2);
     return nh3 !== null && no2 !== null && nh3 <= 0.01 && no2 <= 0.01;
   });
+  const clearTarget = 5;
+  const bioTarget = 3;
+  const faltaClear = Math.max(0, clearTarget - clearStreak);
+  const faltaBio = Math.max(0, bioTarget - bioStreak);
+
+  // O gargalo é o que ainda segura a liberação. Sem isto o app dizia só
+  // "Pronto p/ Green Terror: não" — tinha o dado e não dizia o que faltava,
+  // justamente no marco que o aquarista está esperando há semanas.
+  let gargalo = null;
+  if (faltaBio > 0 && faltaBio >= faltaClear) {
+    gargalo = `faltam ${faltaBio} dia(s) com amônia e nitrito zerados`;
+  } else if (faltaClear > 0) {
+    gargalo = `faltam ${faltaClear} dia(s) de água clara`;
+  }
+
   return {
     clearStreak,
-    clearTarget: 5,
-    clearMet: clearStreak >= 5,
+    clearTarget,
+    clearMet: clearStreak >= clearTarget,
     bioStreak,
-    bioTarget: 3,
-    bioMet: bioStreak >= 3,
-    ready: clearStreak >= 5 && bioStreak >= 3,
+    bioTarget,
+    bioMet: bioStreak >= bioTarget,
+    ready: clearStreak >= clearTarget && bioStreak >= bioTarget,
+    gargalo,
   };
+}
+
+/**
+ * Distância do valor até a faixa ideal, normalizada: 0 = no alvo, 1 = no limite
+ * de alerta, >1 = além do limite.
+ *
+ * Existe para o radar. Plotando o valor bruto, os eixos carregavam duas
+ * semânticas opostas — temperatura e pH têm faixa ideal no MEIO da escala
+ * (longe do centro é ruim dos dois lados), enquanto amônia e nitrito são
+ * "quanto menor melhor" (perto do centro é ótimo). Dois problemas iguais
+ * apontavam para lados contrários do gráfico. Normalizado assim, o centro
+ * sempre significa saudável e qualquer ponta estendida significa problema.
+ */
+export function idealDistance(key, value) {
+  if (value === null || value === undefined || value === "") return 0;
+  const v = Number(value);
+  const r = RANGES[key];
+  if (!r) return 0;
+
+  if (key === "nh3" || key === "no2" || key === "no3") {
+    if (v <= r.goodMax) return 0;
+    return (v - r.goodMax) / (r.warnMax - r.goodMax);
+  }
+  if (v >= r.goodMin && v <= r.goodMax) return 0;
+  if (v < r.goodMin) return (r.goodMin - v) / (r.goodMin - r.warnMin);
+  return (v - r.goodMax) / (r.warnMax - r.goodMax);
 }
 
 const ACTION_MESSAGES = {
@@ -146,13 +192,16 @@ const ACTION_MESSAGES = {
     bad: "KH fora da faixa recomendada (4–8 dKH), o que reduz a estabilidade do pH.",
     warn: "KH no limite. Considere reforçar a capacidade de tamponamento.",
   },
+  // Amônia e nitrito não têm faixa "tranquila": o ideal é zero e qualquer valor
+  // detectável já agride brânquia. A copy de alerta precisa pedir ação, não
+  // apenas atenção — senão o título diz "aja agora" e o texto diz "monitore".
   nh3: {
     bad: "Amônia em nível crítico. Faça troca parcial de água agora e revise o ciclo do filtro.",
-    warn: "Amônia detectada em nível baixo. Redobre atenção à filtragem biológica.",
+    warn: "Amônia detectada. Acima de 0,02 ppm já há agressão a brânquia — faça TPA e verifique a filtragem biológica antes que suba.",
   },
   no2: {
     bad: "Nitrito em nível crítico. TPA imediata e verificação do ciclo do nitrogênio.",
-    warn: "Nitrito presente em nível baixo. Continue monitorando diariamente.",
+    warn: "Nitrito detectado. O ideal é zero — faça TPA e acompanhe de perto: o ciclo do nitrogênio não está fechando.",
   },
   no3: {
     bad: "Nitrato acima de 40 ppm. Realize TPA para reduzir acúmulo de sólidos.",
@@ -162,6 +211,91 @@ const ACTION_MESSAGES = {
     bad: "Água turva registrada. Verifique filtragem mecânica e evite sobrealimentação.",
   },
 };
+
+// Amônia e nitrito são tóxicos em qualquer nível detectável: a faixa "alerta"
+// (0,02–0,25 ppm) já causa dano de brânquia. Para estes dois, alerta escala
+// para crítico — os demais parâmetros toleram ficar no limite por um dia.
+const TOXIC_PARAMS = ["nh3", "no2"];
+
+const SEVERITY_RANK = { bad: 3, warn: 2, good: 1, empty: 0 };
+
+/**
+ * Avalia a água pelo PIOR parâmetro, não pela média.
+ *
+ * O score ponderado (computeWaterScore) responde "como está a água no geral" —
+ * é uma boa medida de tendência, e uma péssima medida de alarme: com peso 20 de
+ * 100, a amônia sozinha nunca derruba o índice abaixo do limiar de "bom", então
+ * 0,30 ppm de NH₃ (emergência declarada pelo próprio app) exibia 80/100 em verde.
+ * Esta função existe para responder a outra pergunta: "preciso agir agora?".
+ */
+export function assessWater(reading) {
+  if (!reading) {
+    return { level: "none", headline: "Nenhuma medição registrada", detail: "Registre a primeira leitura para acompanhar o estado da água.", offenders: [] };
+  }
+
+  const open = countOpenFields(reading);
+  if (open > 0) {
+    const faltando = CORE_PARAMS.filter((k) => {
+      const v = reading[k];
+      return v === null || v === undefined || v === "";
+    }).map((k) => PARAM_LABELS[k]);
+    return {
+      level: "incomplete",
+      headline: `Leitura incompleta — ${open} de ${CORE_PARAMS.length} campos em aberto`,
+      detail: `Faltam: ${faltando.join(", ")}.`,
+      offenders: [],
+    };
+  }
+
+  const offenders = Object.keys(WEIGHTS)
+    .map((key) => {
+      const status = paramStatus(key, reading[key]);
+      if (status === "good" || status === "empty") return null;
+      const critical = status === "bad" || TOXIC_PARAMS.indexOf(key) >= 0;
+      return {
+        key,
+        status,
+        critical,
+        label: PARAM_LABELS[key],
+        value: reading[key],
+        message: (ACTION_MESSAGES[key] || {})[status] || "",
+      };
+    })
+    .filter(Boolean)
+    // Ordem de urgência, não de peso no score: entre dois parâmetros igualmente
+    // ruins, amônia e nitrito vêm primeiro porque matam em horas e pedem uma
+    // ação diferente (TPA imediata) da de temperatura ou pH.
+    .sort((a, b) =>
+      (b.critical - a.critical) ||
+      ((TOXIC_PARAMS.indexOf(b.key) >= 0) - (TOXIC_PARAMS.indexOf(a.key) >= 0)) ||
+      (SEVERITY_RANK[b.status] - SEVERITY_RANK[a.status]) ||
+      (WEIGHTS[b.key] - WEIGHTS[a.key])
+    );
+
+  if (offenders.length === 0) {
+    return { level: "ok", headline: "Todos os parâmetros na faixa ideal", detail: "Nada a fazer hoje além de manter a rotina.", offenders: [] };
+  }
+
+  const worst = offenders[0];
+  const criticos = offenders.filter((o) => o.critical);
+
+  if (worst.critical) {
+    const extra = criticos.length > 1 ? ` (e mais ${criticos.length - 1} em nível crítico)` : "";
+    return {
+      level: "critical",
+      headline: `${worst.label} exige ação agora${extra}`,
+      detail: worst.message,
+      offenders,
+    };
+  }
+
+  return {
+    level: "attention",
+    headline: `${worst.label} fora da faixa ideal`,
+    detail: worst.message,
+    offenders,
+  };
+}
 
 export function deriveActionPlan(lastReading, gates) {
   const items = [];
@@ -175,7 +309,7 @@ export function deriveActionPlan(lastReading, gates) {
   });
   if (openKeys.length > 0) {
     const openLabels = openKeys.map((key) => PARAM_LABELS[key]).join(", ");
-    items.push({ level: "warn", text: `Score zerado até completar todos os parâmetros de hoje. Faltam: ${openLabels}.` });
+    items.push({ level: "warn", text: `O score só é calculado com o dia completo. Faltam: ${openLabels}.` });
   }
   Object.keys(WEIGHTS).forEach((key) => {
     const value = lastReading[key];

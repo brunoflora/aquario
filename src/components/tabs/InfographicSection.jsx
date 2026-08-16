@@ -338,7 +338,7 @@ export default function InfographicSection() {
           </Grid>
           {s.lastKh === null ? (
             <ToneAlert tone="warn">
-              <strong>Registre o KH de hoje na aba Parâmetros</strong> e esta seção calcula a dose exata para o
+              <strong>Registre o KH de hoje na aba Medir</strong> e esta seção calcula a dose exata para o
               volume real de {fmtBR(s.totalSystem, 0)} L.
             </ToneAlert>
           ) : s.khGap <= 0 ? (

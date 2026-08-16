@@ -32,6 +32,9 @@ export default function CloudStatusChip({ cloudState, detail, onClick }) {
       onClick={onClick}
       data-testid="cloud-status-chip"
       data-state={cloudState}
+      // único chip clicável do app; os demais são leitura. Altura elevada ao
+      // mínimo de toque sem inflar os chips de dado das tabelas.
+      sx={{ minHeight: 44, borderRadius: 22 }}
     />
   );
   return detail ? <Tooltip title={detail}>{chip}</Tooltip> : chip;
