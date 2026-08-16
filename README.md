@@ -4,22 +4,20 @@ Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em quatro ab
 
 A interface usa uma analogia de rio amazônico que não é decorativa — ela mapeia função: o display é *o rio*, o sump é *a várzea* (na Amazônia é a planície alagada que filtra o rio), a hidráulica é *a correnteza*, a queda de energia é *a cheia*, o KH 0 é *água preta*, a carga na laje é *o leito* e a manutenção é *o calendário das águas*.
 
-Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`). Ver `HANDOFF.md` para o histórico completo do porquê da migração, e `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Configurações.
+Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`), depois virou uma página vanilla (HTML/CSS/JS puro, sem build) e hoje é um app **React + MUI real** (`@mui/material` + `@mui/x-charts`), buildado com Vite. Ver `HANDOFF.md` para o histórico completo, e `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Configurações.
 
 ## Sistema de design
 
-A interface segue o **sistema do MUI** implementado nativamente em CSS — sem React e sem build, para o arquivo continuar autocontido:
+A interface usa o **MUI em estado default** (`createTheme()` sem paleta/tokens customizados — só `palette.mode` acompanhando claro/escuro do sistema operacional):
 
-- **Campos no padrão MUI TextField**: o label acima traz só o título; a unidade vira *adornment* de sufixo dentro do campo; toda informação de apoio (faixa ideal, `[EST]`, `MEDIR`) desce para o *helper text* abaixo. Nos parâmetros de água o helper é reativo — digite 31 °C e ele fica vermelho explicando o que fazer, usando a mesma função `paramStatus` do score.
-- **Steppers numéricos** nos 6 parâmetros de água, com passo por grandeza (0,1 °C · 0,1 pH · 0,5 dKH · 0,01 ppm de NH₃/NO₂ · 5 ppm de NO₃), limites por grandeza e botão desabilitado ao atingi-los. Campo vazio parte da **última medição daquele parâmetro**, não de zero — é de onde o aquarista realmente parte. Pressionar e segurar acelera. Os incrementos são arredondados à casa do passo, então não aparece `0.30000000000000004`. `inputmode="decimal"` abre o teclado numérico no celular.
-  > Aqui as duas referências conflitam: o Carbon empilha chevrons de ~20px à direita do campo, e a NN/g pede alvo de ~44px no toque. Adotei a **anatomia e os estados do Carbon** (label, helper, inválido, min/max/step) com o **dimensionamento da NN/g** — botões lado a lado de 48×44px no ponteiro grosso.
-- **Escala de espaçamento de 8px**, breakpoints do MUI (600 / 900 / 1200 px), curvas de transição `cubic-bezier(0.4, 0, 0.2, 1)` e escala tipográfica caption/body2/body1/h6/h5.
-- **Padrões do MUI Dashboard**: cards `outlined` (borda de 1px, sem sombra), faixas de estatística, app bar fixa que ganha elevação ao descolar do topo, abas roláveis no mobile.
-- A ficha técnica é gerada de um **spec declarativo** (`CONFIG_SPEC`), o que garante anatomia idêntica em todos os 43 campos.
+- **`TextField` do MUI** em todo campo: label, *adornment* de unidade, `helperText` para faixa ideal/`[EST]`/`MEDIR` — sem componente customizado, sem paleta própria.
+- **Score/Gauge, Radar e Sparklines vêm do `@mui/x-charts`** (tier gratuito/MIT): o gauge de score na aba Painel, o gráfico Radar que compara a leitura de hoje com a faixa ideal (eixos escalados pelos próprios limites de alerta de cada parâmetro), os mini-gráficos de tendência por parâmetro e o gráfico de barras de cadência de medição.
+- **Breakpoints e cores 100% padrão MUI** — nenhum token de espaçamento, cor ou tipografia foi redefinido; o app herda o que o `createTheme()` do MUI entrega de fábrica.
+- A ficha técnica é gerada de um **spec declarativo** (`CONFIG_SPEC`, em `src/domain/config.js`), o que garante anatomia idêntica em todos os 43 campos.
 
 ## Sincronização na nuvem — como foi construída
 
-Toda escrita local passa por uma única função (`saveJSON`), que agora também marca a tabela correspondente como "suja" e agenda um envio (debounce de 900 ms) para o Supabase via `fetch` direto — sem SDK, sem build. Isso significa que `doUndoable`, o fluxo de importar JSON e cada mutação isolada (registrar leitura, marcar checklist, editar a ficha) já propagam para a nuvem automaticamente, sem precisar tocar em cada callback.
+Toda escrita local passa por um único ponto (`persist()` em `AppStateProvider`), que emite um evento num barramento simples (`persistBus`); o módulo de nuvem (`useCloudSync`) assina esse evento, marca a tabela correspondente como "suja" e agenda um envio (debounce de 900 ms) para o Supabase via `fetch` direto — sem SDK do Supabase. Isso significa que desfazer, o fluxo de importar JSON e cada mutação isolada (registrar leitura, marcar checklist, editar a ficha) já propagam para a nuvem automaticamente, sem precisar tocar em cada callback.
 
 - **Upsert + delete real**: cada envio faz upsert (`Prefer: resolution=merge-duplicates`) das linhas atuais e depois busca os ids que existem na nuvem mas não localmente, apagando-os — uma exclusão local vira exclusão na nuvem, não só "esquecer de enviar".
 - **Sem servidor, sem conflito de escrita concorrente de verdade**: o app assume um usuário só, em poucos dispositivos, não editando o mesmo dado ao mesmo tempo em dois aparelhos. A reconciliação usa uma assinatura determinística do estado (ids + valores, ordenados) para decidir se local e nuvem já são iguais, sem precisar de coluna de versão.
@@ -28,15 +26,11 @@ Toda escrita local passa por uma única função (`saveJSON`), que agora também
 
 ## Acessibilidade e contraste
 
-Todos os pares de cor que a interface realmente usa foram medidos (script em `scripts/contrast.js`), nos dois temas:
+Como o tema é o `createTheme()` default do MUI (sem paleta customizada), a acessibilidade de cor vem de fábrica do próprio MUI — não há tokens próprios para auditar. `scripts/contrast.js` media os tokens CSS da versão vanilla anterior e não se aplica a este app; ficou no repositório como referência histórica.
 
-- **0 reprovações** no WCAG 2.1 AA. Texto de corpo vai de 5,1:1 a 16,6:1 — a maioria dos pares passa também no AAA (7:1).
-- **Limite de campo de formulário** ganhou token próprio (`--field-border`, 3,4:1 claro / 3,7:1 escuro). Antes usava a mesma cor das divisórias decorativas, a 1,3:1 — falha real do critério 1.4.11, já que a borda é o que identifica o controle. O padrão do próprio MUI (`rgba(0,0,0,0.23)`, ~2,6:1) também não passa; aqui foi deliberadamente elevado.
-- **Divisórias decorativas** (`--outline-variant`) seguem suaves de propósito: não carregam informação e são isentas do 1.4.11. Os dois tokens são separados justamente para que um não puxe o outro.
-- Foco visível em todos os 44 controles alcançáveis por teclado, verificado navegando por Tab.
-- Snackbar anuncia por `role="status"`; erros por `role="alert"`.
-
-O tema escuro segue a lógica de *elevation overlay* do Material: quanto mais alta a superfície, mais clara (`--bg` #070d0b → `--surface` #0e1613 → `--surface-2` #18221e → `--surface-3` #212d28), com viés de matiz esverdeado coerente com o assunto — água preta amazônica.
+- Foco visível em todos os controles alcançáveis por teclado (MUI Tabs/TextField/Button já tratam isso por padrão).
+- Snackbar anuncia por `role="status"`; erros por `severity="error"` no `Alert`.
+- Tema escuro segue o `palette.mode` do MUI, acompanhando `prefers-color-scheme` do sistema operacional.
 
 ## Heurísticas de usabilidade (Nielsen / NN/g)
 
@@ -57,9 +51,18 @@ Auditoria das 10 heurísticas e o que mudou:
 
 ## Como usar
 
-Abra `index.html` diretamente no navegador — não há build, não há dependências, não há servidor. É uma única página autocontida (HTML + CSS + JavaScript vanilla).
+Em produção: acesse o site publicado (GitHub Pages via Actions, ver `.github/workflows/pages.yml`).
 
-Para publicar como site (ex: GitHub Pages), basta habilitar Pages apontando para a branch/pasta deste `index.html`.
+Para rodar localmente:
+
+```bash
+npm install
+npm run dev      # servidor de desenvolvimento
+npm run build    # build de produção em dist/
+npm run preview  # serve o build de produção localmente
+```
+
+O deploy é automático a cada push em `main`: o workflow instala as dependências, builda com Vite e publica `dist/` no GitHub Pages.
 
 ## O que o app faz
 
