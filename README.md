@@ -1,18 +1,19 @@
 # Parâmetros da Água do Aquário — Ciclídeos Nacionais
 
-Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em quatro abas: **Painel** (visão do estado atual — score da água, *gates* de liberação de espécies e histórico), **Parâmetros** (registro diário, plano de ação, fases do projeto e critérios manuais do gate), **Configurações** (o sistema explicado em formato de infográfico narrativo, com a ficha técnica editável ao final) e **Checklist** (as 11 ações prioritárias do relatório estrutural e as 6 medições pendentes, com progresso e custo em aberto).
+Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em quatro abas **ordenadas por frequência de uso**: **Painel** (consulta diária — alarme do estado da água, score, *gates* de liberação de espécies e histórico), **Medir** (registro diário, plano de ação, fases do projeto e critérios manuais do gate), **Manutenção** (operação semanal — as contas da TPA já calculadas, protocolo de bicarbonato, prazos de mídia e o checklist de obras) e **O sistema** (referência — o infográfico de oito capítulos, a ficha técnica editável e a sincronização na nuvem).
 
 A interface usa uma analogia de rio amazônico que não é decorativa — ela mapeia função: o display é *o rio*, o sump é *a várzea* (na Amazônia é a planície alagada que filtra o rio), a hidráulica é *a correnteza*, a queda de energia é *a cheia*, o KH 0 é *água preta*, a carga na laje é *o leito* e a manutenção é *o calendário das águas*.
 
-Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`), depois virou uma página vanilla (HTML/CSS/JS puro, sem build) e hoje é um app **React + MUI real** (`@mui/material` + `@mui/x-charts`), buildado com Vite. Ver `HANDOFF.md` para o histórico completo, e `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Configurações.
+Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`), depois virou uma página vanilla (HTML/CSS/JS puro, sem build) e hoje é um app **React + MUI real** (`@mui/material` + `@mui/x-charts`), buildado com Vite. Ver `HANDOFF.md` para o histórico completo, e `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba O sistema.
 
 ## Sistema de design
 
 A interface usa o **MUI em estado default** (`createTheme()` sem paleta/tokens customizados — só `palette.mode` acompanhando claro/escuro do sistema operacional):
 
 - **`TextField` do MUI** em todo campo: label, *adornment* de unidade, `helperText` para faixa ideal/`[EST]`/`MEDIR` — sem componente customizado, sem paleta própria.
-- **Score/Gauge, Radar e Sparklines vêm do `@mui/x-charts`** (tier gratuito/MIT): o gauge de score na aba Painel, o gráfico Radar que compara a leitura de hoje com a faixa ideal (eixos escalados pelos próprios limites de alerta de cada parâmetro), os mini-gráficos de tendência por parâmetro e o gráfico de barras de cadência de medição.
-- **Breakpoints e cores 100% padrão MUI** — nenhum token de espaçamento, cor ou tipografia foi redefinido; o app herda o que o `createTheme()` do MUI entrega de fábrica.
+- **Score/Gauge, Radar e Sparklines vêm do `@mui/x-charts`** (tier gratuito/MIT): o gauge de score na aba Painel, o Radar de distância-do-ideal, os mini-gráficos de tendência por parâmetro e o gráfico de barras de cadência de medição.
+- **Cores e tipografia 100% padrão MUI** — nenhum token de cor, espaçamento ou tipografia foi redefinido; o app herda o que o `createTheme()` do MUI entrega de fábrica.
+- **Única exceção, e é de acessibilidade:** `theme.components` eleva os alvos de toque para 44×44 px (WCAG 2.5.5). Os defaults do MUI ficam abaixo disso — `IconButton` 40, `Button` ≈36,5, `ToggleButton` ≈39 — e o contexto de uso é o pior possível para precisão: em pé na frente do aquário, uma mão no celular, a outra no frasco de teste, dedos molhados. A sobrescrita é só de `minHeight`/`minWidth`; nenhuma cor ou fonte é tocada.
 - A ficha técnica é gerada de um **spec declarativo** (`CONFIG_SPEC`, em `src/domain/config.js`), o que garante anatomia idêntica em todos os 43 campos.
 
 ## Sincronização na nuvem — como foi construída
@@ -34,20 +35,26 @@ Como o tema é o `createTheme()` default do MUI (sem paleta customizada), a aces
 
 ## Heurísticas de usabilidade (Nielsen / NN/g)
 
-Auditoria das 10 heurísticas e o que mudou:
+Auditoria por teste baseado em tarefas, conduzida sobre o build de produção em
+viewport de celular (393×852 com toque) — o contexto real de uso é em pé na
+frente do aquário. Onze achados; os três primeiros tinham consequência
+biológica. Todos corrigidos.
 
-| # | Heurística | Estado |
-|---|---|---|
-| 1 | Visibilidade do status | Indicador de salvamento, medidor de score, contadores do checklist e **snackbar** de confirmação |
-| 2 | Correspondência com o mundo real | Vocabulário de aquarista e a analogia do rio; nada de jargão de sistema |
-| 3 | Controle e liberdade | **Corrigido** — toda exclusão agora é reversível com *Desfazer*, em vez de um diálogo nativo irreversível |
-| 4 | Consistência e padrões | Sistema MUI aplicado a todos os campos, botões e superfícies |
-| 5 | Prevenção de erro | Helper text reativo antecipa o erro; o import diz **o que** vai entrar e **o que** será substituído antes de confirmar |
-| 6 | Reconhecer em vez de lembrar | Faixas ideais visíveis sob cada campo; o infográfico explica o número no lugar onde ele aparece |
-| 7 | Flexibilidade e eficiência | **Adicionado** — índice de capítulos para pular direto; navegação por setas nas abas |
-| 8 | Estética e design minimalista | Superfícies planas, cor reservada ao dado |
-| 9 | Recuperação de erros | **Corrigido** — `alert()` substituído por snackbar que diz o que houve e como resolver |
-| 10 | Ajuda e documentação | Os oito capítulos são a documentação, embutida no ponto de uso |
+| # | Heurística | Estado | O que mudou |
+|---|---|---|---|
+| 1 | Visibilidade do status | **Corrigido** | O score é média ponderada e a amônia pesa 20 de 100 — com o verde começando em 80, um parâmetro letal sozinho nunca tirava o painel do verde: NH₃ a 0,30 ppm (emergência declarada pelo próprio texto do campo) exibia 80/100 verde. Alarme agora avalia pelo **pior** parâmetro. E com score 0 o arco do medidor tinha área zero, deixando o pior estado idêntico a "sem dados" |
+| 2 | Correspondência com o mundo real | **Corrigido** | Vocabulário de aquarista sempre foi exemplar, mas "Configurações" abrigava quatro frequências de uso distintas. Abas passam a nomear o que contêm |
+| 3 | Controle e liberdade | Bom | Toda exclusão é reversível com *Desfazer* |
+| 4 | Consistência e padrões | Bom | MUI aplicado uniformemente |
+| 5 | Prevenção de erro | **Corrigido** | O erro que importava aqui não era o do usuário digitando — era o app validando água perigosa como boa |
+| 6 | Reconhecer em vez de lembrar | **Corrigido** | O radar misturava duas semânticas opostas (faixa ideal no meio × quanto-menor-melhor); normalizado para distância-do-ideal |
+| 7 | Flexibilidade e eficiência | **Corrigido** | A conta da TPA, tarefa semanal, estava a 11 telas de rolagem; agora abre a aba Manutenção |
+| 8 | Estética e minimalismo | **Corrigido** | O texto de apresentação consumia 48% da primeira tela em toda visita; agora só antes da primeira medição |
+| 9 | Recuperação de erros | **Corrigido** | A instrução de emergência existia, mas na aba que o usuário não tinha aberto |
+| 10 | Ajuda e documentação | **Corrigido** | Os oito capítulos seguem sendo a documentação no ponto de uso; faltava o convite inicial, agora presente no estado vazio |
+
+Acessibilidade de toque: alvos elevados a 44×44 px (WCAG 2.5.5) — ver *Sistema
+de design*.
 
 ## Como usar
 
@@ -70,13 +77,14 @@ O deploy é automático a cada push em `main`: o workflow instala as dependênci
 
 Visão de estado, sem formulário. É a aba que abre por padrão.
 
-- **Score de água (0–100)**, zerado até o dia estar completo: enquanto qualquer um dos 6 parâmetros numéricos estiver vazio, o score aparece como **0** (não uma média parcial otimista) e o medidor mostra quantos campos faltam. O medidor também informa a **idade da leitura** e fica âmbar a partir de 3 dias — um score de cinco dias atrás não descreve a água de hoje.
-- **Gates de liberação**: dias consecutivos com água clara (5) e biologia zerada (3).
-- **Por parâmetro** (*small multiples*): seis mini-gráficos, um por parâmetro, cada um com a própria faixa ideal sombreada. O score é uma média ponderada — estes mostram qual série o está puxando, que era exatamente o que faltava responder.
-- **Histórico**, em duas visões: **Gráfico do score** (linha de série única, faixas de 7/30 dias ou tudo, limiares nomeados em 80 e 50, tooltip com crosshair listando **quais parâmetros saíram da faixa naquele dia**, e navegação por teclado) e **Tabela completa**. Dias incompletos não viram ponto zero na linha — aparecem como marca vazada na base.
-- **Exportar / Importar JSON**.
+- **Alarme do estado da água**, no topo: avalia pelo **pior** parâmetro, não pela média. Amônia e nitrito são tóxicos em qualquer nível detectável, então neles a faixa de alerta já dispara alarme crítico — com a ação a tomar e todos os parâmetros fora da faixa listados. Numa emergência generalizada, quem lidera é a amônia, não a temperatura: a ação é diferente e o prazo é menor.
+- **Score de água (0–100)** logo abaixo, como medida de qualidade geral. Enquanto o dia estiver incompleto ele mostra **—** com um chip *parcial · faltam N*, nunca 0 — o zero fica reservado para água realmente ruim. O medidor informa a **idade da leitura** e fica âmbar a partir de 3 dias.
+- **Gates de liberação**: dias consecutivos com água clara (5) e biologia zerada (3). Atingido o alvo, o chip passa a mostrar há quanto tempo está mantido; enquanto não, o chip do Green Terror informa **o gargalo** — quantos dias faltam e de quê.
+- **Radar de distância do ideal**: cada eixo normalizado para 0 = na faixa ideal, 1 = no limite de alerta. Centro significa saudável em todos os eixos, então polígono pequeno e regular = água boa, e qualquer ponta esticada é problema — por excesso ou por falta.
+- **Cadência de medição** e **tendências por parâmetro**.
+- **Histórico** em tabela, com **Exportar / Importar JSON**.
 
-### Aba Parâmetros
+### Aba Medir
 
 - **Registro diário**: temperatura, pH, KH, amônia (NH₃), nitrito (NO₂), nitrato (NO₃) e turbidez, com uma nota livre por dia. Salva automaticamente a cada alteração (sem botão "Salvar", sem risco de perder o que foi digitado).
 - **A última leitura preenchida continua ativa**: ao abrir, o formulário carrega o registro mais recente, não um formulário em branco. Ele segue ativo até você iniciar e gravar o próximo. Como editar ali altera aquele dia, um aviso no topo do card diz de que data é a leitura, há quantos dias, e oferece o botão **Registrar hoje**.
@@ -84,7 +92,16 @@ Visão de estado, sem formulário. É a aba que abre por padrão.
 - **Fases do projeto**: checklist livre (ciclagem, plantio/decoração, quarentena, estabilização, introdução, formação de casais, venda de excedentes) com status e notas por fase.
 - **Critérios adicionais do gate**: checklist manual para condições que não vêm de um parâmetro de água (ex: aprovação de um veterinário).
 
-### Aba Configurações
+### Aba Manutenção
+
+O que se faz com balde na mão, toda semana. Estes números existiam antes, mas dentro do capítulo 8 do infográfico — a onze telas de rolagem numa aba chamada "Configurações". Agora são a primeira coisa da tela.
+
+- **As contas da TPA**, já calculadas para o volume real em circulação (não para os 700 L de catálogo): litros a trocar, declorador e bicarbonato de reposição.
+- **Protocolo de bicarbonato**, exibido só quando há déficit de KH: o total, fracionado em três doses, com o dia de medir.
+- **Trocas de mídia**: os prazos de perlon, carvão e Purigen, com o alerta de que perlon vencido inverte de função e vira fonte de nitrato.
+- **Checklist de obras e medições**: as 11 ações prioritárias do relatório agrupadas por prioridade, com progresso, custo em aberto e as 6 medições que substituem as estimativas `[EST]`.
+
+### Aba O sistema
 
 O sistema contado como infográfico escaneável, em oito capítulos, cada um com o número que importa em destaque e o risco explicitado logo abaixo:
 
@@ -100,18 +117,13 @@ O sistema contado como infográfico escaneável, em oito capítulos, cada um com
 | 07 | **Os habitantes** (fauna) | Tamanho atual vs. adulto de cada espécie, medido contra os 200 cm do aquário — o Pangasius ocupa 65% da barra |
 | 08 | **O calendário das águas** | Volumes e frequências de manutenção já calculados para 682 L |
 
-**Os capítulos são calculados, não escritos.** A ficha técnica alimenta o infográfico: mude o volume líquido e o turnover, a TPA e a dose de bicarbonato se recalculam; informe o diâmetro da descida e o capítulo 3 emite o veredito na hora (com quantos L/h faltam de escoamento); marque o furo anti-sifão como instalado e as barras do capítulo 4 mudam de cenário. O KH registrado na aba Parâmetros atravessa para o capítulo 5 e define a dose exata de bicarbonato para o volume real do sistema.
+**Os capítulos são calculados, não escritos.** A ficha técnica alimenta o infográfico: mude o volume líquido e o turnover, a TPA e a dose de bicarbonato se recalculam; informe o diâmetro da descida e o capítulo 3 emite o veredito na hora (com quantos L/h faltam de escoamento); marque o furo anti-sifão como instalado e as barras do capítulo 4 mudam de cenário. O KH registrado na aba Medir atravessa para o capítulo 5 e define a dose exata de bicarbonato para o volume real do sistema.
 
 Ao final, **Ficha técnica editável**: 43 campos (display, sump, hidráulica, equipamentos, substrato, manutenção, carga estrutural, fauna e notas), pré-preenchidos, com salvamento automático e inclusão no export/import JSON.
 
 > **Divergência conhecida com o relatório:** a seção 10 indica repor 6,8 g de bicarbonato por TPA. Essa conta usa 1 dKH, mas uma troca de 33% a 3 dKH derruba o tampão em ~1 dKH *no sistema inteiro* — a reposição correta é `3 × 30 mg/L × volume trocado`, cerca de 20 g. O painel calcula o valor correto e sinaliza a divergência no capítulo 8.
 
-### Aba Checklist
-
-- **Ações prioritárias**: as 11 recomendações do relatório agrupadas por prioridade (crítica → baixa), cada uma com o impacto explicado e o custo estimado.
-- **Painel de progresso**: concluídas, críticas em aberto, custo ainda em aberto (soma automática dos itens não marcados) e medições pendentes. A barra fica vermelha enquanto houver crítica em aberto.
-- **Medições pendentes**: os 6 dados que substituem as estimativas `[EST]` e fecham o relatório.
-- **Ações próprias**: itens adicionados manualmente, separados dos do relatório (não entram na contagem de progresso do relatório e podem ser removidos; os do relatório não podem).
+Nesta aba também fica a **Sincronização na nuvem** (ver seção abaixo).
 
 ### Comum a todas as abas
 
@@ -119,7 +131,7 @@ Ao final, **Ficha técnica editável**: 43 campos (display, sump, hidráulica, e
 
 ## Onde os dados ficam guardados
 
-Por padrão, tudo é salvo em `localStorage` do navegador — client-side, sem backend, atrelado a este dispositivo específico. **A partir da aba Configurações → Sincronização na nuvem, dá para ligar sincronização real com Supabase** — os mesmos dados passam a aparecer em qualquer aparelho que abrir esta página com as mesmas credenciais, sem precisar editar código.
+Por padrão, tudo é salvo em `localStorage` do navegador — client-side, sem backend, atrelado a este dispositivo específico. **A partir da aba O sistema → Sincronização na nuvem, dá para ligar sincronização real com Supabase** — os mesmos dados passam a aparecer em qualquer aparelho que abrir esta página com as mesmas credenciais, sem precisar editar código.
 
 ### ⚠ Isto não funciona dentro do artefato publicado no claude.ai
 
@@ -134,7 +146,7 @@ O link `claude.ai/code/artifact/...` roda a página dentro de um **sandbox com C
 1. Criar um projeto gratuito no [Supabase](https://supabase.com).
 2. Abrir o **SQL Editor** do projeto e rodar o conteúdo de `supabase-schema.sql` deste repositório — cria as 5 tabelas (`readings`, `phase_data`, `gate_criteria`, `tank_config`, `struct_tasks`) já com RLS habilitado e políticas de acesso para o papel `anon`.
 3. Em **Project Settings → API**, copiar o **Project URL** e a chave **anon public** (não a `service_role` — essa nunca deve rodar no navegador).
-4. Na aba **Configurações → Sincronização na nuvem** do app, colar os dois valores e clicar em **Salvar e conectar**.
+4. Na aba **O sistema → Sincronização na nuvem** do app, colar os dois valores e clicar em **Salvar e conectar**.
 5. Repetir o passo 4 em cada dispositivo, com as mesmas credenciais.
 
 O app decide sozinho a direção da primeira sincronização: se um lado está vazio e o outro tem dados, adota automaticamente o lado com dados; se os dois têm dados e são diferentes, **não sobrescreve nada sozinho** — mostra um aviso ("dados diferentes — clique para revisar") e só troca quando você confirma pelo botão **Sincronizar agora**. Dali em diante, toda alteração local é enviada para a nuvem alguns segundos depois, incluindo exclusões (não é só "enviar o que existe": o que foi apagado localmente é apagado na nuvem também).
