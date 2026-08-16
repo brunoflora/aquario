@@ -17,7 +17,7 @@ export const PARAM_LABELS = {
   temp: "Temperatura",
   ph: "pH",
   kh: "KH",
-  nh3: "Amônia (NH₃)",
+  nh3: "Amônia tóxica (NH₃)",
   no2: "Nitrito (NO₂)",
   no3: "Nitrato (NO₃)",
   turbidez: "Turbidez",
@@ -179,6 +179,59 @@ export function idealDistance(key, value) {
   return (v - r.goodMax) / (r.warnMax - r.goodMax);
 }
 
+// Constantes da equação de Emerson et al. (1975), o padrão de aquicultura
+// para converter amônia total (TAN — o que o kit de teste lê pela cor) na
+// fração que é NH₃ não-ionizada (a que atravessa a brânquia e mata). É a
+// mesma equação por trás da tabela impressa pH×temperatura dos kits de teste
+// (LabconTest e equivalentes) — valida contra a tabela do kit com desvio
+// menor que 0,003 ppm em toda a faixa de pH 6,6–8,7 / 22–28°C.
+const AMMONIA_PKA_A = 0.09018;
+const AMMONIA_PKA_B = 2729.92;
+
+function nh3Fraction(pH, tempC) {
+  const tempK = tempC + 273.15;
+  const pKa = AMMONIA_PKA_A + AMMONIA_PKA_B / tempK;
+  return 1 / (1 + Math.pow(10, pKa - pH));
+}
+
+/**
+ * Converte amônia total (TAN, o valor lido pela cor no teste) na fração
+ * tóxica (NH₃) real, dado o pH e a temperatura do dia. Em pH baixo o
+ * equilíbrio químico favorece NH4+ (amônio, inofensivo); em pH alto quase
+ * todo o total vira NH3. Por isso os mesmos 0,25 ppm de TAN podem ser
+ * irrelevantes a pH 6,2 e uma emergência a pH 8,0 — o mesmo número lido no
+ * teste não tem o mesmo significado em dois aquários com pH diferente.
+ *
+ * Sem pH ou temperatura para calcular, assume o pior caso (o total inteiro
+ * seria tóxico) em vez de fingir que está seguro.
+ */
+export function toxicNH3(totalAmmonia, pH, tempC) {
+  if (totalAmmonia === null || totalAmmonia === undefined || totalAmmonia === "") return null;
+  const total = Number(totalAmmonia);
+  if (pH === null || pH === undefined || pH === "" || tempC === null || tempC === undefined || tempC === "") {
+    return total;
+  }
+  return total * nh3Fraction(Number(pH), Number(tempC));
+}
+
+export { nh3Fraction };
+
+/**
+ * O teste de amônia lê "amônia total" (TAN) pela cor — sozinho, esse número
+ * não diz se é perigoso. Esta função devolve uma cópia da leitura com "nh3"
+ * já substituído pelo valor tóxico calculado (usando o pH e a temperatura
+ * do MESMO dia), para que score, gates, radar, alerta e cálculo de TPA
+ * todos julguem o número que realmente importa. O total bruto fica
+ * guardado em nh3Total, para exibição e para a explicação do cálculo.
+ */
+export function deriveEffectiveReading(reading) {
+  if (!reading) return reading;
+  const hasTotal = reading.nh3 !== null && reading.nh3 !== undefined && reading.nh3 !== "";
+  if (!hasTotal) return reading;
+  const toxic = toxicNH3(reading.nh3, reading.ph, reading.temp);
+  return { ...reading, nh3: toxic, nh3Total: Number(reading.nh3) };
+}
+
 const ACTION_MESSAGES = {
   temp: {
     bad: "Temperatura fora da faixa seguro (25–28°C). Ajuste aquecedor/resfriamento imediatamente.",
@@ -196,8 +249,8 @@ const ACTION_MESSAGES = {
   // detectável já agride brânquia. A copy de alerta precisa pedir ação, não
   // apenas atenção — senão o título diz "aja agora" e o texto diz "monitore".
   nh3: {
-    bad: "Amônia em nível crítico. Faça troca parcial de água agora e revise o ciclo do filtro.",
-    warn: "Amônia detectada. Acima de 0,02 ppm já há agressão a brânquia — faça TPA e verifique a filtragem biológica antes que suba.",
+    bad: "Amônia tóxica (NH₃) em nível crítico — já calculada pelo pH e temperatura de hoje. Faça troca parcial de água agora e revise o ciclo do filtro.",
+    warn: "Amônia tóxica (NH₃) detectada. Acima de 0,02 ppm já há agressão a brânquia — faça TPA e verifique a filtragem biológica antes que suba.",
   },
   no2: {
     bad: "Nitrito em nível crítico. TPA imediata e verificação do ciclo do nitrogênio.",
@@ -216,7 +269,7 @@ const FIELD_GOOD_MESSAGES = {
   temp: "Na faixa ideal (25–28°C).",
   ph: "Na faixa ideal (6,5–7,6).",
   kh: "Na faixa ideal (4–8 dKH) — bom tampão para o pH.",
-  nh3: "Zerada, como deve ser.",
+  nh3: "Tóxica (NH₃) sob controle para o pH e a temperatura de hoje.",
   no2: "Zerado, como deve ser.",
   no3: "Dentro da faixa segura (até 20 ppm).",
   turbidez: "Água clara.",
@@ -369,14 +422,14 @@ const SPECIALIST_PLAN = {
   // "monitorar", mesmo no nível de alerta.
   nh3: {
     bad: {
-      diagnostico: "Nível crítico — já compromete a brânquia dos peixes.",
+      diagnostico: "Nível crítico de amônia tóxica (NH₃) — já compromete a brânquia dos peixes. Este valor já converte o total lido no teste pelo pH e temperatura de hoje, não é o número puro da cor do kit.",
       acao: "Faça troca parcial de água agora e revise se o filtro biológico está ciclado.",
-      resultado: "Amônia deve cair perceptivelmente em 24h. Se persistir alta, o ciclo do nitrogênio ainda não está fechado — reduza a alimentação e repita a TPA.",
+      resultado: "Amônia tóxica deve cair perceptivelmente em 24h após a TPA. Se persistir alta, o ciclo do nitrogênio ainda não está fechado — reduza a alimentação e repita a TPA. Se o pH subir nesse meio-tempo, remeça: a fração tóxica cresce junto.",
     },
     warn: {
-      diagnostico: "Detectada — acima de 0,02 ppm já há agressão a brânquia, mesmo sem ser nível crítico.",
+      diagnostico: "Amônia tóxica (NH₃) detectada — acima de 0,02 ppm já há agressão a brânquia, mesmo sem ser nível crítico.",
       acao: "Faça TPA e verifique a filtragem biológica antes que suba mais.",
-      resultado: "Na próxima medição, amônia deve estar zerada ou caindo. Se subir, trate como emergência.",
+      resultado: "Na próxima medição, a amônia tóxica deve estar zerada ou caindo. Se subir, trate como emergência.",
     },
   },
   no2: {
@@ -455,9 +508,16 @@ export function generateSpecialistPlan(lastReading, gates) {
     if (status !== "bad" && status !== "warn") return;
     const spec = (SPECIALIST_PLAN[key] || {})[status];
     if (!spec) return;
+    // Para amônia, "input" mostra os dois números — o que o kit leu pela cor
+    // (TAN) e o que isso significa de fato (tóxico), com o pH/temperatura
+    // que geraram a conversão — sem isso o item parece falar de outro
+    // parâmetro (o valor tóxico costuma ser bem menor que o total do kit).
+    const input = (key === "nh3" && lastReading.nh3Total !== undefined)
+      ? `TAN ${lastReading.nh3Total} ppm no teste → tóxico ${Number(value).toFixed(3)} ppm (pH ${lastReading.ph}, ${lastReading.temp}°C)`
+      : `${value} ${TREND_UNITS[key] || ""}`.trim();
     items.push({
       key, level: status, label: PARAM_LABELS[key],
-      input: `${value} ${TREND_UNITS[key] || ""}`.trim(),
+      input,
       output: spec.diagnostico,
       action: spec.acao,
       outcome: spec.resultado,
@@ -507,59 +567,86 @@ export function generateSpecialistPlan(lastReading, gates) {
   return items;
 }
 
+/**
+ * Calcula a TPA pelo fator mais restritivo entre os três parâmetros que se
+ * resolvem por diluição (amônia tóxica, nitrito, nitrato). Espera receber
+ * uma leitura já processada por deriveEffectiveReading — "nh3" aqui precisa
+ * ser a fração TÓXICA (NH₃), não o total lido no teste (TAN), porque é o
+ * número que decide se o peixe sobrevive.
+ *
+ * Diluir a água reduz o TOTAL de amônia proporcionalmente; como a fração
+ * tóxica é uma % fixa do total para um dado pH/temperatura, o percentual de
+ * TPA calculado sobre o valor tóxico vale igualmente para o total — a conta
+ * não muda dependendo de qual dos dois números você usa como base.
+ */
 export function calculateTPA(reading) {
   if (!reading) return null;
 
-  const tpa = {};
+  const factors = {};
 
-  // Amônia: mais crítica, limite 0.02 ppm
   if (reading.nh3 !== null && reading.nh3 !== undefined && reading.nh3 !== "") {
     const current = Number(reading.nh3);
-    const target = RANGES.nh3.goodMax; // 0.02
+    const target = RANGES.nh3.goodMax; // 0.02 ppm tóxico
     if (current > target) {
-      tpa.nh3 = {
-        current,
-        target,
+      factors.nh3 = {
+        key: "nh3", current, target,
         percentage: ((current - target) / current) * 100,
         priority: "critical",
-        label: "Amônia (NH₃)",
+        label: PARAM_LABELS.nh3,
       };
     }
   }
 
-  // Nitrito: crítico, limite 0.02 ppm
   if (reading.no2 !== null && reading.no2 !== undefined && reading.no2 !== "") {
     const current = Number(reading.no2);
     const target = RANGES.no2.goodMax; // 0.02
     if (current > target) {
-      tpa.no2 = {
-        current,
-        target,
+      factors.no2 = {
+        key: "no2", current, target,
         percentage: ((current - target) / current) * 100,
         priority: "critical",
-        label: "Nitrito (NO₂)",
+        label: PARAM_LABELS.no2,
       };
     }
   }
 
-  // Nitrato: menos crítico, limite 20 ppm
   if (reading.no3 !== null && reading.no3 !== undefined && reading.no3 !== "") {
     const current = Number(reading.no3);
     const target = RANGES.no3.goodMax; // 20
     if (current > target) {
-      tpa.no3 = {
-        current,
-        target,
+      factors.no3 = {
+        key: "no3", current, target,
         percentage: ((current - target) / current) * 100,
         priority: "normal",
-        label: "Nitrato (NO₃)",
+        label: PARAM_LABELS.no3,
       };
     }
   }
 
-  // Encontra o fator limitante (maior TPA% necessária)
-  const needed = Object.values(tpa).filter((t) => t);
-  if (needed.length === 0) return null;
+  const needed = Object.values(factors);
+
+  // TAN alto mas hoje inofensivo (pH baixo segura a toxicidade): não é uma
+  // TPA de emergência, mas é o tipo de coisa que um TPA "não precisa fazer
+  // nada" esconderia — o risco não sumiu, só está represado pelo pH atual.
+  const hasAmmoniaWatch = reading.nh3Total !== undefined && reading.nh3Total !== null
+    && Number(reading.nh3Total) >= 0.25 && !factors.nh3;
+  const ammoniaWatchNote = hasAmmoniaWatch
+    ? ` Amônia total (TAN) em ${Number(reading.nh3Total).toFixed(2)} ppm — hoje inofensiva a este pH, mas a fração tóxica cresce rápido se o pH subir. Sem TPA por causa disso agora; remeça se o pH mudar.`
+    : "";
+
+  if (needed.length === 0) {
+    if (hasAmmoniaWatch) {
+      return {
+        tpaPercentage: 0,
+        urgency: "info",
+        recommendation: `Nenhuma TPA de emergência necessária.${ammoniaWatchNote}`,
+        limitingFactor: null,
+        allFactors: [],
+        ammoniaWatch: true,
+      };
+    }
+    return null;
+  }
 
   needed.sort((a, b) => {
     if (a.priority === "critical" && b.priority !== "critical") return -1;
@@ -575,10 +662,10 @@ export function calculateTPA(reading) {
   if (limiting.priority === "critical") {
     if (tpaPercentage >= 90) {
       urgency = "critical";
-      recommendation = `TPA urgente: troque 90%+ da água AGORA. Verifique a filtragem biológica antes de subir o peixe.`;
+      recommendation = `TPA urgente: troque 90%+ da água AGORA. Reteste em 12–24h — se ainda estiver acima de ${limiting.target} ppm, repita a TPA. Verifique a filtragem biológica antes de recolocar o peixe.`;
     } else if (tpaPercentage >= 75) {
       urgency = "critical";
-      recommendation = `TPA grande: troque 75%+ da água hoje. Monitore a filtragem e recoloque o peixe com cuidado.`;
+      recommendation = `TPA grande: troque 75%+ da água hoje. Reteste amanhã e repita se ainda estiver acima do alvo.`;
     } else {
       urgency = "warning";
       recommendation = `TPA: troque ${tpaPercentage}%+ da água hoje.`;
@@ -596,8 +683,9 @@ export function calculateTPA(reading) {
   return {
     tpaPercentage,
     urgency,
-    recommendation,
+    recommendation: recommendation + (limiting.key !== "nh3" ? ammoniaWatchNote : ""),
     limitingFactor: limiting,
     allFactors: needed,
+    ammoniaWatch: hasAmmoniaWatch,
   };
 }

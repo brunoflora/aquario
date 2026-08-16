@@ -29,6 +29,7 @@ import {
   CORE_PARAMS, PARAM_LABELS, RANGES, TREND_ORDER, TREND_UNITS,
   computeWaterScore, countOpenFields, evaluateGates, assessWater,
   paramStatus, sortedReadings, toDayIndex, idealBand, idealDistance, calculateTPA,
+  deriveEffectiveReading, nh3Fraction,
 } from "../../domain/water.js";
 import WaterAlert from "../WaterAlert.jsx";
 import { cadenceSummary, fromDayIndex, todayDayIndex } from "../../domain/cadence.js";
@@ -47,10 +48,16 @@ function fmt(value, digits = 1) {
 
 const STATUS_COLOR = { good: "success", warn: "warning", bad: "error", empty: "default" };
 
+function trendDigits(key) {
+  if (key === "no3") return 0;
+  if (key === "nh3") return 3;
+  if (key === "no2") return 2;
+  return 1;
+}
+
 function ParamChip({ paramKey, value }) {
   const status = paramStatus(paramKey, value);
-  const label = paramKey === "turbidez" ? (value ? "turva" : "clara")
-    : fmt(value, paramKey === "no3" ? 0 : paramKey === "nh3" || paramKey === "no2" ? 2 : 1);
+  const label = paramKey === "turbidez" ? (value ? "turva" : "clara") : fmt(value, trendDigits(paramKey));
   return <Chip size="small" color={STATUS_COLOR[status]} label={label} variant={status === "empty" ? "outlined" : "filled"} />;
 }
 
@@ -78,11 +85,17 @@ export default function PainelTab({ onGoToForm }) {
   const theme = useTheme();
 
   const sorted = useMemo(() => sortedReadings(state.readings), [state.readings]);
+  // A amônia lida no teste é o TOTAL (TAN) — quem decide se é perigoso é a
+  // fração tóxica (NH₃), que depende do pH e da temperatura do mesmo dia.
+  // effectiveSorted troca "nh3" pelo valor já convertido em cada leitura, e
+  // é isso que score, gates, radar e tendências devem julgar.
+  const effectiveSorted = useMemo(() => sorted.map(deriveEffectiveReading), [sorted]);
   const last = sorted.length ? sorted[sorted.length - 1] : null;
-  const score = last ? computeWaterScore(last) : null;
-  const openCount = last ? countOpenFields(last) : CORE_PARAMS.length;
-  const assessment = useMemo(() => assessWater(last), [last]);
-  const gates = evaluateGates(state.readings);
+  const effectiveLast = effectiveSorted.length ? effectiveSorted[effectiveSorted.length - 1] : null;
+  const score = effectiveLast ? computeWaterScore(effectiveLast) : null;
+  const openCount = effectiveLast ? countOpenFields(effectiveLast) : CORE_PARAMS.length;
+  const assessment = useMemo(() => assessWater(effectiveLast), [effectiveLast]);
+  const gates = useMemo(() => evaluateGates(effectiveSorted), [effectiveSorted]);
 
   const ageLabel = useMemo(() => {
     if (!last) return "Sem registros";
@@ -93,20 +106,20 @@ export default function PainelTab({ onGoToForm }) {
   }, [last]);
 
   const radarData = useMemo(() => {
-    if (!last) return null;
+    if (!effectiveLast) return null;
     return {
       metrics: radarMetrics(),
       series: [
         {
           label: "Distância do ideal",
-          data: CORE_PARAMS.map((k) => Math.min(1.5, idealDistance(k, last[k]))),
+          data: CORE_PARAMS.map((k) => Math.min(1.5, idealDistance(k, effectiveLast[k]))),
           fillArea: true,
           valueFormatter: (v) => (v === 0 ? "na faixa ideal" : v >= 1 ? "além do limite de alerta" : `${Math.round(v * 100)}% do caminho até o limite`),
         },
         { label: "Limite de alerta", data: CORE_PARAMS.map(() => 1), hideMark: true },
       ],
     };
-  }, [last]);
+  }, [effectiveLast]);
 
   const descending = useMemo(() => sorted.slice().reverse(), [sorted]);
 
@@ -127,14 +140,14 @@ export default function PainelTab({ onGoToForm }) {
   }, [sorted]);
 
   const trends = useMemo(() => TREND_ORDER.map((key) => {
-    const series = sorted
+    const series = effectiveSorted
       .filter((r) => r[key] !== null && r[key] !== undefined && r[key] !== "")
       .map((r) => Number(r[key]));
-    const last = series.length ? series[series.length - 1] : null;
-    const status = last === null ? "empty" : paramStatus(key, last);
+    const lastVal = series.length ? Math.round(series[series.length - 1] * 1000) / 1000 : null;
+    const status = lastVal === null ? "empty" : paramStatus(key, lastVal);
     const band = idealBand(key);
-    return { key, series, last, status, band, unit: TREND_UNITS[key] };
-  }), [sorted]);
+    return { key, series, last: lastVal, status, band, unit: TREND_UNITS[key] };
+  }), [effectiveSorted]);
 
   function handleExport() {
     const payload = exportPayload();
@@ -235,30 +248,48 @@ export default function PainelTab({ onGoToForm }) {
         </CardContent>
       </Card>
 
-      {last && (() => {
-        const tpa = calculateTPA(last);
-        return tpa ? (
-          <Alert severity={tpa.urgency === "critical" ? "error" : tpa.urgency === "warning" ? "warning" : "info"} sx={{ p: 2 }}>
+      {effectiveLast && (() => {
+        const tpa = calculateTPA(effectiveLast);
+        if (!tpa) return null;
+        const severity = tpa.urgency === "critical" ? "error" : tpa.urgency === "warning" ? "warning" : "info";
+        const hasTAN = effectiveLast.nh3Total !== undefined
+          && effectiveLast.ph !== "" && effectiveLast.ph !== null && effectiveLast.ph !== undefined
+          && effectiveLast.temp !== "" && effectiveLast.temp !== null && effectiveLast.temp !== undefined;
+        const pctToxic = hasTAN ? nh3Fraction(Number(effectiveLast.ph), Number(effectiveLast.temp)) * 100 : null;
+        return (
+          <Alert severity={severity} sx={{ p: 2 }}>
             <AlertTitle sx={{ fontWeight: 700, mb: 1 }}>Cálculo de TPA</AlertTitle>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              <strong>{tpa.limitingFactor.label}</strong> limitando: {tpa.limitingFactor.current.toFixed(2)} ppm (alvo: {tpa.limitingFactor.target.toFixed(2)} ppm)
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 1, color: tpa.urgency === "critical" ? "error.main" : tpa.urgency === "warning" ? "warning.main" : "info.main" }}>
-              Troque {tpa.tpaPercentage}% da água
-            </Typography>
+            {hasTAN && (
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+                Amônia total (TAN) lida no teste: {fmt(effectiveLast.nh3Total, 2)} ppm → tóxica (NH₃) a pH {fmt(effectiveLast.ph, 1)}/{fmt(effectiveLast.temp, 1)}°C:{" "}
+                {effectiveLast.nh3 < 0.001 ? "<0,001" : fmt(effectiveLast.nh3, 3)} ppm ({pctToxic < 0.1 ? "<0,1" : fmt(pctToxic, pctToxic < 1 ? 2 : 1)}% do total).
+              </Typography>
+            )}
+            {tpa.limitingFactor ? (
+              <>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong>{tpa.limitingFactor.label}</strong> limitando: {fmt(tpa.limitingFactor.current, trendDigits(tpa.limitingFactor.key))} ppm (alvo: {fmt(tpa.limitingFactor.target, trendDigits(tpa.limitingFactor.key))} ppm)
+                </Typography>
+                <Typography variant="h6" sx={{ mb: 1, color: `${severity}.main` }}>
+                  Troque {tpa.tpaPercentage}% da água
+                </Typography>
+              </>
+            ) : (
+              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 700 }}>Nenhuma TPA de emergência necessária agora</Typography>
+            )}
             <Typography variant="body2">{tpa.recommendation}</Typography>
             {tpa.allFactors.length > 1 && (
               <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: "divider" }}>
                 <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>Outros fatores:</Typography>
                 {tpa.allFactors.slice(1).map((factor) => (
                   <Typography key={factor.label} variant="body2" color="text.secondary">
-                    • {factor.label}: {factor.current.toFixed(2)} ppm (precisaria {Math.ceil(factor.percentage)}% de TPA)
+                    • {factor.label}: {fmt(factor.current, trendDigits(factor.key))} ppm (precisaria {Math.ceil(factor.percentage)}% de TPA)
                   </Typography>
                 ))}
               </Box>
             )}
           </Alert>
-        ) : null;
+        );
       })()}
 
       <Card>
@@ -298,7 +329,7 @@ export default function PainelTab({ onGoToForm }) {
                     <TableCell align="right">Temp</TableCell>
                     <TableCell align="right">pH</TableCell>
                     <TableCell align="right">KH</TableCell>
-                    <TableCell align="right">NH₃</TableCell>
+                    <TableCell align="right">NH₃ tóxica</TableCell>
                     <TableCell align="right">NO₂</TableCell>
                     <TableCell align="right">NO₃</TableCell>
                     <TableCell>Turbidez</TableCell>
@@ -325,7 +356,14 @@ export default function PainelTab({ onGoToForm }) {
                         <TableCell align="right"><ParamChip paramKey="temp" value={r.temp} /></TableCell>
                         <TableCell align="right"><ParamChip paramKey="ph" value={r.ph} /></TableCell>
                         <TableCell align="right"><ParamChip paramKey="kh" value={r.kh} /></TableCell>
-                        <TableCell align="right"><ParamChip paramKey="nh3" value={r.nh3} /></TableCell>
+                        <TableCell align="right">
+                          <Stack alignItems="flex-end" spacing={0.25}>
+                            <ParamChip paramKey="nh3" value={deriveEffectiveReading(r).nh3} />
+                            {r.nh3 !== "" && r.nh3 !== null && r.nh3 !== undefined && (
+                              <Typography variant="caption" color="text.secondary">TAN {fmt(r.nh3, 2)}</Typography>
+                            )}
+                          </Stack>
+                        </TableCell>
                         <TableCell align="right"><ParamChip paramKey="no2" value={r.no2} /></TableCell>
                         <TableCell align="right"><ParamChip paramKey="no3" value={r.no3} /></TableCell>
                         <TableCell><ParamChip paramKey="turbidez" value={r.turbidez} /></TableCell>
@@ -378,7 +416,7 @@ export default function PainelTab({ onGoToForm }) {
                   {t.last !== null && (
                     <Chip
                       size="small"
-                      label={`${t.last} ${t.unit}`}
+                      label={`${fmt(t.last, trendDigits(t.key))} ${t.unit}`}
                       color={STATUS_COLOR[t.status]}
                     />
                   )}

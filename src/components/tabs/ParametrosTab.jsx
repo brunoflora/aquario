@@ -22,7 +22,10 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import MenuItem from "@mui/material/MenuItem";
 import { useAppState } from "../../state/AppStateProvider.jsx";
-import { evaluateGates, generateSpecialistPlan, sortedReadings, toDayIndex, fieldGuidance } from "../../domain/water.js";
+import {
+  evaluateGates, generateSpecialistPlan, sortedReadings, toDayIndex, fieldGuidance,
+  toxicNH3, nh3Fraction, deriveEffectiveReading,
+} from "../../domain/water.js";
 import { DEFAULT_PHASES, PHASE_STATUSES } from "../../domain/phases.js";
 
 function todayStr() {
@@ -66,6 +69,40 @@ function ParamField({ paramKey, label, unit, step, staticHelper, value, onChange
       value={value} onChange={onChange}
       InputProps={unit ? { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> } : undefined}
       helperText={guidance ? guidance.text : staticHelper}
+      error={guidance?.status === "bad"}
+      color={guidance?.status === "warn" ? "warning" : guidance?.status === "good" ? "success" : undefined}
+    />
+  );
+}
+
+// Amônia tóxica (NH₃) depende do pH e da temperatura do dia — a mesma
+// conversão que a tabela impressa nos kits de teste (LabconTest e
+// equivalentes) faz para passar de "amônia total" (o que a cor mostra) para
+// a fração que agride brânquia de verdade. O campo pede o valor total lido
+// no teste; o resultado tóxico calculado aparece ao vivo, junto com a ação.
+function AmmoniaField({ value, ph, tempC, onChange }) {
+  const hasContext = ph !== "" && ph !== null && ph !== undefined && tempC !== "" && tempC !== null && tempC !== undefined;
+  const total = value === "" ? null : Number(value);
+  const toxic = total !== null && hasContext ? toxicNH3(total, Number(ph), Number(tempC)) : null;
+  const guidance = toxic !== null ? fieldGuidance("nh3", toxic) : null;
+
+  let helperText = "Leia a cor do teste (Amônia Total/TAN): 0 · 0,25 · 0,50 · 1,00... A toxicidade real depende do pH e da temperatura de hoje.";
+  if (total !== null && !hasContext) {
+    helperText = "Preencha pH e temperatura para calcular a amônia tóxica (NH₃) real deste valor.";
+  } else if (total !== null && hasContext) {
+    const pct = nh3Fraction(Number(ph), Number(tempC)) * 100;
+    const pctText = pct < 0.1 ? "<0,1" : pct.toFixed(pct < 1 ? 2 : 1);
+    const toxicText = toxic < 0.001 ? "<0,001" : toxic.toFixed(3);
+    helperText = `Tóxica (NH₃): ${toxicText} ppm — ${pctText}% do total a pH ${Number(ph).toFixed(1)}/${Number(tempC).toFixed(1)}°C.`
+      + (guidance ? ` ${guidance.text}` : "");
+  }
+
+  return (
+    <TextField
+      fullWidth label="Amônia total (TAN)" type="number" inputProps={{ step: 0.01 }}
+      value={value} onChange={onChange}
+      InputProps={{ endAdornment: <InputAdornment position="end">ppm</InputAdornment> }}
+      helperText={helperText}
       error={guidance?.status === "bad"}
       color={guidance?.status === "warn" ? "warning" : guidance?.status === "good" ? "success" : undefined}
     />
@@ -179,8 +216,9 @@ export default function ParametrosTab() {
     return { label: brDate(form.date), quando };
   }, [form.date]);
 
-  const gates = evaluateGates(state.readings);
-  const specialistPlan = generateSpecialistPlan(mostRecent, gates);
+  const gates = useMemo(() => evaluateGates(state.readings.map(deriveEffectiveReading)), [state.readings]);
+  const effectiveMostRecent = useMemo(() => deriveEffectiveReading(mostRecent), [mostRecent]);
+  const specialistPlan = generateSpecialistPlan(effectiveMostRecent, gates);
 
   return (
     <Stack spacing={3}>
@@ -221,8 +259,7 @@ export default function ParametrosTab() {
                     staticHelper="Faixa ideal 4–8. É o tampão que segura o pH." value={form.kh} onChange={(e) => handleField("kh", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <ParamField paramKey="nh3" label="Amônia" unit="ppm" step={0.01}
-                    staticHelper="Ideal zero. Acima de 0,02 já agride brânquia." value={form.nh3} onChange={(e) => handleField("nh3", e.target.value)} />
+                  <AmmoniaField value={form.nh3} ph={form.ph} tempC={form.temp} onChange={(e) => handleField("nh3", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <ParamField paramKey="no2" label="Nitrito" unit="ppm" step={0.01}
