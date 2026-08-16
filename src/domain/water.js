@@ -54,9 +54,13 @@ export function countOpenFields(reading) {
   }).length;
 }
 
+// Devolve null quando o dia ainda está incompleto. Antes devolvia 0, o que
+// fazia "faltou digitar um campo" e "água catastrófica" exibirem o mesmo
+// número — dois estados opostos com a mesma cara (achado F4 da auditoria).
+// Quem exibe distingue os casos com countOpenFields().
 export function computeWaterScore(reading) {
   if (!reading) return null;
-  if (countOpenFields(reading) > 0) return 0;
+  if (countOpenFields(reading) > 0) return null;
   let total = 0;
   let totalWeight = 0;
   Object.keys(WEIGHTS).forEach((key) => {
@@ -163,6 +167,91 @@ const ACTION_MESSAGES = {
   },
 };
 
+// Amônia e nitrito são tóxicos em qualquer nível detectável: a faixa "alerta"
+// (0,02–0,25 ppm) já causa dano de brânquia. Para estes dois, alerta escala
+// para crítico — os demais parâmetros toleram ficar no limite por um dia.
+const TOXIC_PARAMS = ["nh3", "no2"];
+
+const SEVERITY_RANK = { bad: 3, warn: 2, good: 1, empty: 0 };
+
+/**
+ * Avalia a água pelo PIOR parâmetro, não pela média.
+ *
+ * O score ponderado (computeWaterScore) responde "como está a água no geral" —
+ * é uma boa medida de tendência, e uma péssima medida de alarme: com peso 20 de
+ * 100, a amônia sozinha nunca derruba o índice abaixo do limiar de "bom", então
+ * 0,30 ppm de NH₃ (emergência declarada pelo próprio app) exibia 80/100 em verde.
+ * Esta função existe para responder a outra pergunta: "preciso agir agora?".
+ */
+export function assessWater(reading) {
+  if (!reading) {
+    return { level: "none", headline: "Nenhuma medição registrada", detail: "Registre a primeira leitura para acompanhar o estado da água.", offenders: [] };
+  }
+
+  const open = countOpenFields(reading);
+  if (open > 0) {
+    const faltando = CORE_PARAMS.filter((k) => {
+      const v = reading[k];
+      return v === null || v === undefined || v === "";
+    }).map((k) => PARAM_LABELS[k]);
+    return {
+      level: "incomplete",
+      headline: `Leitura incompleta — ${open} de ${CORE_PARAMS.length} campos em aberto`,
+      detail: `Faltam: ${faltando.join(", ")}.`,
+      offenders: [],
+    };
+  }
+
+  const offenders = Object.keys(WEIGHTS)
+    .map((key) => {
+      const status = paramStatus(key, reading[key]);
+      if (status === "good" || status === "empty") return null;
+      const critical = status === "bad" || TOXIC_PARAMS.indexOf(key) >= 0;
+      return {
+        key,
+        status,
+        critical,
+        label: PARAM_LABELS[key],
+        value: reading[key],
+        message: (ACTION_MESSAGES[key] || {})[status] || "",
+      };
+    })
+    .filter(Boolean)
+    // Ordem de urgência, não de peso no score: entre dois parâmetros igualmente
+    // ruins, amônia e nitrito vêm primeiro porque matam em horas e pedem uma
+    // ação diferente (TPA imediata) da de temperatura ou pH.
+    .sort((a, b) =>
+      (b.critical - a.critical) ||
+      ((TOXIC_PARAMS.indexOf(b.key) >= 0) - (TOXIC_PARAMS.indexOf(a.key) >= 0)) ||
+      (SEVERITY_RANK[b.status] - SEVERITY_RANK[a.status]) ||
+      (WEIGHTS[b.key] - WEIGHTS[a.key])
+    );
+
+  if (offenders.length === 0) {
+    return { level: "ok", headline: "Todos os parâmetros na faixa ideal", detail: "Nada a fazer hoje além de manter a rotina.", offenders: [] };
+  }
+
+  const worst = offenders[0];
+  const criticos = offenders.filter((o) => o.critical);
+
+  if (worst.critical) {
+    const extra = criticos.length > 1 ? ` (e mais ${criticos.length - 1} em nível crítico)` : "";
+    return {
+      level: "critical",
+      headline: `${worst.label} exige ação agora${extra}`,
+      detail: worst.message,
+      offenders,
+    };
+  }
+
+  return {
+    level: "attention",
+    headline: `${worst.label} fora da faixa ideal`,
+    detail: worst.message,
+    offenders,
+  };
+}
+
 export function deriveActionPlan(lastReading, gates) {
   const items = [];
   if (!lastReading) {
@@ -175,7 +264,7 @@ export function deriveActionPlan(lastReading, gates) {
   });
   if (openKeys.length > 0) {
     const openLabels = openKeys.map((key) => PARAM_LABELS[key]).join(", ");
-    items.push({ level: "warn", text: `Score zerado até completar todos os parâmetros de hoje. Faltam: ${openLabels}.` });
+    items.push({ level: "warn", text: `O score só é calculado com o dia completo. Faltam: ${openLabels}.` });
   }
   Object.keys(WEIGHTS).forEach((key) => {
     const value = lastReading[key];

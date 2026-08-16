@@ -25,9 +25,10 @@ import { useTheme } from "@mui/material/styles";
 import { useAppState } from "../../state/AppStateProvider.jsx";
 import {
   CORE_PARAMS, PARAM_LABELS, RANGES, TREND_ORDER, TREND_UNITS,
-  computeWaterScore, countOpenFields, evaluateGates,
+  computeWaterScore, countOpenFields, evaluateGates, assessWater,
   paramStatus, sortedReadings, toDayIndex, idealBand,
 } from "../../domain/water.js";
+import WaterAlert from "../WaterAlert.jsx";
 import { cadenceSummary, fromDayIndex, todayDayIndex } from "../../domain/cadence.js";
 
 function todayStr() {
@@ -77,7 +78,7 @@ function idealSeriesValue(key) {
   return isPpm ? r.goodMax : (r.goodMin + r.goodMax) / 2;
 }
 
-export default function PainelTab() {
+export default function PainelTab({ onGoToForm }) {
   const { state, deleteReading, exportPayload, importData } = useAppState();
   const fileInputRef = useRef(null);
   const theme = useTheme();
@@ -86,6 +87,7 @@ export default function PainelTab() {
   const last = sorted.length ? sorted[sorted.length - 1] : null;
   const score = last ? computeWaterScore(last) : null;
   const openCount = last ? countOpenFields(last) : CORE_PARAMS.length;
+  const assessment = useMemo(() => assessWater(last), [last]);
   const gates = evaluateGates(state.readings);
 
   const ageLabel = useMemo(() => {
@@ -174,8 +176,15 @@ export default function PainelTab() {
     reader.readAsText(file);
   }
 
+  const scoreColor = score === null ? theme.palette.text.disabled
+    : score >= 80 ? theme.palette.success.main
+    : score >= 50 ? theme.palette.warning.main
+    : theme.palette.error.main;
+
   return (
     <Stack spacing={3}>
+      <WaterAlert assessment={assessment} onGoToForm={onGoToForm} />
+
       <Card>
         <CardContent>
           <Grid container spacing={3} alignItems="center">
@@ -183,16 +192,28 @@ export default function PainelTab() {
               <Gauge
                 width={160}
                 height={160}
-                value={score}
+                // Com score 0 o arco tem área zero e o vermelho não desenha —
+                // o pior estado possível ficava idêntico a "sem dados". Um piso
+                // de 2% garante que exista sempre traço visível; o texto segue
+                // mostrando o valor real.
+                value={score === null ? null : Math.max(score, 2)}
                 valueMin={0}
                 valueMax={100}
-                text={({ value }) => (value === null ? "—" : `${value}/100`)}
+                text={() => (score === null ? "—" : `${score}/100`)}
                 sx={{
-                  [`& .${gaugeClasses.valueArc}`]: {
-                    fill: score === null ? undefined : score >= 80 ? theme.palette.success.main : score >= 50 ? theme.palette.warning.main : theme.palette.error.main,
+                  [`& .${gaugeClasses.valueArc}`]: { fill: scoreColor },
+                  // abaixo de 50 o anel de fundo também tinge: o cartão inteiro
+                  // muda de estado, não só um arco fino
+                  [`& .${gaugeClasses.referenceArc}`]: {
+                    fill: score !== null && score < 50 ? theme.palette.error.light : undefined,
+                    opacity: score !== null && score < 50 ? 0.35 : undefined,
                   },
                 }}
               />
+              {last && openCount > 0 && (
+                <Chip size="small" color="info" variant="outlined" sx={{ mt: 1 }}
+                  label={`parcial · faltam ${openCount}`} />
+              )}
             </Grid>
             <Grid item xs={12} sm={8}>
               <Typography variant="h6">{last ? `Leitura de ${brDate(last.date)}` : "Sem registros"}</Typography>
@@ -257,6 +278,7 @@ export default function PainelTab() {
                 <TableBody>
                   {descending.map((r) => {
                     const rowScore = computeWaterScore(r);
+                    const rowOpen = countOpenFields(r);
                     return (
                       <TableRow key={r.date}>
                         <TableCell>{brDate(r.date)}</TableCell>
@@ -265,8 +287,9 @@ export default function PainelTab() {
                             component="span"
                             fontWeight={700}
                             color={rowScore === null ? "text.secondary" : rowScore >= 80 ? "success.main" : rowScore >= 50 ? "warning.main" : "error.main"}
+                            title={rowOpen > 0 ? `${rowOpen} campo(s) em aberto` : undefined}
                           >
-                            {rowScore === null ? "—" : rowScore}
+                            {rowScore === null ? (rowOpen > 0 ? "parcial" : "—") : rowScore}
                           </Typography>
                         </TableCell>
                         <TableCell align="right"><ParamChip paramKey="temp" value={r.temp} /></TableCell>

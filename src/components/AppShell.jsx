@@ -61,7 +61,7 @@ export default function AppShell() {
       </AppBar>
 
       <Container maxWidth="md" sx={{ py: 3 }}>
-        <Box role="tabpanel" hidden={tab !== 0}>{tab === 0 && <PainelTab />}</Box>
+        <Box role="tabpanel" hidden={tab !== 0}>{tab === 0 && <PainelTab onGoToForm={() => setTab(1)} />}</Box>
         <Box role="tabpanel" hidden={tab !== 1}>{tab === 1 && <ParametrosTab />}</Box>
         <Box role="tabpanel" hidden={tab !== 2}>{tab === 2 && <ConfiguracoesTab cloud={cloud} />}</Box>
         <Box role="tabpanel" hidden={tab !== 3}>{tab === 3 && <ChecklistTab />}</Box>
