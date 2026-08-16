@@ -53,10 +53,12 @@ export function AppStateProvider({ children }) {
 
   const showSnackbar = useCallback((message, options = {}) => {
     clearTimeout(snackTimerRef.current);
-    const isError = options.variant === "error";
-    setSnackbar({ message, variant: isError ? "error" : "default", actionLabel: options.actionLabel, onAction: options.onAction });
-    // undo precisa de tempo de leitura e reação; erro fica até ser lido
-    snackTimerRef.current = setTimeout(dismissSnackbar, isError ? 12000 : options.onAction ? 10000 : 5000);
+    // variant segue as severidades do MUI Alert: "success" | "warning" | "error" | "default" (info)
+    const variant = options.variant || "default";
+    setSnackbar({ message, variant, actionLabel: options.actionLabel, onAction: options.onAction });
+    // undo precisa de tempo de leitura e reação; erro fica até ser lido; sucesso passa rápido
+    const isError = variant === "error";
+    snackTimerRef.current = setTimeout(dismissSnackbar, isError ? 12000 : options.onAction ? 10000 : variant === "success" ? 3500 : 5000);
   }, [dismissSnackbar]);
 
   const snapshot = useCallback(() => JSON.parse(JSON.stringify(stateRef.current)), []);
