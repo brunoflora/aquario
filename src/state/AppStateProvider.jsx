@@ -79,7 +79,10 @@ export function AppStateProvider({ children }) {
   // Aplica uma mutação de forma reversível: sem diálogo de confirmação,
   // com desfazer disponível via snackbar (mesmo padrão do vanilla original).
   // `mutate` é puro (prev -> next); a persistência roda depois, fora do updater.
-  const doUndoable = useCallback((message, mutate) => {
+  // Variant "warning" por padrão: é sempre uma mudança de dados em massa
+  // (exclusão, importação, adoção de dados remotos) — undoable, mas não
+  // uma ação neutra, por isso não é "success" nem "default".
+  const doUndoable = useCallback((message, mutate, options = {}) => {
     const prev = stateRef.current;
     const snap = snapshot();
     const next = mutate(prev);
@@ -88,8 +91,9 @@ export function AppStateProvider({ children }) {
       if (next[key] !== prev[key]) persist(key, next[key]);
     });
     showSnackbar(message, {
+      variant: options.variant || "warning",
       actionLabel: "Desfazer",
-      onAction: () => { restore(snap); showSnackbar("Ação desfeita."); },
+      onAction: () => { restore(snap); showSnackbar("Ação desfeita.", { variant: "success" }); },
     });
   }, [snapshot, persist, showSnackbar, restore]);
 
@@ -131,7 +135,8 @@ export function AppStateProvider({ children }) {
     const criteria = [...prev.criteria, { label, checked: false }];
     setState({ ...prev, criteria });
     persist("criteria", criteria);
-  }, [persist]);
+    showSnackbar(`Critério "${label}" adicionado.`, { variant: "success" });
+  }, [persist, showSnackbar]);
 
   const toggleCriteria = useCallback((idx, checked) => {
     const prev = stateRef.current;
@@ -156,7 +161,8 @@ export function AppStateProvider({ children }) {
     const structTasks = [...prev.structTasks, { id: `custom-${label}`, group: "acao", priority: "baixa", label, checked: false, custom: true }];
     setState({ ...prev, structTasks });
     persist("structTasks", structTasks);
-  }, [persist]);
+    showSnackbar(`Ação "${label}" adicionada.`, { variant: "success" });
+  }, [persist, showSnackbar]);
 
   const toggleStructTask = useCallback((idx, checked) => {
     const prev = stateRef.current;

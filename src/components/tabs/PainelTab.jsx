@@ -71,7 +71,7 @@ function radarMetrics() {
 }
 
 export default function PainelTab({ onGoToForm }) {
-  const { state, deleteReading, exportPayload, importData } = useAppState();
+  const { state, deleteReading, exportPayload, importData, showSnackbar } = useAppState();
   const fileInputRef = useRef(null);
   const theme = useTheme();
 
@@ -145,6 +145,7 @@ export default function PainelTab({ onGoToForm }) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    showSnackbar("Backup exportado.", { variant: "success" });
   }
 
   function handleImportFile(e) {
@@ -155,7 +156,7 @@ export default function PainelTab({ onGoToForm }) {
       try {
         const data = JSON.parse(reader.result);
         if (!Array.isArray(data.readings)) {
-          window.alert('Este arquivo não parece um backup do painel: falta a lista "readings". Use um arquivo gerado pelo próprio botão Exportar JSON.');
+          showSnackbar('Este arquivo não parece um backup do painel: falta a lista "readings". Use um arquivo gerado pelo próprio botão Exportar JSON.', { variant: "error" });
         } else {
           const summary = `${data.readings.length} leitura(s)` +
             (Array.isArray(data.structTasks) ? `, ${data.structTasks.length} ação(ões)` : "") +
@@ -166,7 +167,7 @@ export default function PainelTab({ onGoToForm }) {
           if (ok) importData(data, summary);
         }
       } catch (err) {
-        window.alert(`Não foi possível ler o arquivo — ele não é um JSON válido. Detalhe: ${err.message}`);
+        showSnackbar(`Não foi possível ler o arquivo — ele não é um JSON válido. Detalhe: ${err.message}`, { variant: "error" });
       }
       e.target.value = "";
     };

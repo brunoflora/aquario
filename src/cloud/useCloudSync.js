@@ -137,16 +137,16 @@ export function useCloudSync() {
       .then((remote) => {
         const s = stateRef.current;
         const lEmpty = localIsEmpty(s), rEmpty = remoteIsEmpty(remote);
-        if (lEmpty && rEmpty) { setCloudState("synced"); showSnackbar("Nada para sincronizar ainda — nem aqui, nem na nuvem."); return; }
+        if (lEmpty && rEmpty) { setCloudState("synced"); showSnackbar("Nada para sincronizar ainda — nem aqui, nem na nuvem.", { variant: "success" }); return; }
         if (rEmpty) {
           return cloudPushAll(getLocal, ensureCriteriaIds).then(() => {
             setCloudState("synced");
-            showSnackbar("Dados deste aparelho enviados para a nuvem.");
+            showSnackbar("Dados deste aparelho enviados para a nuvem.", { variant: "success" });
           });
         }
         const sig = stateSignature(s.readings, s.criteria, s.structTasks, s.config);
         const rSig = stateSignature(remote.readings, remote.criteria, remote.structTasks, remote.config);
-        if (sig === rSig) { setCloudState("synced"); showSnackbar("Já está tudo sincronizado."); return; }
+        if (sig === rSig) { setCloudState("synced"); showSnackbar("Já está tudo sincronizado.", { variant: "success" }); return; }
         const ok = window.confirm(
           `A nuvem tem ${remote.readings.length} leitura(s) e este aparelho tem ${s.readings.length}.\n\n` +
           "Adotar os dados da nuvem aqui? Isso substitui o que está neste navegador — dá para desfazer em seguida.\n" +
@@ -170,7 +170,7 @@ export function useCloudSync() {
     if (!url || !key) { showSnackbar("Preencha a URL e a chave antes de conectar.", { variant: "error" }); return; }
     if (!/^https:\/\//.test(url)) { showSnackbar("A URL do projeto deve começar com https://", { variant: "error" }); return; }
     setCloudConfigValues(url, key);
-    showSnackbar("Credenciais salvas. Conectando…");
+    showSnackbar("Credenciais salvas. Conectando…", { variant: "success" });
     setCfg(getCloudConfig());
   }, [showSnackbar]);
 
@@ -178,7 +178,7 @@ export function useCloudSync() {
     clearCloudConfigValues();
     setCfg(null);
     setCloudState("off");
-    showSnackbar("Desconectado. Os dados continuam salvos neste navegador.");
+    showSnackbar("Desconectado. Os dados continuam salvos neste navegador.", { variant: "success" });
   }, [showSnackbar, setCloudState]);
 
   return {
