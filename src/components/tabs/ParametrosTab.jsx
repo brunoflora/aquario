@@ -237,7 +237,7 @@ export default function ParametrosTab() {
               <Stack spacing={2}>
                 {(state.phases.length ? state.phases : DEFAULT_PHASES).map((phase) => (
                   <Box key={phase.id}>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                    <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
                       <Typography variant="body2" sx={{ flex: 1 }}>{phase.label}</Typography>
                       <TextField
                         select size="small" value={phase.status}

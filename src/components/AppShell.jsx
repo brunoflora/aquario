@@ -28,7 +28,7 @@ export default function AppShell() {
   return (
     <Box sx={{ minHeight: "100vh" }}>
       <Container maxWidth="md" sx={{ pt: 4, pb: 2 }}>
-        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "flex-start" }} spacing={2}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "flex-start" } }}>
           <Box>
             <Typography variant="overline" color="text.secondary">Aquário jumbo — Ciclídeos Nacionais</Typography>
             <Typography variant="h4" component="h1" gutterBottom>Um trecho de rio amazônico, medido todo dia</Typography>
@@ -37,7 +37,7 @@ export default function AppShell() {
               abas registram o parâmetro do dia, explicam a ficha do sistema e riscam o que ainda falta consertar.
             </Typography>
           </Box>
-          <Stack alignItems={{ xs: "flex-start", sm: "flex-end" }} spacing={1}>
+          <Stack spacing={1} sx={{ alignItems: { xs: "flex-start", sm: "flex-end" } }}>
             <Typography variant="caption" color="text.secondary" aria-live="polite" aria-atomic="true">
               {saveIndicator}
             </Typography>

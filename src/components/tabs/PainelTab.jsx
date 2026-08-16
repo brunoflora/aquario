@@ -200,7 +200,7 @@ export default function PainelTab() {
                 Score de água · {ageLabel}
                 {last && (openCount > 0 ? ` · ${openCount} de ${CORE_PARAMS.length} campos em aberto` : " · todos os parâmetros preenchidos")}
               </Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
+              <Stack direction="row" spacing={1} useFlexGap sx={{ mt: 1, flexWrap: "wrap" }}>
                 <GateChip label="Água clara" streak={gates.clearStreak} target={gates.clearTarget} met={gates.clearMet} />
                 <GateChip label="Biologia zerada" streak={gates.bioStreak} target={gates.bioTarget} met={gates.bioMet} />
                 <Chip
@@ -227,7 +227,7 @@ export default function PainelTab() {
 
       <Card>
         <CardContent>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+          <Stack direction="row" sx={{ mb: 2, justifyContent: "space-between", alignItems: "center" }}>
             <Typography variant="h6">Histórico de leituras</Typography>
             <Stack direction="row" spacing={1}>
               <Button size="small" startIcon={<FileDownloadIcon />} onClick={handleExport}>Exportar JSON</Button>
@@ -320,7 +320,7 @@ export default function PainelTab() {
           <Grid container spacing={2}>
             {trends.map((t) => (
               <Grid item xs={12} sm={6} md={4} key={t.key}>
-                <Stack direction="row" justifyContent="space-between" alignItems="baseline">
+                <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "baseline" }}>
                   <Typography variant="body2">{PARAM_LABELS[t.key]}</Typography>
                   {t.last !== null && (
                     <Chip

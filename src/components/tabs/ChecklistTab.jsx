@@ -120,7 +120,7 @@ export default function ChecklistTab() {
             const meta = PRIORITY_META[g.key];
             return (
               <Box key={g.key} sx={{ mb: 3 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                   <Chip size="small" label={meta.label} color={meta.chipColor} />
                   <Typography variant="subtitle1">{g.label}</Typography>
                   <Typography variant="caption" color="text.secondary">{done}/{groupEntries.length}</Typography>
@@ -137,7 +137,7 @@ export default function ChecklistTab() {
 
           {customs.length > 0 && (
             <Box sx={{ mb: 3 }}>
-              <Stack direction="row" alignItems="center" spacing={1}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                 <Typography variant="subtitle1">Ações próprias</Typography>
                 <Typography variant="caption" color="text.secondary">
                   {customs.filter((e) => e.task.checked).length}/{customs.length}
