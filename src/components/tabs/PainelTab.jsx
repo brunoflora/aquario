@@ -26,7 +26,7 @@ import { useAppState } from "../../state/AppStateProvider.jsx";
 import {
   CORE_PARAMS, PARAM_LABELS, RANGES, TREND_ORDER, TREND_UNITS,
   computeWaterScore, countOpenFields, evaluateGates, assessWater,
-  paramStatus, sortedReadings, toDayIndex, idealBand,
+  paramStatus, sortedReadings, toDayIndex, idealBand, idealDistance,
 } from "../../domain/water.js";
 import WaterAlert from "../WaterAlert.jsx";
 import { cadenceSummary, fromDayIndex, todayDayIndex } from "../../domain/cadence.js";
@@ -53,29 +53,21 @@ function ParamChip({ paramKey, value }) {
 }
 
 function GateChip({ label, streak, target, met }) {
-  return (
-    <Chip
-      color={met ? "success" : "default"}
-      variant={met ? "filled" : "outlined"}
-      label={`${label}: ${streak}/${target}`}
-    />
-  );
+  // Um indicador de progresso não deve ultrapassar o próprio máximo: com 12
+  // dias de água clara o chip exibia "12/5". Atingido o alvo, ele passa a
+  // informar há quanto tempo está mantido, que é o dado útil a partir dali.
+  const excedente = streak - target;
+  const texto = met
+    ? `${label}: ✓ ${target}/${target}${excedente > 0 ? ` · há ${excedente} dia(s)` : ""}`
+    : `${label}: ${streak}/${target}`;
+  return <Chip color={met ? "success" : "default"} variant={met ? "filled" : "outlined"} label={texto} />;
 }
 
-// eixos do radar: mín/máx = limite de alerta de cada parâmetro (RANGES.warnMin/warnMax),
-// então o próprio raio do gráfico já mostra o quão perto do limite cada leitura está.
+// Eixos em "distância do ideal" (ver idealDistance): 0 no centro = no alvo,
+// 1 = no limite de alerta. Assim o gráfico tem UMA semântica só — polígono
+// pequeno e regular significa água saudável, qualquer ponta esticada é problema.
 function radarMetrics() {
-  return CORE_PARAMS.map((key) => {
-    const r = RANGES[key];
-    const isPpm = key === "nh3" || key === "no2" || key === "no3";
-    return { name: PARAM_LABELS[key], min: isPpm ? 0 : r.warnMin, max: r.warnMax };
-  });
-}
-
-function idealSeriesValue(key) {
-  const r = RANGES[key];
-  const isPpm = key === "nh3" || key === "no2" || key === "no3";
-  return isPpm ? r.goodMax : (r.goodMin + r.goodMax) / 2;
+  return CORE_PARAMS.map((key) => ({ name: PARAM_LABELS[key], min: 0, max: 1.5 }));
 }
 
 export default function PainelTab({ onGoToForm }) {
@@ -103,8 +95,13 @@ export default function PainelTab({ onGoToForm }) {
     return {
       metrics: radarMetrics(),
       series: [
-        { label: "Leitura de hoje", data: CORE_PARAMS.map((k) => Number(last[k]) || 0) },
-        { label: "Faixa ideal", data: CORE_PARAMS.map((k) => idealSeriesValue(k)) },
+        {
+          label: "Distância do ideal",
+          data: CORE_PARAMS.map((k) => Math.min(1.5, idealDistance(k, last[k]))),
+          fillArea: true,
+          valueFormatter: (v) => (v === 0 ? "na faixa ideal" : v >= 1 ? "além do limite de alerta" : `${Math.round(v * 100)}% do caminho até o limite`),
+        },
+        { label: "Limite de alerta", data: CORE_PARAMS.map(() => 1), hideMark: true },
       ],
     };
   }, [last]);
@@ -227,7 +224,7 @@ export default function PainelTab({ onGoToForm }) {
                 <Chip
                   color={gates.ready ? "success" : "default"}
                   variant={gates.ready ? "filled" : "outlined"}
-                  label={`Pronto p/ Green Terror: ${gates.ready ? "sim" : "não"}`}
+                  label={gates.ready ? "Pronto p/ Green Terror: sim" : `Green Terror — ${gates.gargalo || "registre as leituras"}`}
                 />
               </Stack>
             </Grid>
@@ -237,11 +234,15 @@ export default function PainelTab({ onGoToForm }) {
 
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>Leitura de hoje vs. faixa ideal</Typography>
+          <Typography variant="h6" gutterBottom>Quanto cada parâmetro está longe do ideal</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Centro é a faixa ideal. O anel externo é o limite de alerta — qualquer ponta que o
+            alcance está fora da faixa, seja por excesso ou por falta.
+          </Typography>
           {radarData ? (
             <RadarChart height={340} series={radarData.series} radar={{ metrics: radarData.metrics }} />
           ) : (
-            <Typography color="text.secondary">Registre um parâmetro na aba Parâmetros para ver o radar.</Typography>
+            <Typography color="text.secondary">Registre um parâmetro na aba Medir para ver o radar.</Typography>
           )}
         </CardContent>
       </Card>

@@ -126,15 +126,57 @@ export function evaluateGates(readings) {
     const no2 = r.no2 === null || r.no2 === undefined || r.no2 === "" ? null : Number(r.no2);
     return nh3 !== null && no2 !== null && nh3 <= 0.01 && no2 <= 0.01;
   });
+  const clearTarget = 5;
+  const bioTarget = 3;
+  const faltaClear = Math.max(0, clearTarget - clearStreak);
+  const faltaBio = Math.max(0, bioTarget - bioStreak);
+
+  // O gargalo é o que ainda segura a liberação. Sem isto o app dizia só
+  // "Pronto p/ Green Terror: não" — tinha o dado e não dizia o que faltava,
+  // justamente no marco que o aquarista está esperando há semanas.
+  let gargalo = null;
+  if (faltaBio > 0 && faltaBio >= faltaClear) {
+    gargalo = `faltam ${faltaBio} dia(s) com amônia e nitrito zerados`;
+  } else if (faltaClear > 0) {
+    gargalo = `faltam ${faltaClear} dia(s) de água clara`;
+  }
+
   return {
     clearStreak,
-    clearTarget: 5,
-    clearMet: clearStreak >= 5,
+    clearTarget,
+    clearMet: clearStreak >= clearTarget,
     bioStreak,
-    bioTarget: 3,
-    bioMet: bioStreak >= 3,
-    ready: clearStreak >= 5 && bioStreak >= 3,
+    bioTarget,
+    bioMet: bioStreak >= bioTarget,
+    ready: clearStreak >= clearTarget && bioStreak >= bioTarget,
+    gargalo,
   };
+}
+
+/**
+ * Distância do valor até a faixa ideal, normalizada: 0 = no alvo, 1 = no limite
+ * de alerta, >1 = além do limite.
+ *
+ * Existe para o radar. Plotando o valor bruto, os eixos carregavam duas
+ * semânticas opostas — temperatura e pH têm faixa ideal no MEIO da escala
+ * (longe do centro é ruim dos dois lados), enquanto amônia e nitrito são
+ * "quanto menor melhor" (perto do centro é ótimo). Dois problemas iguais
+ * apontavam para lados contrários do gráfico. Normalizado assim, o centro
+ * sempre significa saudável e qualquer ponta estendida significa problema.
+ */
+export function idealDistance(key, value) {
+  if (value === null || value === undefined || value === "") return 0;
+  const v = Number(value);
+  const r = RANGES[key];
+  if (!r) return 0;
+
+  if (key === "nh3" || key === "no2" || key === "no3") {
+    if (v <= r.goodMax) return 0;
+    return (v - r.goodMax) / (r.warnMax - r.goodMax);
+  }
+  if (v >= r.goodMin && v <= r.goodMax) return 0;
+  if (v < r.goodMin) return (r.goodMin - v) / (r.goodMin - r.warnMin);
+  return (v - r.goodMax) / (r.warnMax - r.goodMax);
 }
 
 const ACTION_MESSAGES = {
@@ -150,13 +192,16 @@ const ACTION_MESSAGES = {
     bad: "KH fora da faixa recomendada (4–8 dKH), o que reduz a estabilidade do pH.",
     warn: "KH no limite. Considere reforçar a capacidade de tamponamento.",
   },
+  // Amônia e nitrito não têm faixa "tranquila": o ideal é zero e qualquer valor
+  // detectável já agride brânquia. A copy de alerta precisa pedir ação, não
+  // apenas atenção — senão o título diz "aja agora" e o texto diz "monitore".
   nh3: {
     bad: "Amônia em nível crítico. Faça troca parcial de água agora e revise o ciclo do filtro.",
-    warn: "Amônia detectada em nível baixo. Redobre atenção à filtragem biológica.",
+    warn: "Amônia detectada. Acima de 0,02 ppm já há agressão a brânquia — faça TPA e verifique a filtragem biológica antes que suba.",
   },
   no2: {
     bad: "Nitrito em nível crítico. TPA imediata e verificação do ciclo do nitrogênio.",
-    warn: "Nitrito presente em nível baixo. Continue monitorando diariamente.",
+    warn: "Nitrito detectado. O ideal é zero — faça TPA e acompanhe de perto: o ciclo do nitrogênio não está fechando.",
   },
   no3: {
     bad: "Nitrato acima de 40 ppm. Realize TPA para reduzir acúmulo de sólidos.",
