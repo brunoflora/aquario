@@ -6,13 +6,6 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
@@ -26,13 +19,16 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { RadarChart } from "@mui/x-charts/RadarChart";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
+import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
+import { BarChart } from "@mui/x-charts/BarChart";
 import { useTheme } from "@mui/material/styles";
 import { useAppState } from "../../state/AppStateProvider.jsx";
 import {
-  CORE_PARAMS, PARAM_LABELS, RANGES,
-  computeWaterScore, countOpenFields, evaluateGates, deriveActionPlan,
-  paramStatus, sortedReadings, toDayIndex,
+  CORE_PARAMS, PARAM_LABELS, RANGES, TREND_ORDER, TREND_UNITS,
+  computeWaterScore, countOpenFields, evaluateGates,
+  paramStatus, sortedReadings, toDayIndex, idealBand,
 } from "../../domain/water.js";
+import { cadenceSummary, fromDayIndex, todayDayIndex } from "../../domain/cadence.js";
 
 function todayStr() {
   const d = new Date();
@@ -65,8 +61,6 @@ function GateChip({ label, streak, target, met }) {
   );
 }
 
-const LEVEL_ICON = { good: <CheckCircleIcon color="success" />, warn: <WarningAmberIcon color="warning" />, bad: <ErrorOutlineIcon color="error" /> };
-
 // eixos do radar: mín/máx = limite de alerta de cada parâmetro (RANGES.warnMin/warnMax),
 // então o próprio raio do gráfico já mostra o quão perto do limite cada leitura está.
 function radarMetrics() {
@@ -93,7 +87,6 @@ export default function PainelTab() {
   const score = last ? computeWaterScore(last) : null;
   const openCount = last ? countOpenFields(last) : CORE_PARAMS.length;
   const gates = evaluateGates(state.readings);
-  const actionPlan = deriveActionPlan(last, gates);
 
   const ageLabel = useMemo(() => {
     if (!last) return "Sem registros";
@@ -115,6 +108,32 @@ export default function PainelTab() {
   }, [last]);
 
   const descending = useMemo(() => sorted.slice().reverse(), [sorted]);
+
+  const CADENCE_WINDOW_DAYS = 30;
+  const cadence = useMemo(() => {
+    const byDate = {};
+    sorted.forEach((r) => { byDate[r.date] = r; });
+    const todayIdx = todayDayIndex();
+    const startIdx = todayIdx - CADENCE_WINDOW_DAYS + 1;
+    const days = [];
+    for (let i = startIdx; i <= todayIdx; i++) {
+      const date = fromDayIndex(i);
+      const reading = byDate[date];
+      days.push({ date, score: reading ? computeWaterScore(reading) : null });
+    }
+    const summary = cadenceSummary(byDate, startIdx, todayIdx, Math.ceil(CADENCE_WINDOW_DAYS / 7));
+    return { days, summary };
+  }, [sorted]);
+
+  const trends = useMemo(() => TREND_ORDER.map((key) => {
+    const series = sorted
+      .filter((r) => r[key] !== null && r[key] !== undefined && r[key] !== "")
+      .map((r) => Number(r[key]));
+    const last = series.length ? series[series.length - 1] : null;
+    const status = last === null ? "empty" : paramStatus(key, last);
+    const band = idealBand(key);
+    return { key, series, last, status, band, unit: TREND_UNITS[key] };
+  }), [sorted]);
 
   function handleExport() {
     const payload = exportPayload();
@@ -197,20 +216,6 @@ export default function PainelTab() {
 
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>Recomendações</Typography>
-          <List dense>
-            {actionPlan.map((item, i) => (
-              <ListItem key={i} disableGutters>
-                <ListItemIcon sx={{ minWidth: 36 }}>{LEVEL_ICON[item.level]}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItem>
-            ))}
-          </List>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent>
           <Typography variant="h6" gutterBottom>Leitura de hoje vs. faixa ideal</Typography>
           {radarData ? (
             <RadarChart height={340} series={radarData.series} radar={{ metrics: radarData.metrics }} />
@@ -283,6 +288,65 @@ export default function PainelTab() {
               </Table>
             </TableContainer>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Cadência de medição</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Os gates contam dias consecutivos — um dia sem medir zera a contagem. As barras mostram o score
+            dos últimos {CADENCE_WINDOW_DAYS} dias; um vão vazio é um dia sem registro.
+          </Typography>
+          <BarChart
+            height={200}
+            series={[{
+              data: cadence.days.map((d) => d.score),
+              valueFormatter: (v) => (v === null ? "sem medição" : `score ${v}`),
+            }]}
+            xAxis={[{ data: cadence.days.map((d) => d.date.slice(5).split("-").reverse().join("/")), scaleType: "band" }]}
+            yAxis={[{ min: 0, max: 100 }]}
+          />
+          <Typography variant="caption" color="text.secondary">{cadence.summary.caption}</Typography>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Por parâmetro</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            O score é uma média ponderada — aqui dá para ver qual parâmetro está puxando o resultado.
+          </Typography>
+          <Grid container spacing={2}>
+            {trends.map((t) => (
+              <Grid item xs={12} sm={6} md={4} key={t.key}>
+                <Stack direction="row" justifyContent="space-between" alignItems="baseline">
+                  <Typography variant="body2">{PARAM_LABELS[t.key]}</Typography>
+                  {t.last !== null && (
+                    <Chip
+                      size="small"
+                      label={`${t.last} ${t.unit}`}
+                      color={STATUS_COLOR[t.status]}
+                    />
+                  )}
+                </Stack>
+                {t.series.length ? (
+                  <SparkLineChart
+                    height={60}
+                    data={t.series}
+                    showHighlight
+                    area
+                    color={t.status === "bad" ? theme.palette.error.main : t.status === "warn" ? theme.palette.warning.main : theme.palette.success.main}
+                  />
+                ) : (
+                  <Typography variant="caption" color="text.secondary">sem medição no período</Typography>
+                )}
+                <Typography variant="caption" color="text.secondary">
+                  faixa ideal {t.band[0]}–{t.band[1]} {t.unit}
+                </Typography>
+              </Grid>
+            ))}
+          </Grid>
         </CardContent>
       </Card>
     </Stack>
