@@ -91,7 +91,7 @@ export default function AppShell() {
         {snackbar ? (
           <Alert
             onClose={dismissSnackbar}
-            severity={snackbar.variant === "error" ? "error" : "info"}
+            severity={snackbar.variant === "default" ? "info" : snackbar.variant}
             action={snackbar.actionLabel ? (
               <Button color="inherit" size="small" onClick={() => { dismissSnackbar(); snackbar.onAction?.(); }}>
                 {snackbar.actionLabel}

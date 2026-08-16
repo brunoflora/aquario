@@ -22,7 +22,7 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import MenuItem from "@mui/material/MenuItem";
 import { useAppState } from "../../state/AppStateProvider.jsx";
-import { evaluateGates, deriveActionPlan, sortedReadings, toDayIndex } from "../../domain/water.js";
+import { evaluateGates, deriveActionPlan, sortedReadings, toDayIndex, fieldGuidance } from "../../domain/water.js";
 import { DEFAULT_PHASES, PHASE_STATUSES } from "../../domain/phases.js";
 
 function todayStr() {
@@ -53,6 +53,25 @@ function readingHasData(reading) {
 
 const LEVEL_ICON = { good: <CheckCircleIcon color="success" />, warn: <WarningAmberIcon color="warning" />, bad: <ErrorOutlineIcon color="error" /> };
 
+// Feedback em tempo real por campo: enquanto vazio, mostra a faixa ideal
+// (texto estático); a partir do primeiro valor digitado, o helperText passa
+// a dizer o que aconteceu e o que fazer — bom sinaliza pela cor no foco,
+// crítico fica em vermelho persistente (error), seguindo os estados padrão
+// do MUI TextField, sem componente novo.
+function ParamField({ paramKey, label, unit, step, staticHelper, value, onChange }) {
+  const guidance = value === "" ? null : fieldGuidance(paramKey, Number(value));
+  return (
+    <TextField
+      fullWidth label={label} type="number" inputProps={{ step }}
+      value={value} onChange={onChange}
+      InputProps={unit ? { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> } : undefined}
+      helperText={guidance ? guidance.text : staticHelper}
+      error={guidance?.status === "bad"}
+      color={guidance?.status === "warn" ? "warning" : guidance?.status === "good" ? "success" : undefined}
+    />
+  );
+}
+
 export default function ParametrosTab() {
   const { state, upsertReading, deleteReading, showSnackbar, addCriteria, toggleCriteria, removeCriteria, updatePhase } = useAppState();
 
@@ -61,6 +80,7 @@ export default function ParametrosTab() {
 
   const [form, setForm] = useState(() => mostRecent || BLANK);
   const saveTimerRef = useRef(null);
+  const confirmTimerRef = useRef(null);
   const initedRef = useRef(false);
 
   // preenche com o registro mais recente na primeira carga (mesmo comportamento do init() vanilla)
@@ -71,6 +91,8 @@ export default function ParametrosTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => () => { clearTimeout(saveTimerRef.current); clearTimeout(confirmTimerRef.current); }, []);
+
   function scheduleAutosave(next) {
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
@@ -79,6 +101,20 @@ export default function ParametrosTab() {
       if (!readingHasData(next) && !exists) return;
       upsertReading(toStoredReading(next));
     }, 300);
+
+    // Confirmação em alerta visual (não só o texto pequeno no topo da página):
+    // dispara uma vez quando o usuário PAUSA de digitar, não a cada tecla —
+    // preencher os 6 campos deve gerar um aviso, não seis.
+    clearTimeout(confirmTimerRef.current);
+    confirmTimerRef.current = setTimeout(() => {
+      if (!next.date || !readingHasData(next)) return;
+      const filled = NUMERIC_FIELDS.filter((k) => next[k] !== "" && next[k] !== null && next[k] !== undefined).length;
+      const label = next.date === todayStr() ? "hoje" : brDate(next.date);
+      const resumo = filled >= NUMERIC_FIELDS.length
+        ? `Leitura de ${label} completa e salva.`
+        : `Leitura de ${label} salva — ${filled} de ${NUMERIC_FIELDS.length} parâmetros preenchidos.`;
+      showSnackbar(resumo, { variant: "success" });
+    }, 1300);
   }
 
   function handleField(key, value) {
@@ -144,51 +180,28 @@ export default function ParametrosTab() {
                 </Grid>
                 <Grid item xs={12} sm={6} />
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth label="Temperatura" type="number" inputProps={{ step: 0.1 }}
-                    value={form.temp} onChange={(e) => handleField("temp", e.target.value)}
-                    InputProps={{ endAdornment: <InputAdornment position="end">°C</InputAdornment> }}
-                    helperText="Faixa ideal 25–28."
-                  />
+                  <ParamField paramKey="temp" label="Temperatura" unit="°C" step={0.1}
+                    staticHelper="Faixa ideal 25–28." value={form.temp} onChange={(e) => handleField("temp", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth label="pH" type="number" inputProps={{ step: 0.1 }}
-                    value={form.ph} onChange={(e) => handleField("ph", e.target.value)}
-                    helperText="Faixa ideal 6,5–7,6."
-                  />
+                  <ParamField paramKey="ph" label="pH" step={0.1}
+                    staticHelper="Faixa ideal 6,5–7,6." value={form.ph} onChange={(e) => handleField("ph", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth label="Dureza de carbonatos" type="number" inputProps={{ step: 0.5 }}
-                    value={form.kh} onChange={(e) => handleField("kh", e.target.value)}
-                    InputProps={{ endAdornment: <InputAdornment position="end">dKH</InputAdornment> }}
-                    helperText="Faixa ideal 4–8. É o tampão que segura o pH."
-                  />
+                  <ParamField paramKey="kh" label="Dureza de carbonatos" unit="dKH" step={0.5}
+                    staticHelper="Faixa ideal 4–8. É o tampão que segura o pH." value={form.kh} onChange={(e) => handleField("kh", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth label="Amônia" type="number" inputProps={{ step: 0.01 }}
-                    value={form.nh3} onChange={(e) => handleField("nh3", e.target.value)}
-                    InputProps={{ endAdornment: <InputAdornment position="end">ppm</InputAdornment> }}
-                    helperText="Ideal zero. Acima de 0,25 é emergência."
-                  />
+                  <ParamField paramKey="nh3" label="Amônia" unit="ppm" step={0.01}
+                    staticHelper="Ideal zero. Acima de 0,02 já agride brânquia." value={form.nh3} onChange={(e) => handleField("nh3", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth label="Nitrito" type="number" inputProps={{ step: 0.01 }}
-                    value={form.no2} onChange={(e) => handleField("no2", e.target.value)}
-                    InputProps={{ endAdornment: <InputAdornment position="end">ppm</InputAdornment> }}
-                    helperText="Ideal zero. Acima de 0,25 é emergência."
-                  />
+                  <ParamField paramKey="no2" label="Nitrito" unit="ppm" step={0.01}
+                    staticHelper="Ideal zero. Acima de 0,02 já agride brânquia." value={form.no2} onChange={(e) => handleField("no2", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth label="Nitrato" type="number" inputProps={{ step: 5 }}
-                    value={form.no3} onChange={(e) => handleField("no3", e.target.value)}
-                    InputProps={{ endAdornment: <InputAdornment position="end">ppm</InputAdornment> }}
-                    helperText="Ideal abaixo de 20. Acima de 40, faça TPA."
-                  />
+                  <ParamField paramKey="no3" label="Nitrato" unit="ppm" step={5}
+                    staticHelper="Ideal abaixo de 20. Acima de 40, faça TPA." value={form.no3} onChange={(e) => handleField("no3", e.target.value)} />
                 </Grid>
                 <Grid item xs={12} sm={6} sx={{ display: "flex", alignItems: "center" }}>
                   <FormControlLabel

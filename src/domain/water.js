@@ -212,6 +212,30 @@ const ACTION_MESSAGES = {
   },
 };
 
+const FIELD_GOOD_MESSAGES = {
+  temp: "Na faixa ideal (25–28°C).",
+  ph: "Na faixa ideal (6,5–7,6).",
+  kh: "Na faixa ideal (4–8 dKH) — bom tampão para o pH.",
+  nh3: "Zerada, como deve ser.",
+  no2: "Zerado, como deve ser.",
+  no3: "Dentro da faixa segura (até 20 ppm).",
+  turbidez: "Água clara.",
+};
+
+/**
+ * Feedback do que esse valor significa e o que fazer, pra aparecer no
+ * helperText do campo enquanto o usuário digita — não só depois, resumido
+ * no plano de ação. Null enquanto o campo está vazio (helperText volta ao
+ * texto estático de faixa ideal).
+ */
+export function fieldGuidance(key, value) {
+  const status = paramStatus(key, value);
+  if (status === "empty") return null;
+  if (status === "good") return { status, text: FIELD_GOOD_MESSAGES[key] || "Na faixa ideal." };
+  const text = (ACTION_MESSAGES[key] || {})[status];
+  return text ? { status, text } : null;
+}
+
 // Amônia e nitrito são tóxicos em qualquer nível detectável: a faixa "alerta"
 // (0,02–0,25 ppm) já causa dano de brânquia. Para estes dois, alerta escala
 // para crítico — os demais parâmetros toleram ficar no limite por um dia.
