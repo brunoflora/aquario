@@ -506,3 +506,98 @@ export function generateSpecialistPlan(lastReading, gates) {
 
   return items;
 }
+
+export function calculateTPA(reading) {
+  if (!reading) return null;
+
+  const tpa = {};
+
+  // Amônia: mais crítica, limite 0.02 ppm
+  if (reading.nh3 !== null && reading.nh3 !== undefined && reading.nh3 !== "") {
+    const current = Number(reading.nh3);
+    const target = RANGES.nh3.goodMax; // 0.02
+    if (current > target) {
+      tpa.nh3 = {
+        current,
+        target,
+        percentage: ((current - target) / current) * 100,
+        priority: "critical",
+        label: "Amônia (NH₃)",
+      };
+    }
+  }
+
+  // Nitrito: crítico, limite 0.02 ppm
+  if (reading.no2 !== null && reading.no2 !== undefined && reading.no2 !== "") {
+    const current = Number(reading.no2);
+    const target = RANGES.no2.goodMax; // 0.02
+    if (current > target) {
+      tpa.no2 = {
+        current,
+        target,
+        percentage: ((current - target) / current) * 100,
+        priority: "critical",
+        label: "Nitrito (NO₂)",
+      };
+    }
+  }
+
+  // Nitrato: menos crítico, limite 20 ppm
+  if (reading.no3 !== null && reading.no3 !== undefined && reading.no3 !== "") {
+    const current = Number(reading.no3);
+    const target = RANGES.no3.goodMax; // 20
+    if (current > target) {
+      tpa.no3 = {
+        current,
+        target,
+        percentage: ((current - target) / current) * 100,
+        priority: "normal",
+        label: "Nitrato (NO₃)",
+      };
+    }
+  }
+
+  // Encontra o fator limitante (maior TPA% necessária)
+  const needed = Object.values(tpa).filter((t) => t);
+  if (needed.length === 0) return null;
+
+  needed.sort((a, b) => {
+    if (a.priority === "critical" && b.priority !== "critical") return -1;
+    if (b.priority === "critical" && a.priority !== "critical") return 1;
+    return b.percentage - a.percentage;
+  });
+
+  const limiting = needed[0];
+  const tpaPercentage = Math.ceil(limiting.percentage);
+
+  let urgency = "normal";
+  let recommendation = "";
+  if (limiting.priority === "critical") {
+    if (tpaPercentage >= 90) {
+      urgency = "critical";
+      recommendation = `TPA urgente: troque 90%+ da água AGORA. Verifique a filtragem biológica antes de subir o peixe.`;
+    } else if (tpaPercentage >= 75) {
+      urgency = "critical";
+      recommendation = `TPA grande: troque 75%+ da água hoje. Monitore a filtragem e recoloque o peixe com cuidado.`;
+    } else {
+      urgency = "warning";
+      recommendation = `TPA: troque ${tpaPercentage}%+ da água hoje.`;
+    }
+  } else {
+    if (tpaPercentage >= 50) {
+      urgency = "warning";
+      recommendation = `TPA planejada: troque ${tpaPercentage}% da água nos próximos dias.`;
+    } else {
+      urgency = "info";
+      recommendation = `TPA de manutenção: ${tpaPercentage}% nos próximos 7 dias.`;
+    }
+  }
+
+  return {
+    tpaPercentage,
+    urgency,
+    recommendation,
+    limitingFactor: limiting,
+    allFactors: needed,
+  };
+}

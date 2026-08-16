@@ -15,6 +15,8 @@ import TableContainer from "@mui/material/TableContainer";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { RadarChart } from "@mui/x-charts/RadarChart";
@@ -26,7 +28,7 @@ import { useAppState } from "../../state/AppStateProvider.jsx";
 import {
   CORE_PARAMS, PARAM_LABELS, RANGES, TREND_ORDER, TREND_UNITS,
   computeWaterScore, countOpenFields, evaluateGates, assessWater,
-  paramStatus, sortedReadings, toDayIndex, idealBand, idealDistance,
+  paramStatus, sortedReadings, toDayIndex, idealBand, idealDistance, calculateTPA,
 } from "../../domain/water.js";
 import WaterAlert from "../WaterAlert.jsx";
 import { cadenceSummary, fromDayIndex, todayDayIndex } from "../../domain/cadence.js";
@@ -232,6 +234,32 @@ export default function PainelTab({ onGoToForm }) {
           </Grid>
         </CardContent>
       </Card>
+
+      {last && (() => {
+        const tpa = calculateTPA(last);
+        return tpa ? (
+          <Alert severity={tpa.urgency === "critical" ? "error" : tpa.urgency === "warning" ? "warning" : "info"} sx={{ p: 2 }}>
+            <AlertTitle sx={{ fontWeight: 700, mb: 1 }}>Cálculo de TPA</AlertTitle>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              <strong>{tpa.limitingFactor.label}</strong> limitando: {tpa.limitingFactor.current.toFixed(2)} ppm (alvo: {tpa.limitingFactor.target.toFixed(2)} ppm)
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 1, color: tpa.urgency === "critical" ? "error.main" : tpa.urgency === "warning" ? "warning.main" : "info.main" }}>
+              Troque {tpa.tpaPercentage}% da água
+            </Typography>
+            <Typography variant="body2">{tpa.recommendation}</Typography>
+            {tpa.allFactors.length > 1 && (
+              <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: "divider" }}>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>Outros fatores:</Typography>
+                {tpa.allFactors.slice(1).map((factor) => (
+                  <Typography key={factor.label} variant="body2" color="text.secondary">
+                    • {factor.label}: {factor.current.toFixed(2)} ppm (precisaria {Math.ceil(factor.percentage)}% de TPA)
+                  </Typography>
+                ))}
+              </Box>
+            )}
+          </Alert>
+        ) : null;
+      })()}
 
       <Card>
         <CardContent>
