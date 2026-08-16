@@ -58,9 +58,16 @@ function TaskRow({ task, idx, onToggle, onRemove }) {
 }
 
 export default function ChecklistTab() {
-  const { state, toggleStructTask, removeStructTask, addStructTask } = useAppState();
+  const { state, toggleStructTask, removeStructTask, addStructTask, showSnackbar } = useAppState();
   const [hideDone, setHideDone] = useState(false);
   const [newTask, setNewTask] = useState("");
+
+  function submitNewTask() {
+    const label = newTask.trim();
+    if (!label) { showSnackbar("Digite uma ação antes de adicionar.", { variant: "error" }); return; }
+    addStructTask(label);
+    setNewTask("");
+  }
 
   const entries = useMemo(() => state.structTasks.map((task, idx) => ({ task, idx })), [state.structTasks]);
   const acoes = entries.filter((e) => e.task.group !== "medicao");
@@ -155,9 +162,9 @@ export default function ChecklistTab() {
             <TextField
               fullWidth size="small" placeholder="Adicionar ação própria..."
               value={newTask} onChange={(e) => setNewTask(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && newTask.trim()) { addStructTask(newTask.trim()); setNewTask(""); } }}
+              onKeyDown={(e) => { if (e.key === "Enter") submitNewTask(); }}
             />
-            <Button variant="outlined" onClick={() => { if (newTask.trim()) { addStructTask(newTask.trim()); setNewTask(""); } }}>Adicionar</Button>
+            <Button variant="outlined" onClick={submitNewTask}>Adicionar</Button>
           </Stack>
         </CardContent>
       </Card>

@@ -165,7 +165,7 @@ export default function ParametrosTab() {
   function handleDeleteCurrent() {
     if (!form.date) return;
     if (!state.readings.some((r) => r.date === form.date)) {
-      showSnackbar("Não há registro salvo nesta data para excluir.");
+      showSnackbar("Não há registro salvo nesta data para excluir.", { variant: "warning" });
       return;
     }
     deleteReading(form.date);
@@ -335,10 +335,11 @@ export default function ParametrosTab() {
 }
 
 function NewCriteriaForm({ onAdd }) {
+  const { showSnackbar } = useAppState();
   const [value, setValue] = useState("");
   function submit() {
     const label = value.trim();
-    if (!label) return;
+    if (!label) { showSnackbar("Digite um critério antes de adicionar.", { variant: "error" }); return; }
     onAdd(label);
     setValue("");
   }
