@@ -2583,14 +2583,21 @@
 
   function describeCloudError(err) {
     if (!err) return "Erro desconhecido.";
+    if (typeof err === "string") return err;
     if (err.code === "not_configured") return "Nuvem não configurada.";
     if (err.code === "sandboxed") return "Bloqueado pelo sandbox do artefato — abra o index.html fora do claude.ai.";
-    if (err.code === "timeout") return "Sem resposta do servidor (tempo esgotado). Verifique a URL do projeto.";
-    if (err.code === "network") return "Não foi possível conectar. Verifique a URL do projeto e sua internet.";
+    if (err.code === "timeout") return "Sem resposta do servidor (tempo esgotado). Verifique a URL do projeto, ou se ele está pausado no painel do Supabase (plano free pausa projetos sem uso — abra o painel e clique em \"Restore project\").";
+    if (err.code === "network") return "Não foi possível conectar. Verifique a URL do projeto, sua internet, ou se o projeto está pausado no painel do Supabase (plano free pausa projetos sem uso — abra o painel e clique em \"Restore project\").";
     if (err.code === "http_401" || err.code === "http_403") return "Chave rejeitada pelo Supabase. Confira se copiou a chave \"anon public\" correta.";
     if (err.code === "http_404") return "Projeto não encontrado, ou as tabelas ainda não existem (rode o supabase-schema.sql).";
     if (err.code && err.code.indexOf("http_") === 0) return "O Supabase respondeu com erro (" + err.code.replace("http_", "") + ").";
     return err.message || "Erro ao sincronizar.";
+  }
+
+  function cloudErrorDetail(err) {
+    var msg = describeCloudError(err);
+    var raw = err && (err.message || err.code);
+    return raw && raw !== msg ? msg + " [" + raw + "]" : msg;
   }
 
   // ---------- adaptadores: estado local <-> linhas do Postgres ----------
@@ -2854,8 +2861,9 @@
     keys.reduce(function (p, k) { return p.then(function () { return cloudPushTable(k); }); }, Promise.resolve())
       .then(function () { setCloudState("synced"); })
       .catch(function (err) {
+        console.error("[aquario] falha ao enviar dados para a nuvem:", err);
         keys.forEach(function (k) { CLOUD_DIRTY[k] = true; });
-        setCloudState("error", describeCloudError(err));
+        setCloudState("error", cloudErrorDetail(err));
         clearTimeout(cloudRetryTimer);
         cloudRetryTimer = setTimeout(runCloudPush, CLOUD_RETRY_MS);
       });
@@ -2878,7 +2886,8 @@
       if (sig === rSig) { setCloudState("synced"); return; }
       setCloudState("diverge", "toque em \"Sincronizar agora\" na aba Configurações para revisar");
     }).catch(function (err) {
-      setCloudState("error", describeCloudError(err));
+      console.error("[aquario] falha ao reconciliar com a nuvem:", err);
+      setCloudState("error", cloudErrorDetail(err));
     });
   }
 
@@ -2902,7 +2911,8 @@
       if (ok) { cloudAdoptRemote(remote); setCloudState("synced"); }
       else { setCloudState("diverge"); }
     }).catch(function (err) {
-      setCloudState("error", describeCloudError(err));
+      console.error("[aquario] falha ao sincronizar com a nuvem:", err);
+      setCloudState("error", cloudErrorDetail(err));
       showSnackbar("Não foi possível sincronizar: " + describeCloudError(err), { variant: "error" });
     });
   }
