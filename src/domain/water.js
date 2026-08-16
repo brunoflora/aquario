@@ -321,40 +321,188 @@ export function assessWater(reading) {
   };
 }
 
-export function deriveActionPlan(lastReading, gates) {
-  const items = [];
+// Cada entrada tem três papéis fixos, o "especialista em aquário jumbo" pedido:
+// input = o dado bruto que chegou; output = o diagnóstico daquele dado;
+// outcome = o que esperar DEPOIS de seguir a ação, com prazo. Sem isso, um
+// plano de ação normal só diz "o que fazer" — este diz também "o que checar
+// depois pra saber se funcionou", que é a diferença entre uma lista de
+// tarefas e uma recomendação de especialista.
+const SPECIALIST_PLAN = {
+  temp: {
+    bad: {
+      diagnostico: "Fora da faixa segura para ciclídeos amazônicos (25–28°C).",
+      acao: "Ajuste o aquecedor/resfriador agora.",
+      resultado: "Confira de novo em 30 min: deve estar voltando para 25–28°C. Se não se mover, o equipamento pode estar com defeito.",
+    },
+    warn: {
+      diagnostico: "No limite da faixa ideal.",
+      acao: "Nenhuma ação ainda — só acompanhe de perto nas próximas horas.",
+      resultado: "Se estabilizar sozinha dentro da faixa, não precisa de mais nada. Se continuar subindo/descendo, vira caso de ajuste.",
+    },
+  },
+  ph: {
+    bad: {
+      diagnostico: "Fora da faixa ideal (6,5–7,6).",
+      acao: "Verifique substrato/décor por materiais calcários e considere uma TPA.",
+      resultado: "Depois da TPA, meça de novo em algumas horas. Se o pH voltar a fugir rápido, o KH provavelmente está baixo demais para segurar.",
+    },
+    warn: {
+      diagnostico: "Próximo do limite da faixa ideal.",
+      acao: "Acompanhe a tendência nos próximos dias, sem intervenção imediata.",
+      resultado: "Se o pH oscilar pouco entre medições, é ruído normal. Se a tendência for de piora dia após dia, use uma TPA pequena.",
+    },
+  },
+  kh: {
+    bad: {
+      diagnostico: "Fora da faixa recomendada (4–8 dKH) — reduz a capacidade de tamponar o pH.",
+      acao: "Reforce a dureza de carbonatos (ex.: bicarbonato de sódio em dose controlada) ou faça TPA com água de dureza adequada.",
+      resultado: "KH deve subir gradualmente nas próximas medições; o pH tende a ficar mais estável junto.",
+    },
+    warn: {
+      diagnostico: "No limite da faixa — o tampão do pH está ficando fraco.",
+      acao: "Considere reforçar a capacidade de tamponamento antes que o pH comece a variar.",
+      resultado: "Se o KH se mantiver estável a partir daqui, não é preciso agir mais. Se continuar caindo, reforce.",
+    },
+  },
+  // Amônia e nitrito não têm faixa "tranquila": o ideal é zero e qualquer valor
+  // detectável já agride brânquia — por isso a ação aqui é sempre TPA, não
+  // "monitorar", mesmo no nível de alerta.
+  nh3: {
+    bad: {
+      diagnostico: "Nível crítico — já compromete a brânquia dos peixes.",
+      acao: "Faça troca parcial de água agora e revise se o filtro biológico está ciclado.",
+      resultado: "Amônia deve cair perceptivelmente em 24h. Se persistir alta, o ciclo do nitrogênio ainda não está fechado — reduza a alimentação e repita a TPA.",
+    },
+    warn: {
+      diagnostico: "Detectada — acima de 0,02 ppm já há agressão a brânquia, mesmo sem ser nível crítico.",
+      acao: "Faça TPA e verifique a filtragem biológica antes que suba mais.",
+      resultado: "Na próxima medição, amônia deve estar zerada ou caindo. Se subir, trate como emergência.",
+    },
+  },
+  no2: {
+    bad: {
+      diagnostico: "Nível crítico do ciclo do nitrogênio.",
+      acao: "TPA imediata e verificação completa do ciclo (a colônia bacteriana que converte nitrito não está dando conta).",
+      resultado: "Nitrito deve cair nas próximas 24–48h com TPAs repetidas. Se ficar estagnado, o filtro precisa de mais tempo/mídia biológica.",
+    },
+    warn: {
+      diagnostico: "Detectado — o ideal é zero; o ciclo do nitrogênio ainda não fechou de vez.",
+      acao: "Faça TPA e acompanhe de perto nos próximos dias.",
+      resultado: "Deve zerar em poucos dias conforme a colônia bacteriana amadurece. Se subir em vez de cair, é sinal de sobrecarga (alimentação/lotação).",
+    },
+  },
+  no3: {
+    bad: {
+      diagnostico: "Acima de 40 ppm — acúmulo de sólidos dissolvidos.",
+      acao: "Realize uma TPA para reduzir o acúmulo.",
+      resultado: "Nitrato deve cair proporcionalmente ao volume trocado. Se voltar a subir rápido, a cadência de TPA semanal pode precisar aumentar.",
+    },
+    warn: {
+      diagnostico: "Entre 20–40 ppm — ainda seguro, mas subindo em direção ao limite.",
+      acao: "Planeje uma TPA nos próximos dias, sem urgência.",
+      resultado: "Uma TPA de rotina deve trazer de volta para abaixo de 20 ppm.",
+    },
+  },
+  turbidez: {
+    bad: {
+      diagnostico: "Água turva registrada.",
+      acao: "Verifique a filtragem mecânica (mídia suja/entupida) e evite sobrealimentação.",
+      resultado: "Água deve clarear em 1–2 dias após limpar/trocar a mídia mecânica. Se persistir, pode ser bloom bacteriano — revise a manutenção do filtro.",
+    },
+  },
+};
+
+/**
+ * O "especialista em aquário jumbo": lê a leitura mais recente e os gates, e
+ * devolve um plano de ação estruturado em input (o dado) → output (o
+ * diagnóstico) → outcome (o que esperar depois de agir), um item por
+ * parâmetro fora da faixa, mais um item sobre o gate de introdução do Green
+ * Terror. Continua sendo regra codificada (determinístico, auditável, sem
+ * chamada de rede) — não um modelo de linguagem.
+ */
+export function generateSpecialistPlan(lastReading, gates) {
   if (!lastReading) {
-    items.push({ level: "warn", text: "Registre o parâmetro de hoje para começar a receber recomendações." });
-    return items;
+    return [{
+      key: null, level: "warn", label: null,
+      input: "nenhuma leitura registrada",
+      output: "Ainda não há dado para diagnosticar.",
+      action: "Registre o parâmetro de hoje na aba Medir.",
+      outcome: "A partir da primeira leitura completa, este plano passa a ser gerado automaticamente.",
+    }];
   }
+
   const openKeys = CORE_PARAMS.filter((key) => {
     const v = lastReading[key];
     return v === null || v === undefined || v === "";
   });
+
+  const items = [];
+
   if (openKeys.length > 0) {
     const openLabels = openKeys.map((key) => PARAM_LABELS[key]).join(", ");
-    items.push({ level: "warn", text: `O score só é calculado com o dia completo. Faltam: ${openLabels}.` });
+    items.push({
+      key: "incomplete", level: "warn", label: "Leitura incompleta",
+      input: `${CORE_PARAMS.length - openKeys.length} de ${CORE_PARAMS.length} campos preenchidos`,
+      output: `O score do dia só é calculado com a leitura completa. Faltam: ${openLabels}.`,
+      action: "Complete os campos que faltam na aba Medir.",
+      outcome: "Assim que o dia estiver completo, o score e o plano passam a refletir o estado real da água.",
+    });
   }
-  Object.keys(WEIGHTS).forEach((key) => {
+
+  CORE_PARAMS.forEach((key) => {
     const value = lastReading[key];
     const status = paramStatus(key, value);
-    if ((status === "bad" || status === "warn") && ACTION_MESSAGES[key] && ACTION_MESSAGES[key][status]) {
-      items.push({ level: status, text: ACTION_MESSAGES[key][status] });
-    }
+    if (status !== "bad" && status !== "warn") return;
+    const spec = (SPECIALIST_PLAN[key] || {})[status];
+    if (!spec) return;
+    items.push({
+      key, level: status, label: PARAM_LABELS[key],
+      input: `${value} ${TREND_UNITS[key] || ""}`.trim(),
+      output: spec.diagnostico,
+      action: spec.acao,
+      outcome: spec.resultado,
+    });
   });
-  if (gates.ready) {
+
+  const turbStatus = paramStatus("turbidez", lastReading.turbidez);
+  if (turbStatus === "bad") {
+    const spec = SPECIALIST_PLAN.turbidez.bad;
     items.push({
-      level: "good",
-      text: `Critérios atendidos: ${gates.clearTarget} dias de água clara e ${gates.bioTarget} dias com amônia/nitrito zerados. Ambiente pronto para introduzir o Green Terror.`,
-    });
-  } else {
-    items.push({
-      level: "warn",
-      text: `Progresso do gate — água clara: ${gates.clearStreak}/${gates.clearTarget} dias · biologia zerada: ${gates.bioStreak}/${gates.bioTarget} dias.`,
+      key: "turbidez", level: "bad", label: "Turbidez",
+      input: "água turva", output: spec.diagnostico, action: spec.acao, outcome: spec.resultado,
     });
   }
-  if (items.length === 0) {
-    items.push({ level: "good", text: "Todos os parâmetros dentro da faixa ideal hoje." });
+
+  // Ordem de urgência: mesma regra do assessWater — amônia/nitrito primeiro
+  // entre os igualmente ruins, porque a ação deles (TPA) é mais urgente.
+  items.sort((a, b) =>
+    (SEVERITY_RANK[b.level] - SEVERITY_RANK[a.level]) ||
+    ((TOXIC_PARAMS.indexOf(b.key) >= 0) - (TOXIC_PARAMS.indexOf(a.key) >= 0))
+  );
+
+  items.push(gates.ready ? {
+    key: "gate", level: "good", label: "Introdução do Green Terror",
+    input: `água clara ${gates.clearStreak}/${gates.clearTarget} dias · biologia zerada ${gates.bioStreak}/${gates.bioTarget} dias`,
+    output: "Critérios de estabilidade atendidos.",
+    action: "Pode introduzir o Green Terror.",
+    outcome: "Ambiente pronto — mantenha a rotina de medição também depois da introdução.",
+  } : {
+    key: "gate", level: "warn", label: "Introdução do Green Terror",
+    input: `água clara ${gates.clearStreak}/${gates.clearTarget} dias · biologia zerada ${gates.bioStreak}/${gates.bioTarget} dias`,
+    output: `Ainda ${gates.gargalo || "sem leituras suficientes para calcular o progresso"}.`,
+    action: "Continue a rotina diária de medição sem interrupção — um dia sem medir zera a contagem dos dois gates.",
+    outcome: "Ao completar os dias que faltam, o ambiente libera a introdução.",
+  });
+
+  if (items.length === 1 && openKeys.length === 0) {
+    items.unshift({
+      key: null, level: "good", label: "Todos os parâmetros",
+      input: "6 de 6 parâmetros na faixa ideal",
+      output: "Nenhum parâmetro fora da faixa hoje.",
+      action: "Manter a rotina atual de medição e manutenção.",
+      outcome: "Sem mudanças esperadas; continue monitorando diariamente.",
+    });
   }
+
   return items;
 }

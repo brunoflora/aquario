@@ -22,7 +22,7 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import MenuItem from "@mui/material/MenuItem";
 import { useAppState } from "../../state/AppStateProvider.jsx";
-import { evaluateGates, deriveActionPlan, sortedReadings, toDayIndex, fieldGuidance } from "../../domain/water.js";
+import { evaluateGates, generateSpecialistPlan, sortedReadings, toDayIndex, fieldGuidance } from "../../domain/water.js";
 import { DEFAULT_PHASES, PHASE_STATUSES } from "../../domain/phases.js";
 
 function todayStr() {
@@ -69,6 +69,35 @@ function ParamField({ paramKey, label, unit, step, staticHelper, value, onChange
       error={guidance?.status === "bad"}
       color={guidance?.status === "warn" ? "warning" : guidance?.status === "good" ? "success" : undefined}
     />
+  );
+}
+
+const LEVEL_BORDER = { good: "success.main", warn: "warning.main", bad: "error.main" };
+
+// Cada item do plano de ação segue input → output → outcome: o dado que
+// chegou, o que ele significa (diagnóstico + ação) e o que esperar depois de
+// agir — assim o usuário não só sabe o que fazer, sabe também como checar se
+// funcionou.
+function PlanItem({ item }) {
+  return (
+    <Box sx={{ borderLeft: 3, borderColor: LEVEL_BORDER[item.level] || "divider", pl: 1.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 0.5 }}>
+        {LEVEL_ICON[item.level]}
+        <Typography variant="subtitle2">{item.label || "Estado geral"}</Typography>
+      </Stack>
+      <Typography variant="caption" color="text.secondary" display="block">
+        Entrada: {item.input}
+      </Typography>
+      <Typography variant="body2" sx={{ mt: 0.5 }}>{item.output}</Typography>
+      {item.action && (
+        <Typography variant="body2" sx={{ mt: 0.5 }}><strong>Ação:</strong> {item.action}</Typography>
+      )}
+      {item.outcome && (
+        <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+          Resultado esperado: {item.outcome}
+        </Typography>
+      )}
+    </Box>
   );
 }
 
@@ -151,7 +180,7 @@ export default function ParametrosTab() {
   }, [form.date]);
 
   const gates = evaluateGates(state.readings);
-  const actionPlan = deriveActionPlan(mostRecent, gates);
+  const specialistPlan = generateSpecialistPlan(mostRecent, gates);
 
   return (
     <Stack spacing={3}>
@@ -229,14 +258,15 @@ export default function ParametrosTab() {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>Plano de ação</Typography>
-              <List dense>
-                {actionPlan.map((item, i) => (
-                  <ListItem key={i} disableGutters>
-                    <ListItemIcon sx={{ minWidth: 36 }}>{LEVEL_ICON[item.level]}</ListItemIcon>
-                    <ListItemText primary={item.text} />
-                  </ListItem>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Gerado a partir da leitura mais recente: o que chegou, o que significa e o que esperar
+                depois de agir.
+              </Typography>
+              <Stack spacing={2}>
+                {specialistPlan.map((item, i) => (
+                  <PlanItem key={item.key ?? i} item={item} />
                 ))}
-              </List>
+              </Stack>
             </CardContent>
           </Card>
         </Grid>
