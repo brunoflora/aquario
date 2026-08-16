@@ -466,8 +466,9 @@
     line-height: 1.45;
     box-shadow: var(--elevation-2);
     white-space: nowrap;
-    transform: translate(-50%, -120%);
+    transform: translate(-50%, calc(-100% - 10px));
   }
+  .aq-chart-tip.aq-chart-tip--below { transform: translate(-50%, 10px); }
   .aq-chart-tip b { display: block; font-family: var(--font-mono); font-size: var(--fs-body2); }
   .aq-chart-tip span { color: var(--snack-action); }
 
@@ -3548,8 +3549,16 @@
     }
     var host = document.getElementById("aq-score-chart");
     var scale = host.clientWidth / g.w || 1;
-    tip.style.left = (px * scale) + "px";
-    tip.style.top = (py * scale) + "px";
+    var left = px * scale, top = py * scale;
+    // evita o tooltip escapar por cima do gráfico (e cobrir os chips de
+    // período acima) quando o ponto está perto do topo — nesse caso mostra
+    // o tooltip abaixo do ponto em vez de acima
+    tip.classList.toggle("aq-chart-tip--below", top < tip.offsetHeight + 10);
+    var wrapWidth = tip.parentElement.clientWidth;
+    var halfTip = tip.offsetWidth / 2;
+    left = Math.max(halfTip, Math.min(wrapWidth - halfTip, left));
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
     document.getElementById("aq-chart-live").textContent = p.score === null
       ? brDate(p.date) + ": incompleto, " + p.open + " campos em aberto."
       : brDate(p.date) + ": score " + p.score + " de 100, " + scoreLabel(p.score) + ".";
