@@ -4,6 +4,7 @@ import { emitPersist } from "./persistBus.js";
 import { DEFAULT_PHASES } from "../domain/phases.js";
 import { DEFAULT_CONFIG } from "../domain/config.js";
 import { migrateStructTasks } from "../domain/tasks.js";
+import { sortedReadings } from "../domain/water.js";
 import { randomUUID } from "../utils/uuid.js";
 
 const AppStateContext = createContext(null);
@@ -27,6 +28,13 @@ function initialState() {
 
 export function AppStateProvider({ children }) {
   const [state, setState] = useState(initialState);
+  const [saveIndicator, setSaveIndicator] = useState(() => {
+    if (!storageAvailable) return "aviso: armazenamento local indisponível — dados só duram esta sessão";
+    const sorted = sortedReadings(state.readings);
+    if (!sorted.length) return "aguardando primeiro registro";
+    const mostRecent = sorted[sorted.length - 1];
+    return `carregado — último registro em ${mostRecent.date.split("-").reverse().join("/")}`;
+  });
   const [snackbar, setSnackbar] = useState(null); // { message, variant, actionLabel, onAction }
   const snackTimerRef = useRef(null);
   const configSaveTimerRef = useRef(null);
@@ -93,6 +101,7 @@ export function AppStateProvider({ children }) {
       : [...prev.readings, reading];
     setState({ ...prev, readings });
     persist("readings", readings);
+    setSaveIndicator(`salvo automaticamente às ${new Date().toLocaleTimeString("pt-BR")}`);
   }, [persist]);
 
   const deleteReading = useCallback((date) => {
@@ -101,6 +110,7 @@ export function AppStateProvider({ children }) {
       ...prev,
       readings: prev.readings.filter((r) => r.date !== date),
     }));
+    setSaveIndicator(`registro de ${label} excluído`);
   }, [doUndoable]);
 
   // ---------- phases ----------
@@ -187,7 +197,10 @@ export function AppStateProvider({ children }) {
     const config = { ...prev.config, ...patch };
     setState({ ...prev, config });
     clearTimeout(configSaveTimerRef.current);
-    configSaveTimerRef.current = setTimeout(() => persist("config", stateRef.current.config), 300);
+    configSaveTimerRef.current = setTimeout(() => {
+      persist("config", stateRef.current.config);
+      setSaveIndicator(`configuração salva automaticamente às ${new Date().toLocaleTimeString("pt-BR")}`);
+    }, 300);
   }, [persist]);
 
   const flushConfigSave = useCallback(() => {
@@ -211,6 +224,7 @@ export function AppStateProvider({ children }) {
       config: data.config && typeof data.config === "object" ? data.config : prev.config,
       structTasks: Array.isArray(data.structTasks) ? migrateStructTasks(data.structTasks) : prev.structTasks,
     }));
+    setSaveIndicator("dados importados com sucesso");
   }, [doUndoable]);
 
   // usado pelo módulo de nuvem para adotar dados remotos (mesma função no
@@ -228,6 +242,7 @@ export function AppStateProvider({ children }) {
   const value = useMemo(() => ({
     state,
     storageAvailable,
+    saveIndicator,
     snackbar,
     showSnackbar,
     dismissSnackbar,
@@ -246,7 +261,7 @@ export function AppStateProvider({ children }) {
     importData,
     adoptRemote,
     ensureCriteriaIds,
-  }), [state, snackbar, showSnackbar, dismissSnackbar, upsertReading, deleteReading, updatePhase,
+  }), [state, saveIndicator, snackbar, showSnackbar, dismissSnackbar, upsertReading, deleteReading, updatePhase,
       addCriteria, toggleCriteria, removeCriteria, addStructTask, toggleStructTask, removeStructTask,
       updateConfig, flushConfigSave, exportPayload, importData, adoptRemote, ensureCriteriaIds]);
 
