@@ -1,97 +1,152 @@
-import { useState } from "react";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+import { useMemo, useState } from "react";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import BottomNavigation from "@mui/material/BottomNavigation";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import WaterDropOutlinedIcon from "@mui/icons-material/WaterDropOutlined";
+import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
+import ChecklistRtlOutlinedIcon from "@mui/icons-material/ChecklistRtlOutlined";
+import TuneOutlinedIcon from "@mui/icons-material/Tune";
 import { useAppState } from "../state/AppStateProvider.jsx";
 import { useCloudSync } from "../cloud/useCloudSync.js";
 import CloudStatusChip from "./CloudStatusChip.jsx";
-import PainelTab from "./tabs/PainelTab.jsx";
-import ParametrosTab from "./tabs/ParametrosTab.jsx";
-import ManutencaoTab from "./tabs/ManutencaoTab.jsx";
-import ConfiguracoesTab from "./tabs/ConfiguracoesTab.jsx";
+import HojeScreen from "./screens/HojeScreen.jsx";
+import MedirScreen from "./screens/MedirScreen.jsx";
+import PlanoScreen from "./screens/PlanoScreen.jsx";
+import SistemaScreen from "./screens/SistemaScreen.jsx";
+import { useAq } from "./ui.jsx";
+import { sortedReadings } from "../domain/water.js";
+import { todayStr, brDate } from "../domain/format.js";
 
-// Ordenadas por frequência de uso, não por assunto: consulta diária, registro
-// diário, operação semanal, referência ocasional. Antes, a conta da TPA (semanal)
-// morava no capítulo 8 do infográfico dentro de "Configurações".
-const TABS = ["Painel", "Medir", "Manutenção", "O sistema"];
+// Quatro destinos, na ordem em que o aquarista faz as perguntas:
+// "como está?" → "registrar" → "o que faço?" → "como está montado?".
+//
+// A navegação saiu do topo para a base. Tabs horizontais no topo tinham dois
+// defeitos num celular de 393 px: a quarta aba ficava cortada ("O SI…") e todas
+// ficavam no canto mais distante do polegar. A barra inferior resolve os dois.
+const DESTINOS = [
+  { key: "hoje", label: "Hoje", icon: <WaterDropOutlinedIcon /> },
+  { key: "medir", label: "Medir", icon: <AddchartOutlinedIcon /> },
+  { key: "plano", label: "Plano", icon: <ChecklistRtlOutlinedIcon /> },
+  { key: "sistema", label: "Sistema", icon: <TuneOutlinedIcon /> },
+];
+
+const NAV_HEIGHT = 64;
 
 export default function AppShell() {
   const { state, saveIndicator, snackbar, dismissSnackbar } = useAppState();
   const cloud = useCloudSync();
-  const [tab, setTab] = useState(0);
+  const [destino, setDestino] = useState("hoje");
+  const aq = useAq();
 
-  // O texto de apresentação ocupava 48% da primeira tela no celular, em toda
-  // visita. Faz sentido antes da primeira medição; a partir daí é rolagem
-  // obrigatória entre o usuário e o dado que ele veio ver.
-  const primeiraVisita = state.readings.length === 0;
+  const ultimaData = useMemo(() => {
+    const sorted = sortedReadings(state.readings);
+    return sorted.length ? sorted[sorted.length - 1].date : null;
+  }, [state.readings]);
+
+  const subtitulo = !ultimaData
+    ? "nenhuma leitura registrada"
+    : ultimaData === todayStr()
+      ? "medido hoje"
+      : `última leitura em ${brDate(ultimaData)}`;
 
   return (
-    <Box sx={{ minHeight: "100vh" }}>
-      <Container maxWidth="md" sx={{ pt: primeiraVisita ? 4 : 2, pb: 2 }}>
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={primeiraVisita ? 2 : 1} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: primeiraVisita ? "flex-start" : "center" } }}>
-          <Box>
-            <Typography variant="overline" color="text.secondary">Aquário jumbo — Ciclídeos Nacionais</Typography>
-            {primeiraVisita ? (
-              <>
-                <Typography variant="h4" component="h1" gutterBottom>Um trecho de rio amazônico, medido todo dia</Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640 }}>
-                  598 litros de água preta em 2 metros de leito. O painel mostra como a água está hoje; as outras
-                  abas registram o parâmetro do dia, explicam a ficha do sistema e riscam o que ainda falta consertar.
-                </Typography>
-              </>
-            ) : (
-              <Typography variant="h6" component="h1" sx={{ lineHeight: 1.3 }}>
-                Um trecho de rio amazônico
-              </Typography>
-            )}
-          </Box>
-          <Stack spacing={1} sx={{ alignItems: { xs: "flex-start", sm: "flex-end" } }}>
-            <Typography variant="caption" color="text.secondary" aria-live="polite" aria-atomic="true">
-              {saveIndicator}
+    <Box sx={{ minHeight: "100dvh", backgroundColor: aq.ground, display: "flex", flexDirection: "column" }}>
+      {/* Cabeçalho fixo e enxuto. O anterior gastava ~330 px (39% da primeira
+          tela do iPhone) com título, subtítulo e chip — em toda visita, antes de
+          qualquer dado. Aqui são 56 px. */}
+      <Box
+        component="header"
+        sx={{
+          position: "sticky", top: 0, zIndex: 10,
+          backgroundColor: aq.ground, borderBottom: `1px solid ${aq.line}`,
+          pt: "env(safe-area-inset-top)",
+        }}
+      >
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", justifyContent: "space-between", gap: 1, px: 2, height: 56, maxWidth: 560, mx: "auto" }}
+        >
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ fontWeight: 700, fontSize: 15, letterSpacing: "-.01em", lineHeight: 1.2 }} noWrap>
+              Rio amazônico · 598 L
             </Typography>
-            <CloudStatusChip
-              cloudState={cloud.cloudState}
-              detail={cloud.cloudDetail}
-              onClick={() => setTab(3)}
-            />
-          </Stack>
+            <Typography variant="caption" sx={{ color: aq.inkDim, lineHeight: 1.2 }} noWrap aria-live="polite">
+              {subtitulo}
+            </Typography>
+          </Box>
+          <CloudStatusChip
+            cloudState={cloud.cloudState}
+            detail={cloud.cloudDetail}
+            onClick={() => setDestino("sistema")}
+          />
         </Stack>
-      </Container>
+      </Box>
 
-      <AppBar position="sticky" color="default" elevation={1}>
-        <Container maxWidth="md">
-          <Toolbar disableGutters variant="dense">
-            <Tabs value={tab} onChange={(_, v) => setTab(v)} aria-label="Seções do painel">
-              {TABS.map((label) => <Tab key={label} label={label} />)}
-            </Tabs>
-          </Toolbar>
-        </Container>
-      </AppBar>
+      <Box
+        component="main"
+        sx={{ flex: 1, px: 2, pt: 2.5, pb: `calc(${NAV_HEIGHT}px + env(safe-area-inset-bottom) + 24px)`, maxWidth: 560, width: "100%", mx: "auto" }}
+      >
+        {destino === "hoje" && (
+          <HojeScreen
+            onIrParaMedir={() => setDestino("medir")}
+            onIrParaPlano={() => setDestino("plano")}
+          />
+        )}
+        {destino === "medir" && <MedirScreen />}
+        {destino === "plano" && <PlanoScreen />}
+        {destino === "sistema" && <SistemaScreen cloud={cloud} />}
 
-      <Container maxWidth="md" sx={{ py: 3 }}>
-        <Box role="tabpanel" hidden={tab !== 0}>{tab === 0 && <PainelTab onGoToForm={() => setTab(1)} />}</Box>
-        <Box role="tabpanel" hidden={tab !== 1}>{tab === 1 && <ParametrosTab />}</Box>
-        <Box role="tabpanel" hidden={tab !== 2}>{tab === 2 && <ManutencaoTab />}</Box>
-        <Box role="tabpanel" hidden={tab !== 3}>{tab === 3 && <ConfiguracoesTab cloud={cloud} />}</Box>
-      </Container>
+        <Typography
+          variant="caption"
+          sx={{ display: "block", color: aq.inkFaint, mt: 4, textAlign: "center" }}
+        >
+          {saveIndicator}
+        </Typography>
+      </Box>
+
+      <Box
+        component="nav"
+        sx={{
+          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 20,
+          backgroundColor: aq.surface, borderTop: `1px solid ${aq.line}`,
+          pb: "env(safe-area-inset-bottom)",
+        }}
+      >
+        <BottomNavigation
+          showLabels
+          value={destino}
+          onChange={(_, v) => setDestino(v)}
+          sx={{ backgroundColor: "transparent", height: NAV_HEIGHT, maxWidth: 560, mx: "auto" }}
+        >
+          {DESTINOS.map((d) => (
+            <BottomNavigationAction
+              key={d.key} value={d.key} label={d.label} icon={d.icon}
+              sx={{
+                color: aq.inkFaint, minWidth: 0,
+                "&.Mui-selected": { color: aq.ink },
+                "& .MuiBottomNavigationAction-label": { fontSize: 11, "&.Mui-selected": { fontSize: 11 } },
+              }}
+            />
+          ))}
+        </BottomNavigation>
+      </Box>
 
       <Snackbar
         open={!!snackbar}
         onClose={dismissSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{ bottom: `calc(${NAV_HEIGHT}px + env(safe-area-inset-bottom) + 12px) !important` }}
       >
         {snackbar ? (
           <Alert
             onClose={dismissSnackbar}
             severity={snackbar.variant === "default" ? "info" : snackbar.variant}
+            variant="filled"
             action={snackbar.actionLabel ? (
               <Button color="inherit" size="small" onClick={() => { dismissSnackbar(); snackbar.onAction?.(); }}>
                 {snackbar.actionLabel}
