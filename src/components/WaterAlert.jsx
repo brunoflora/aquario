@@ -17,8 +17,9 @@ const SEVERITY = {
 
 function fmtValue(key, value) {
   if (key === "turbidez") return value ? "turva" : "clara";
-  const digits = key === "no3" ? 0 : key === "nh3" || key === "no2" ? 2 : 1;
-  return Number(value).toFixed(digits);
+  const digits = key === "no3" ? 0 : key === "nh3" ? 3 : key === "no2" ? 2 : 1;
+  const v = Number(value);
+  return key === "nh3" && v < 0.001 ? "<0,001" : v.toFixed(digits);
 }
 
 /**
