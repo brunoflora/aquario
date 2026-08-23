@@ -19,7 +19,11 @@ export const PALETTE = {
     lineStrong: "#33423B",
     ink: "#E9F1EC",
     inkDim: "#8DA096",
-    inkFaint: "#5E6F67",
+    // 5,5:1 sobre surface. O valor anterior (#5E6F67) rendia 3,1:1 — abaixo do
+    // mínimo de 4,5:1 da WCAG AA para texto pequeno, e este token carrega
+    // justamente o texto pequeno: faixas ideais, unidades, deltas de tendência
+    // e os rótulos da navegação inferior.
+    inkFaint: "#7A8C83",
     ok: "#35B87A",
     warn: "#D99A2B",
     crit: "#E04B4F",
@@ -35,7 +39,7 @@ export const PALETTE = {
     lineStrong: "#C3D0C8",
     ink: "#0E1613",
     inkDim: "#5A6B63",
-    inkFaint: "#87978E",
+    inkFaint: "#667469", // 4,9:1 sobre branco; o anterior (#87978E) dava 3,1:1
     ok: "#17804C",
     warn: "#94640C",
     crit: "#BC2F33",

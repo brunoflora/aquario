@@ -34,7 +34,15 @@ export default function CloudStatusChip({ cloudState, detail, onClick }) {
       data-state={cloudState}
       // único chip clicável do app; os demais são leitura. Altura elevada ao
       // mínimo de toque sem inflar os chips de dado das tabelas.
-      sx={{ minHeight: 44, borderRadius: 22 }}
+      //
+      // maxWidth + truncagem do rótulo: com a fonte do sistema ampliada, o
+      // rótulo por extenso empurrava o chip por cima do título do cabeçalho.
+      // O estado continua legível pela cor e pelo início do texto, e o texto
+      // completo segue no tooltip.
+      sx={{
+        minHeight: 44, borderRadius: 22, maxWidth: "45%", flexShrink: 1,
+        "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis" },
+      }}
     />
   );
   return detail ? <Tooltip title={detail}>{chip}</Tooltip> : chip;

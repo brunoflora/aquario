@@ -92,7 +92,7 @@ export default function HistoricoLista() {
             <IconButton
               size="small" aria-label={`Excluir registro de ${brDate(r.date)}`}
               onClick={() => deleteReading(r.date)}
-              sx={{ color: aq.inkFaint, minWidth: 36, minHeight: 36 }}
+              sx={{ color: aq.inkFaint, minWidth: 44, minHeight: 44 }}
             >
               <DeleteIcon sx={{ fontSize: 17 }} />
             </IconButton>
