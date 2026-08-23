@@ -67,11 +67,15 @@ export default function AppShell() {
           pt: "env(safe-area-inset-top)",
         }}
       >
+        {/* minHeight, não height: com a fonte do sistema em 200% o conteúdo
+            crescia além dos 56 px fixos e o chip de nuvem passava por cima do
+            título — perda de conteúdo por sobreposição (WCAG 1.4.4). Agora a
+            faixa cresce junto e o chip cede espaço antes de invadir o texto. */}
         <Stack
           direction="row"
-          sx={{ alignItems: "center", justifyContent: "space-between", gap: 1, px: 2, height: 56, maxWidth: 560, mx: "auto" }}
+          sx={{ alignItems: "center", justifyContent: "space-between", gap: 1.5, px: 2, py: 0.75, minHeight: 56, maxWidth: 560, mx: "auto" }}
         >
-          <Box sx={{ minWidth: 0 }}>
+          <Box sx={{ minWidth: 0, flex: 1 }}>
             <Typography sx={{ fontWeight: 700, fontSize: 15, letterSpacing: "-.01em", lineHeight: 1.2 }} noWrap>
               Rio amazônico · 598 L
             </Typography>

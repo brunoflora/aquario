@@ -64,6 +64,25 @@ export default function AppThemeProvider({ children }) {
         MuiCheckbox: { styleOverrides: { root: { padding: 11 } } },
         MuiTab: { styleOverrides: { root: { minHeight: TOUCH_TARGET, textTransform: "none" } } },
         MuiAlert: { styleOverrides: { root: { borderRadius: 12 } } },
+        // Campos de texto do app inteiro no mínimo de toque. Os da ficha técnica
+        // e o de "adicionar ação" vinham com 40 px de altura.
+        MuiInputBase: { styleOverrides: { root: { minHeight: TOUCH_TARGET } } },
+        // Chip semântico preenchido usa o FUNDO da página como cor de texto, não
+        // branco. O branco do MUI sobre o vermelho de alerta rende 3,97:1 — abaixo
+        // dos 4,5:1 da AA — enquanto a tinta do fundo rende 4,9:1 no escuro e
+        // 5,4:1 no claro. Vira uma regra só, válida nos dois temas, em vez de uma
+        // cor de exceção por severidade.
+        // Este MUI compõe as classes separadas (.MuiChip-filled + .MuiChip-colorError),
+        // e não um slot `filledError` — por isso o seletor aninhado, e não a chave de slot.
+        MuiChip: {
+          styleOverrides: {
+            root: {
+              "&.MuiChip-filled.MuiChip-colorError": { backgroundColor: t.crit, color: t.ground },
+              "&.MuiChip-filled.MuiChip-colorWarning": { backgroundColor: t.warn, color: t.ground },
+              "&.MuiChip-filled.MuiChip-colorSuccess": { backgroundColor: t.ok, color: t.ground },
+            },
+          },
+        },
       },
     });
   }, [mode]);

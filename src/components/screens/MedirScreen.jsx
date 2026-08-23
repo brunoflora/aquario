@@ -98,15 +98,25 @@ function FieldRow({ paramKey, value, onChange, guidance, autoFocus }) {
           </Typography>
         </Box>
 
-        {/* Largura fixa e sem encolher: com o campo em `flex`, o input engolia a
-            linha e empurrava "Dureza de carbonatos" para três linhas. */}
+        {/* O contêiner É o alvo de toque, via <label>.
+            Antes, a caixa desenhada media 132×48 mas o <input> dentro dela
+            media 88×29: tocar na borda — a metade superior, a área da unidade —
+            não focava nada. O alvo visual mentia sobre o alvo real, num
+            formulário preenchido com dedo molhado na frente do aquário. Em
+            <label>, o toque em qualquer pixel da caixa cai no campo, sem JS.
+
+            Largura fixa e sem encolher: com o campo em `flex`, o input engolia
+            a linha e empurrava "Dureza de carbonatos" para três linhas. */}
         <Stack
+          component="label"
           direction="row"
           sx={{
-            alignItems: "center", gap: 0.75, px: 1.5, width: 132, flexShrink: 0, minHeight: 48,
+            alignItems: "center", gap: 0.75, px: 1.5, width: 132, flexShrink: 0,
+            minHeight: 52, cursor: "text",
             borderRadius: 2.5,
             border: `1.5px solid ${preenchido && tone !== "none" ? toneColor(aq, tone) : aq.line}`,
             backgroundColor: aq.surfaceRaised,
+            "&:focus-within": { borderColor: aq.ink },
           }}
         >
           <InputBase
@@ -123,8 +133,9 @@ function FieldRow({ paramKey, value, onChange, guidance, autoFocus }) {
             type="text"
             placeholder="—"
             sx={{
-              flex: 1, minWidth: 0,
+              flex: 1, minWidth: 0, alignSelf: "stretch",
               "& input": {
+                height: "100%",
                 fontFamily: '"IBM Plex Mono", monospace', fontVariantNumeric: "tabular-nums",
                 fontSize: 20, fontWeight: 600, color: preenchido && tone !== "none" ? toneColor(aq, tone) : aq.ink,
               },
@@ -302,8 +313,8 @@ export default function MedirScreen() {
         <SectionLabel
           action={
             <Button
-              size="small" startIcon={<ContentCopyIcon sx={{ fontSize: 15 }} />} onClick={copiarDeOntem}
-              sx={{ minHeight: 32, px: 1 }} color="inherit"
+              startIcon={<ContentCopyIcon sx={{ fontSize: 16 }} />} onClick={copiarDeOntem}
+              sx={{ minHeight: 44, px: 1.25 }} color="inherit"
             >
               Copiar anterior
             </Button>
@@ -332,8 +343,11 @@ export default function MedirScreen() {
         </Panel>
       </Box>
 
+      {/* A linha inteira é o alvo, não só o interruptor: o MuiSwitch entrega
+          58×38 de área clicável, abaixo dos 44 pt, e mirar num interruptor com
+          dedo molhado é pior do que mirar numa faixa de 56 pt de altura. */}
       <Panel sx={{ py: 1, px: 2 }}>
-        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", minHeight: 48 }}>
+        <Stack component="label" direction="row" sx={{ alignItems: "center", justifyContent: "space-between", minHeight: 56, cursor: "pointer" }}>
           <Box>
             <Typography sx={{ fontSize: 14, fontWeight: 500 }}>Água turva hoje</Typography>
             <Typography variant="caption" color="text.secondary">

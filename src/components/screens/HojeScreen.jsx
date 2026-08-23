@@ -58,7 +58,10 @@ function VerdictHero({ verdict, onRegistrar }) {
           <Typography sx={{ color: aq.ink, fontWeight: 600, fontSize: 15 }}>
             {verdict.driver.label}
           </Typography>
-          <Num size={22} sx={{ color }}>{verdict.driver.value}</Num>
+          {/* peso 700: aos 22 px isso qualifica como texto grande na WCAG
+              (limiar 3:1 em vez de 4,5:1) e, mais ao ponto, deixa o número que
+              manda no veredicto de fato mais legível */}
+          <Num size={22} sx={{ color, fontWeight: 700 }}>{verdict.driver.value}</Num>
           <Typography variant="caption" sx={{ color: aq.inkDim }}>
             {TREND_UNITS[verdict.driver.key]}
           </Typography>
@@ -95,7 +98,7 @@ function ParamGrid({ reading, onEditar }) {
     <Box>
       <SectionLabel
         action={
-          <Button size="small" onClick={onEditar} sx={{ color: aq.inkDim, minHeight: 32, px: 1 }}>
+          <Button onClick={onEditar} sx={{ color: aq.inkDim, minHeight: 44, px: 1.25 }}>
             Editar
           </Button>
         }
