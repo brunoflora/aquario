@@ -72,7 +72,7 @@ export default function InfographicSection() {
     <Stack spacing={3}>
       <Card>
         <CardContent>
-          <Typography variant="overline" color="text.secondary">A ficha do sistema · relatório de 09/08/2026</Typography>
+          <Typography variant="overline" color="text.secondary">A ficha do sistema · relatório de 09/08/2026, atualizado em 13/09/2026</Typography>
           <Typography variant="h5" gutterBottom>Todo aquário amazônico é um rio encurtado</Typography>
           <Typography paragraph color="text.secondary">
             Lá fora, o Oscar e o Severum vivem num sistema de milhares de quilômetros que se autorregula: a cheia
@@ -89,6 +89,7 @@ export default function InfographicSection() {
             <Stat label="Turnover" value={`${fmtBR(s.turnover, 1).replace(".", ",")}×/h`} note={turnoverOk ? "alvo 5–10×/h · dentro da faixa" : "alvo 5–10×/h · fora da faixa"} tone={turnoverOk ? "good" : "warn"} />
             <Stat label="Sobre a laje" value="1.069 kg" note="951 kg/m² no footprint" tone="bad" />
             <Stat label="Tampão medido" value={s.lastKh === null ? "—" : `${fmtBR(s.lastKh, 1).replace(".", ",")} dKH`} note={s.lastKh === null ? "sem medição de KH registrada ainda" : s.lastKh >= 2 ? "tampão presente · pH com inércia" : "pH sem nenhuma inércia"} tone={khTone} />
+            <Stat label="Aquecedor" value="Instalado" note="26–28°C · termostato ativo, confirmado 13/09/2026" tone="good" />
           </Grid>
         </CardContent>
       </Card>
@@ -105,9 +106,9 @@ export default function InfographicSection() {
             {[
               { vol: "598 L", name: "O rio", note: "display 200×50×70" },
               { arrow: "→ descida Ø?", bad: true },
-              { vol: "33 L", name: "C1 · decantação", note: "manta de perlon" },
+              { vol: "33 L", name: "C1 · decantação", note: "sem mídia declarada" },
               { arrow: "→" },
-              { vol: "8,5 L", name: "C2 · biológica", note: "gargalo — precisa 12–18 L", bad: true },
+              { vol: "8,5 L", name: "C2 · biológica", note: "perlon + K1 fluidizado — gargalo, precisa 12–18 L", bad: true },
               { arrow: "→" },
               { vol: "37 L", name: "C3 · retorno", note: "bomba Oceantech" },
               { arrow: "↺ ~5.000 L/h" },
@@ -165,8 +166,8 @@ export default function InfographicSection() {
           </Typography>
           <Stack direction="row" sx={{ mb: 2, borderRadius: 1, overflow: "hidden" }}>
             {[
-              { flex: 39, name: "C1 · decantação", val: "33,2 L", sub: "39 cm · perlon" },
-              { flex: 10, name: "C2 · bio", val: "8,5 L", sub: "10 cm", bad: true },
+              { flex: 39, name: "C1 · decantação", val: "33,2 L", sub: "39 cm · sem mídia declarada" },
+              { flex: 10, name: "C2 · bio", val: "8,5 L", sub: "10 cm · perlon + K1", bad: true },
               { flex: 44, name: "C3 · retorno", val: "37,4 L", sub: "44 cm · bomba + aquecedor" },
             ].map((seg) => (
               <Box key={seg.name} sx={{ flex: seg.flex, p: 1, textAlign: "center", bgcolor: seg.bad ? "error.light" : "action.hover", borderRight: 1, borderColor: "background.paper" }}>
@@ -177,15 +178,27 @@ export default function InfographicSection() {
             ))}
           </Stack>
           <ToneAlert tone="bad">
-            <strong>A conta não fecha.</strong> A C2 comporta 8,5 L no nível de trabalho. O projeto declara 10 L
-            de quartzito mais cerâmicas — ou a mídia está compactada acima da linha d'água, ou parte dela mora em
-            outra câmara.
-            <br />Hoje isso não aparece: amônia e nitrito zerados provam que a colônia dá conta da carga atual. A
-            conta quebra quando o Oscar dobrar de tamanho. Alvo real: <strong>12–18 L de mídia porosa</strong>.
+            <strong>A conta não fecha.</strong> A C2 comporta 8,5 L no nível de trabalho e hoje abriga a manta de
+            perlon <strong>e</strong> a mídia K1 fluidizada (confirmado em 13/09/2026, funcionando com fluxo
+            constante). O projeto ainda declara 10 L de quartzito (Quartzite Glass/Miracle Baby) mais cerâmicas —
+            <strong> a câmara onde esse saco de 10L está não foi confirmada</strong> (não é a C2, que já está
+            ocupada por perlon + K1; pode estar na C1, que hoje não tem mídia declarada, mas isso não foi verificado).
+            <br />Também em 13/09/2026: mais mídia cerâmica foi comprada (Nano Rings 1kg, Nano Block 4un), mas
+            sem volume declarado pelo fabricante — não dá para somar aos litros desta conta.
+            <br />Hoje isso não trava o sistema: amônia e nitrito zerados provam que a colônia dá conta da carga
+            atual. A conta quebra quando o Oscar dobrar de tamanho. Alvo real: <strong>12–18 L de mídia porosa</strong>.
           </ToneAlert>
           <ToneAlert tone="info">
-            <strong>Saída sem obra:</strong> cesto suspenso na C1, logo após o perlon, rende +8 a 12 L. Recolar
-            divisória (C1 39→30, C2 10→19 cm) rende +7,7 L, mas exige esvaziar o sump.
+            <strong>Saída sem obra:</strong> cesto suspenso na C1 (hoje sem mídia declarada) rende +8 a 12 L —
+            e é justamente onde a mídia alcalinizante do protocolo de KH (capítulo 05) já foi decidida para entrar.
+            Recolar divisória (C1 39→30, C2 10→19 cm) rende +7,7 L, mas exige esvaziar o sump.
+          </ToneAlert>
+          <ToneAlert tone="warn">
+            <strong>Dimensões do sump em discrepância, não resolvida.</strong> Este relatório usa 94×34×34 cm
+            (C1 39 · C2 10 · C3 44 cm), medido em agosto/2026. O relatório de manejo de 13/09/2026 remediu o sump
+            em 90×30×41 cm, com câmaras C1 40 · C2 10 · C3 40 cm — uma altura 7 cm maior, que muda a folga
+            anti-transbordo (capítulo 04) e a capacidade real de mídia biológica acima. Nenhum dos dois conjuntos
+            de números foi confirmado como o correto: remedir fisicamente antes de decidir qual usar.
           </ToneAlert>
         </CardContent>
       </Card>
@@ -363,6 +376,13 @@ export default function InfographicSection() {
             busca. Para a meta de 6,4–6,8, <strong>bicarbonato dosado é a via correta</strong>; deixe a aragonita
             como plano B se a rotina de dosagem não pegar.
           </ToneAlert>
+          <ToneAlert tone="good">
+            <strong>Protocolo confirmado em 13/09/2026:</strong> o bicarbonato é dosado na <strong>Câmara 3</strong>{" "}
+            (recalque) — a alta vazão da bomba dilui antes de chegar aos peixes. A mídia alcalinizante de longo
+            prazo (aragonita, conchas moídas ou dolomita, em bags microperfurados) vai para a{" "}
+            <strong>Câmara 1</strong>, confirmada pelo usuário — não na C2, onde já ficam perlon e K1 com fluxo
+            constante.
+          </ToneAlert>
         </CardContent>
       </Card>
 
@@ -411,7 +431,9 @@ export default function InfographicSection() {
                 ["Oscar Bronze", "Astronotus ocellatus", "15 → 38 cm", 38 / 200 * 100],
                 ["Jack Dempsey Blue", "Rocio octofasciata", "10 → 25 cm", 25 / 200 * 100],
                 ["Severum Gold ♀♂ (2×)", "Heros efasciatus", "10 e 6 → 25 cm cada", 25 / 200 * 100],
-                ["Lambaris (6×)", "Astyanax sp.", "5 → 12 cm", 12 / 200 * 100],
+                ["Green Terror (novo, 06/09/2026)", "Andinoacara rivulatus", "tamanho não registrado", 0],
+                ["Cascudo (2×, novo, 06/09/2026)", "Loricariidae", "tamanho não registrado", 0],
+                ["Lambaris (6×, plantel)", "Astyanax sp.", "5 → 12 cm", 12 / 200 * 100],
                 ["Pangasius Albino", "Pangasianodon hypophthalmus", "10 → 130 cm", 130 / 200 * 100],
               ].map(([name, sci, size, pct]) => (
                 <TableRow key={name}>
@@ -438,16 +460,24 @@ export default function InfographicSection() {
             adaptação — ele chega a 40–60 cm.
             <br />Nesse tamanho ocupa <strong>um terço do comprimento do aquário</strong>, é funcionalmente cego e
             propenso a pânico. Um peixe de 40 cm em pânico dentro de 2 metros derruba rocha, arranca equipamento e
-            pode trincar o vidro frontal. <strong>Realocar em 6–12 meses</strong> — o custo de esperar demais
-            inclui o vidro.
+            pode trincar o vidro frontal. <strong>Realocar em 6–12 meses</strong> era a recomendação original
+            (desde ~nov/2025) — já se passaram cerca de <strong>9 a 10 meses</strong> e o status da realocação não
+            foi confirmado. O custo de esperar demais inclui o vidro.
           </ToneAlert>
           <ToneAlert tone="warn">
-            <strong>Território: 2.500 cm² por ciclídeo adulto</strong> (≈ 50 × 50 cm cada). É suficiente — desde
-            que haja quebra de linha de visão. O layout aberto de hoje é belíssimo e funcionalmente hostil: cada
-            peixe enxerga todos os outros o tempo inteiro.
+            <strong>Território: 2.500 cm² por ciclídeo adulto</strong> (≈ 50 × 50 cm cada, calculado sobre 4
+            territoriais). Com o Green Terror somando-se em 06/09/2026, agora são <strong>5 ciclídeos
+            territoriais</strong> — essa conta ainda não foi refeita para 5, e a área média por indivíduo cai. O
+            layout aberto de hoje é belíssimo e funcionalmente hostil: cada peixe enxerga todos os outros o tempo
+            inteiro.
             <br />Duas ou três <strong>colunas verticais de rocha</strong> por volta dos 50 cm e 150 cm reforçam a
-            linguagem de galeria, criam três territórios distintos e dão ao casal de Severum um sítio de desova
+            linguagem de galeria, criam territórios distintos e dão ao casal de Severum um sítio de desova
             protegido.
+          </ToneAlert>
+          <ToneAlert tone="info">
+            <strong>Lambaris (6×) na tabela acima são o plantel de referência da ficha técnica</strong> — um grupo
+            separado do lote de forragem viva (20 unidades, 13 restantes em 06/09/2026) que é alimentado ao Oscar
+            e não conta como fauna residente.
           </ToneAlert>
         </CardContent>
       </Card>
@@ -465,14 +495,16 @@ export default function InfographicSection() {
             <Stat label="Troca parcial" value={`${fmtBR(s.tpaLitros, 0)} L`} note={`${fmtBR(s.tpaPct, 0)}% de ${fmtBR(s.totalSystem, 0)} L`} />
             <Stat label="Declorador" value={`${fmtBR(s.declorador, 0)} mL`} note="a cada TPA · 1 mL para 10 L" />
             <Stat label="Bicarbonato" value={`${fmtBR(s.bicReposicao, 1).replace(".", ",")} g`} note="repõe os 3 dKH levados na troca" />
-            <Stat label="Perlon" value="10–14 d" note="era 20–30 · revisado" tone="warn" />
+            <Stat label="Perlon" value="Semanal" note="era 10–14 d · revisado 13/09/2026" tone="warn" />
             <Stat label="Carvão ativado" value="4–6 sem" note="1,5–2 L por ciclo" />
             <Stat label="Purigen" value="4–6 mes" note="regenerar ~700 mL" />
           </Grid>
           <ToneAlert tone="warn">
-            <strong>Perlon vencido inverte de função.</strong> Com peixe grande e ração carnívora, passar de 14
-            dias transforma a manta de removedor de sólidos em fonte de nitrato — ela continua segurando a sujeira,
-            só que agora dissolvida.
+            <strong>Perlon vencido inverte de função.</strong> Com peixe grande e ração carnívora, passar de 7
+            dias (protocolo revisado em 13/09/2026, era 14) transforma a manta de removedor de sólidos em fonte de
+            nitrato — ela continua segurando a sujeira, só que agora dissolvida. Ainda mais relevante hoje: a
+            manta divide a Câmara 2 com a mídia K1 fluidizada, então sujeira acumulada ali afeta os dois ao mesmo
+            tempo.
           </ToneAlert>
           <ToneAlert tone="warn">
             <strong>Correção sobre o relatório:</strong> ele indica 6,8 g de bicarbonato por TPA, mas essa conta
