@@ -480,6 +480,27 @@ A seção 7 já registrava, desde a origem, que o Pangasius era estruturalmente 
 - Confirmação física das dimensões do sump (seção 13.4)
 - Status real do plano de realocação do Pangasius
 - GH e Nitrato atuais (o relatório de 13/09 só trouxe temperatura, NH₃, NO₂, pH e KH)
+- Se o saco "Miracle Baby Quartzite Glass 10L" (seção 13.7) é adicional ao Quartzite Glass 10L já contado, ou o mesmo
+- Se o pedido de Nano Block (seção 13.7) é 2 ou 4 unidades
+
+### 13.7 Expansão de mídia biológica (mesmo dia, addendum)
+
+O usuário comprou mídia adicional para a Câmara 2 (o gargalo identificado na seção 6):
+
+| Produto | Marca | Tipo | Quantidade pedida |
+|---|---|---|---|
+| Miracle Baby Quartzite Glass | AquaTank | Cerâmica estática, porosa | 01× embalagem de 10L |
+| Nano Rings High Energy | Ocean Tech | Cerâmica estática, em anéis | 01× 1kg |
+| Nano Block | Ocean Tech | Cerâmica estática, em blocos | 02× (embalagem vendida em 2un cada) |
+| Ocean K (K1) "Reator de Biofilme" | Ocean Tech | **Leito móvel/fluidizado** — mídia solta que precisa de fluxo de água/ar para tumbling, não se comporta como as demais | 01× 1,5L |
+
+**Duas pendências não resolvidas por suposição** (incluídas na lista da seção 13.6):
+1. O saco "Miracle Baby Quartzite Glass 10L" pode ser **o mesmo** já contabilizado como "Quartzite Glass 10L" na ficha técnica (mesma especificação: Quartzite Glass, 10L), ou pode ser **um segundo saco adicional**. Isso muda o total de mídia biológica em 10L — decisivo para saber se o sistema já atingiu a meta de 12–18L da seção 6.
+2. Não está confirmado se "02× Nano Block" significa 2 unidades ou 4 (2 pacotes de 2un cada).
+
+**Nota sobre o Ocean K (K1):** essa mídia é do tipo leito móvel/fluidizado — coincide exatamente com a opção "Leito fluidizado externo" já listada na tabela de soluções da seção 6 ("melhor custo-benefício por litro"). Não está confirmado se o usuário já montou um reator externo para essa mídia ou se pretende usá-la solta dentro de uma câmara do sump (o que não teria o mesmo efeito — K1 precisa de agitação/fluxo constante para funcionar).
+
+Sem essas confirmações, não é possível recalcular se o gargalo de mídia biológica da Câmara 2 (seção 6) foi resolvido.
 
 ---
 
