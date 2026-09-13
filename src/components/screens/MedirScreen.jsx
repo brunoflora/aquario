@@ -18,14 +18,15 @@ import { todayStr, brDate, formatParam, formatBand, parseDecimal } from "../../d
 import { Panel, SectionLabel, Num, useAq, toneColor } from "../ui.jsx";
 import HistoricoLista from "../HistoricoLista.jsx";
 
-const BLANK = { date: todayStr(), temp: "", ph: "", kh: "", nh3: "", no2: "", no3: "", turbidez: false, notes: "" };
-const NUMERIC_FIELDS = ["temp", "ph", "kh", "nh3", "no2", "no3"];
+const BLANK = { date: todayStr(), temp: "", ph: "", kh: "", gh: "", nh3: "", no2: "", no3: "", turbidez: false, notes: "" };
+const NUMERIC_FIELDS = ["temp", "ph", "kh", "gh", "nh3", "no2", "no3"];
 const TONE_OF = { good: "good", warn: "warn", bad: "bad", empty: "none" };
 
 const FIELD_META = {
   temp: { label: "Temperatura", unit: "°C", step: "0.1" },
   ph: { label: "pH", unit: "", step: "0.1" },
   kh: { label: "Dureza de carbonatos", unit: "dKH", step: "0.5" },
+  gh: { label: "Dureza geral", unit: "dGH", step: "1" },
   nh3: { label: "Amônia total (TAN)", unit: "ppm", step: "0.01" },
   no2: { label: "Nitrito", unit: "ppm", step: "0.01" },
   no3: { label: "Nitrato", unit: "ppm", step: "5" },
@@ -232,7 +233,7 @@ export default function MedirScreen() {
     });
   }
 
-  /** Atalho real de campo: em sistema estável, 4 dos 6 valores repetem. */
+  /** Atalho real de campo: em sistema estável, a maioria dos valores repete. */
   function copiarDeOntem() {
     const anterior = sorted.filter((r) => r.date < form.date).pop();
     if (!anterior) { showSnackbar("Não há leitura anterior para copiar.", { variant: "warning" }); return; }
@@ -294,8 +295,8 @@ export default function MedirScreen() {
             />
           </Box>
           <Box sx={{ textAlign: "right" }}>
-            <Num size={20} tone={preenchidos === 6 ? "good" : preenchidos > 0 ? "warn" : undefined}>
-              {preenchidos}/6
+            <Num size={20} tone={preenchidos === CORE_PARAMS.length ? "good" : preenchidos > 0 ? "warn" : undefined}>
+              {preenchidos}/{CORE_PARAMS.length}
             </Num>
             <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
               preenchidos
@@ -351,7 +352,7 @@ export default function MedirScreen() {
           <Box>
             <Typography sx={{ fontSize: 14, fontWeight: 500 }}>Água turva hoje</Typography>
             <Typography variant="caption" color="text.secondary">
-              zera a contagem do gate de água clara
+              conta no score do dia · sinal de filtragem mecânica saturada
             </Typography>
           </Box>
           <Switch

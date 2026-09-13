@@ -6,7 +6,7 @@ import Divider from "@mui/material/Divider";
 import { useAppState } from "../../state/AppStateProvider.jsx";
 import { computeSystem } from "../../domain/system.js";
 import {
-  sortedReadings, deriveEffectiveReading, calculateTPA,
+  sortedReadings, deriveEffectiveReading, calculateTPA, generateSpecialistPlan,
 } from "../../domain/water.js";
 import { formatNumber } from "../../domain/format.js";
 import { Panel, SectionLabel, Num, useAq } from "../ui.jsx";
@@ -33,6 +33,43 @@ function Dose({ valor, unidade, rotulo, nota, tone }) {
   );
 }
 
+/**
+ * Diagnóstico do especialista: um card por parâmetro fora da faixa, no
+ * formato input (o dado) → diagnóstico → ação → resultado esperado. Existia
+ * como função pronta em domain/water.js (generateSpecialistPlan) mas nunca
+ * era chamada por nenhuma tela — o AcaoCard da aba Hoje cobre só TPA/KH.
+ * Aqui cobre todos os parâmetros, inclusive os que a TPA sozinha não resolve
+ * (GH, temperatura).
+ */
+function DiagnosticoEspecialista({ plano }) {
+  const aq = useAq();
+  const itens = plano.filter((item) => item.key !== null);
+  if (itens.length === 0) return null;
+
+  return (
+    <Box>
+      <SectionLabel>Diagnóstico do especialista</SectionLabel>
+      <Stack spacing={1.25}>
+        {itens.map((item) => (
+          <Panel key={item.key} tone={item.level === "good" ? undefined : item.level}>
+            <Typography sx={{ fontWeight: 600, mb: 0.75 }}>{item.label}</Typography>
+            <Typography variant="body2" sx={{ color: aq.inkFaint, mb: 1 }} className="aq-num">
+              {item.input}
+            </Typography>
+            <Typography variant="body2" sx={{ color: aq.inkDim, mb: 1 }}>{item.output}</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>{item.action}</Typography>
+            <Box sx={{ pt: 1, borderTop: `1px dashed ${aq.line}` }}>
+              <Typography variant="caption" sx={{ color: aq.inkFaint }}>
+                Esperado depois: {item.outcome}
+              </Typography>
+            </Box>
+          </Panel>
+        ))}
+      </Stack>
+    </Box>
+  );
+}
+
 export default function PlanoScreen() {
   const { state } = useAppState();
   const s = useMemo(() => computeSystem(state.config, state.readings), [state.config, state.readings]);
@@ -42,6 +79,7 @@ export default function PlanoScreen() {
     return sorted.length ? sorted[sorted.length - 1] : null;
   }, [state.readings]);
   const tpa = useMemo(() => (last ? calculateTPA(last) : null), [last]);
+  const planoEspecialista = useMemo(() => generateSpecialistPlan(last), [last]);
 
   // A TPA corretiva (puxada pelo pior parâmetro) manda sobre a de rotina: se a
   // água pede 70%, trocar os 33% do calendário não resolve o problema de hoje.
@@ -116,19 +154,22 @@ export default function PlanoScreen() {
         <SectionLabel>Trocas de mídia</SectionLabel>
         <Panel>
           <Stack direction="row" sx={{ gap: 3, flexWrap: "wrap", rowGap: 2 }}>
-            <Dose valor="10–14" unidade="d" rotulo="Perlon" nota="vencido, vira fonte de nitrato" />
+            <Dose valor="7" unidade="d" rotulo="Perlon" nota="revisado 13/09/2026, era 10–14" tone="warn" />
             <Dose valor="4–6" unidade="sem" rotulo="Carvão ativado" nota="1,5–2 L por ciclo" />
             <Dose valor="4–6" unidade="mes" rotulo="Purigen" nota="regenerar ~700 mL" />
           </Stack>
           <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: "divider" }}>
             <Typography variant="body2" color="text.secondary">
               <strong>Perlon vencido inverte de função.</strong> Com peixe grande e ração carnívora,
-              passar de 14 dias transforma a manta de removedor de sólidos em fonte de nitrato — ela
-              continua segurando a sujeira, só que agora dissolvida.
+              passar de 7 dias transforma a manta de removedor de sólidos em fonte de nitrato — ela
+              continua segurando a sujeira, só que agora dissolvida. A troca ficou mais frequente porque
+              a manta hoje divide a Câmara 2 com a mídia K1 fluidizada.
             </Typography>
           </Box>
         </Panel>
       </Box>
+
+      <DiagnosticoEspecialista plano={planoEspecialista} />
 
       <Divider />
       <ChecklistTab />
