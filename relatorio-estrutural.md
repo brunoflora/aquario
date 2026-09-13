@@ -480,8 +480,8 @@ A seção 7 já registrava, desde a origem, que o Pangasius era estruturalmente 
 - Confirmação física das dimensões do sump (seção 13.4)
 - Status real do plano de realocação do Pangasius
 - GH e Nitrato atuais (o relatório de 13/09 só trouxe temperatura, NH₃, NO₂, pH e KH)
-- Se o Ocean K (K1) já está montado como reator de leito fluidizado com fluxo constante, ou apenas solto numa câmara (seção 13.7)
 - Volume em litros do Nano Rings (1kg) e do Nano Block (4un) — vendidos por peso/unidade, não por litro; sem isso não dá para fechar a soma de mídia biológica contra a meta de 12–18L da seção 6
+- 🔴 **Nova, crítica:** o perlon + K1 fluidizado estão dentro da Câmara 2 — mesma câmara que o passo 2 do protocolo de KH (seção 13.3) exige manter 100% livre para não obstruir a fresta de 1cm. Confirmar se essa instalação é anterior ao protocolo ou se é uma tensão real a corrigir (ver seção 13.7.1)
 
 ### 13.7 Expansão de mídia biológica (mesmo dia, addendum)
 
@@ -501,7 +501,18 @@ O usuário comprou mídia adicional para a Câmara 2 (o gargalo identificado na 
 
 **Conclusão honesta:** não é possível confirmar se a meta de 12–18L da Câmara 2 foi atingida. O que dá para afirmar com os números disponíveis é que o volume conhecido subiu de 10L (+ cerâmicas não quantificadas) para pelo menos **11,5L** (+ mesmas cerâmicas não quantificadas + Nano Rings + Nano Block, ainda sem conversão) — ou seja, a expansão ajuda, mas sem os volumes reais de Nano Rings e Nano Block não dá para saber se fechou o gargalo.
 
-**Nota sobre o Ocean K (K1), ainda pendente:** essa mídia é do tipo leito móvel/fluidizado — coincide exatamente com a opção "Leito fluidizado externo" já listada na tabela de soluções da seção 6 ("melhor custo-benefício por litro"). Segue sem confirmação se o usuário já montou um reator externo com fluxo constante para essa mídia, ou se está solta dentro de uma câmara do sump — sem tumbling, o K1 não funciona como leito fluidizado.
+**Ocean K (K1) — confirmado pelo usuário em 13/09/2026:** está instalado **dentro da Câmara 2**, abaixo da manta de perlon, com fluxo de água e movimento constante — funcionando como leito fluidizado ativo, não solto e parado. Isso resolve a dúvida sobre se a mídia cumpre sua função (cumpre).
+
+#### 13.7.1 🔴 Tensão identificada: perlon + K1 na própria Câmara 2
+
+Essa mesma confirmação expõe um conflito com o **passo 2 do protocolo de correção de KH** (seção 13.3), que diz textualmente: *"a Câmara 2 deve ser mantida 100% livre. A fresta inferior de passagem de 1 cm não pode sofrer obstrução mecânica por mídias, evitando o travamento do fluxo hidráulico e riscos de transbordamento do Sump."*
+
+Hoje a Câmara 2 — que tem apenas 10 cm de comprimento na arquitetura do relatório de 13/09 (seção 13.4) — abriga **ao mesmo tempo**: a manta de perlon (retém sólidos, acumula gradualmente) e a mídia K1 em movimento constante. Dois pontos não resolvidos aqui:
+
+1. **Não sei se essa instalação é anterior ao protocolo de KH** (e a instrução de "manter livre" se referia só à mídia alcalinizante nova do passo 2, não ao que já estava montado) — ou se é uma **inconsistência real** entre a prática atual e a própria recomendação de segurança do usuário.
+2. Perlon suja progressivamente ao longo dos dias entre trocas (a própria seção 10 já recomenda trocar semanalmente por esse motivo). Numa câmara de só 10 cm, com a fresta de passagem de apenas 1 cm no fundo, o acúmulo de sólidos no perlon **antes da próxima troca semanal** pode ser justamente o tipo de obstrução gradual que o protocolo de KH tentava evitar — isso não foi testado nem medido, é um risco a monitorar, não um fato constatado.
+
+**Não decidido aqui se a instalação precisa mudar** — fica como pergunta para o usuário confirmar intenção e, se for o caso, decidir se reposiciona o perlon/K1 para C1 ou C3, ou se mantém como está por já funcionar assim há mais tempo.
 
 ---
 
