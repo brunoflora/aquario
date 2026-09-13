@@ -233,7 +233,7 @@ export default function MedirScreen() {
     });
   }
 
-  /** Atalho real de campo: em sistema estável, 4 dos 6 valores repetem. */
+  /** Atalho real de campo: em sistema estável, a maioria dos valores repete. */
   function copiarDeOntem() {
     const anterior = sorted.filter((r) => r.date < form.date).pop();
     if (!anterior) { showSnackbar("Não há leitura anterior para copiar.", { variant: "warning" }); return; }
