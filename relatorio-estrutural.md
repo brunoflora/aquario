@@ -3,7 +3,7 @@
 **Local:** Balneário Cidade Atlântica, Guarujá/SP
 **Sistema:** Display 700 L + sump 108 L
 **Início:** Nov/2025 · Ciclagem: Dez/2025
-**Data do relatório:** 09/08/2026
+**Data do relatório:** 09/08/2026 · **Atualizado em:** 13/09/2026 (ver seção 13)
 
 > **Base de cálculo:** medidas confirmadas do projeto. Onde faltam dados (nível real de água, espessura de vidro, diâmetro da tubulação, volume real de rocha), foram usadas estimativas explicitamente marcadas como **[EST]**. Substitua-as pelas medidas reais para fechar o relatório.
 
@@ -265,7 +265,9 @@ Carga alta, típica de sump compacto. Com peixes de grande porte e alimentação
 | Jack Dempsey Blue | *Rocio octofasciata* | 1 | 10 cm | **20–25 cm** | 2,2× |
 | Pangasius Albino | *Pangasianodon hypophthalmus* | 1 | 10 cm | **100–130 cm** | ⚠ **11×** |
 | Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 10 e 6 cm | **20–25 cm** cada | 2,5× |
-| Lambaris | *Astyanax* sp. | 6 | ~5 cm | 10–12 cm | 2,2× |
+| **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | — | — | — |
+| **Cascudo** *(novo, 06/09/2026)* | Loricariidae | 2 | — | — | — |
+| Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09, 13 restantes no mesmo dia | ~5 cm | — | consumidos pelo Oscar |
 
 ### Massa e carga orgânica projetadas
 
@@ -392,13 +394,13 @@ Depois, **repor a cada TPA**: 33% de 682 L = 225 L trocados → repor ~6,8 g de 
 
 ## 11. Síntese — prioridades
 
-| # | Prioridade | Ação | Impacto | Custo |
-|---|---|---|---|---|
-| 1 | 🔴 **Crítica** | Furo anti-sifão no recalque | Evita inundação em queda de energia | ~R$ 0 |
-| 2 | 🔴 **Crítica** | Corrigir KH 0 → 3 dKH com bicarbonato | Evita colapso de pH e parada da nitrificação | ~R$ 15 |
-| 3 | 🔴 **Crítica** | Medir diâmetro da descida e instalar registro no recalque, se < 50 mm | Evita transbordo por descompasso bomba/dreno | ~R$ 60 |
-| 4 | 🟠 Alta | Instalar 2 × 300 W + termostato externo, subindo 0,5 °C/dia | Fecha o déficit de 3 °C; melhora digestão e imunidade | ~R$ 400 |
-| 5 | 🟠 Alta | Planejar realocação do Pangasius | Remove risco estrutural e 90% da carga orgânica futura | — |
+| # | Prioridade | Ação | Impacto | Custo | Status em 13/09/2026 |
+|---|---|---|---|---|---|
+| 1 | 🔴 **Crítica** | Furo anti-sifão no recalque | Evita inundação em queda de energia | ~R$ 0 | Não confirmado — pendente |
+| 2 | 🔴 **Crítica** | Corrigir KH 0 → 3 dKH com bicarbonato | Evita colapso de pH e parada da nitrificação | ~R$ 15 | **Ainda não resolvido — KH segue em 0°dKH mais de um mês depois.** Protocolo de dosagem reiniciado em 13/09 (ver seção 13) |
+| 3 | 🔴 **Crítica** | Medir diâmetro da descida e instalar registro no recalque, se < 50 mm | Evita transbordo por descompasso bomba/dreno | ~R$ 60 | Não medido — pendente |
+| 4 | 🟠 Alta | Instalar 2 × 300 W + termostato externo, subindo 0,5 °C/dia | Fecha o déficit de 3 °C; melhora digestão e imunidade | ~R$ 400 | ✅ Concluído — termostato ativo, 26–28°C confirmado. Modelo/potência exatos ainda não registrados |
+| 5 | 🟠 Alta | Planejar realocação do Pangasius | Remove risco estrutural e 90% da carga orgânica futura | — | Ainda no sistema em 13/09/2026 — 9-10 meses após o prazo original de 6-12 meses ter começado a contar; status do plano não confirmado |
 | 6 | 🟡 Média | Expandir mídia biológica para 12–18 L | Prepara o sistema para a biomassa adulta | ~R$ 250 |
 | 7 | 🟡 Média | Confirmar espessura de vidro e travessas | Segurança estrutural do painel de 200 × 70 cm | — |
 | 8 | 🟡 Média | Avaliar posicionamento sobre a laje (parede estrutural) | ~951 kg/m² em edifício de orla | — |
@@ -423,4 +425,62 @@ Com esses seis números, todas as tabelas de vazão, turnover, folga anti-transb
 
 ---
 
-*Relatório gerado a partir da documentação do projeto Ciclídeos Nacionais (última atualização de parâmetros: 26/05/2026). As recomendações de segurança estrutural não substituem avaliação de engenheiro habilitado.*
+---
+
+## 13. Atualização — 13/09/2026
+
+Com base em relatório de manejo enviado pelo usuário nesta data. Convenção: `[relatório]` = dado novo desta atualização; `[ficha]` = valor da ficha técnica/relatório original (08/2025–08/2026), mantido como está.
+
+### 13.1 Fauna — duas entradas novas
+
+**Green Terror** (*Andinoacara rivulatus*) e **2 Cascudos** (Loricariidae) foram adicionados no sistema no **domingo, 06/09/2026**. Ver tabela atualizada na seção 7.
+
+O mesmo dia, um lote de **20 lambaris** foi introduzido — não como plantel residente, mas como **alimento vivo para o Oscar**. Das 20 unidades, 13 restavam ainda em 06/09 (7 já consumidas). Isso não altera a biomassa residente calculada na seção 7.
+
+O Green Terror é mais um ciclídeo territorial de porte médio-grande somando-se aos 4 já existentes (Oscar, Jack Dempsey, 2 Severuns) — a análise de territorialidade da seção 7 (área média de 2.500 cm²/indivíduo) deve ser revisada para 5 indivíduos territoriais, reduzindo a área média disponível. Não recalculado aqui por falta de biometria atual do Green Terror.
+
+### 13.2 Aquecimento — item 4 da síntese, concluído
+
+O relatório de 13/09 confirma: **"Temperatura: 26°C a 28°C (Controlada estritamente via termostato)."** Isso resolve o déficit de 2–3°C identificado na seção 8 deste relatório (situação de agosto: 23°C, sem nenhum aquecedor). Modelo e potência exatos do equipamento instalado **não foram informados** — recomenda-se confirmar que segue a lógica de redundância (2 unidades) descrita na seção 8, e não um único aquecedor de alta potência.
+
+### 13.3 KH/pH — item 2 da síntese, ainda crítico
+
+O relatório de 13/09 mede **KH = 0°dKH** e **pH = 6,4–6,6**. Esse é exatamente o mesmo problema identificado na seção 9 deste relatório (data original: agosto/2026) — ou seja, **passou-se mais de um mês sem que a correção fosse concluída ou sem que ela se sustentasse**. Não há como saber, a partir dos dados disponíveis, se o KH nunca chegou a subir ou se subiu e caiu de novo — isso não foi inferido.
+
+**Novo protocolo de correção, conforme relatório do usuário (mais detalhado que a seção 9 quanto ao ponto de dosagem):**
+
+1. **Curto prazo:** bicarbonato de sódio, 1–2 colheres de sopa diluídas em água do aquário, dosadas na **Câmara 3 (recalque)** — não na Câmara 2, como uma das alternativas passivas da seção 9 sugeria. Dosagem diária, testando KH/pH a cada 12h, até o teste de KH virar de cor na 3ª–4ª gota (~3–4°dKH).
+2. **Longo prazo (tamponamento passivo):** aragonita grossa, conchas moídas ou dolomita, em bags microperfurados, na **base da Câmara 1** (abaixo do perlon) ou **fundo da Câmara 3**. Restrição explícita do relatório: **a Câmara 2 deve ficar 100% livre** — a fresta de passagem de 1 cm entre C2 e C3 não pode ser obstruída por mídia, sob risco de travar o fluxo e transbordar o sump.
+3. **Manutenção de rotina:** perlon lavado/trocado semanalmente (mais frequente que os 10–14 dias já revisados na seção 10), sifonagem focada a cada TPA, e TPA agressiva de **30–50% semanal** (a seção 10 previa 33% semanal ou quinzenal).
+
+### 13.4 Discrepância nas dimensões do sump — NÃO resolvida
+
+O relatório de 13/09 traz uma remedição do sump com números diferentes dos usados neste relatório desde agosto:
+
+| Item | Este relatório (seção 2, agosto/2026) | Relatório de 13/09/2026 |
+|---|---|---|
+| Dimensões externas | 94 × 34 × 34 cm | 90 × 30 × 41 cm |
+| Volume bruto | 108,7 L | ~110 L |
+| Câmaras (comprimento) | C1 39cm · C2 10cm · C3 44cm | C1 40cm · C2 10cm · C3 40cm |
+
+A altura mudou de 34cm para 41cm — uma diferença grande o suficiente para alterar significativamente os cálculos de folga anti-transbordo (seção 4) e capacidade de mídia biológica (seção 6), que foram feitos sobre a base de 34cm.
+
+**Decisão tomada aqui: não recalcular as seções 2, 4 e 6 a partir dos novos números.** Fazer isso exigiria decidir qual medição está correta sem uma fonte capaz de arbitrar isso — e as tabelas de segurança (folga de transbordo, headroom por câmara) são sensíveis demais a esse número para migrar sem confirmação física. **Ação recomendada: remedir o sump com trena, das duas formas (externa e por câmara), e atualizar este relatório numa próxima revisão.**
+
+### 13.5 Pangasius — prazo de realocação vencendo
+
+A seção 7 já registrava, desde a origem, que o Pangasius era estruturalmente incompatível com o sistema e recomendava realocação em 6–12 meses. Contando a partir do início do projeto (Nov/2025), esse prazo está entre o meio e o fim da janela em 13/09/2026. O relatório de manejo mais recente lista o Pangasius como parte do plantel atual, sem mencionar se a realocação foi planejada, iniciada ou adiada. Este ponto segue como pendência aberta.
+
+### 13.6 Pendências que seguem sem resposta
+
+- Diâmetro da descida (item 3 da síntese) — ainda não medido
+- Furo anti-sifão (item 1 da síntese) — status não confirmado
+- Modelo/potência exata do aquecedor instalado
+- Iluminação — modelo e fotoperíodo
+- Confirmação física das dimensões do sump (seção 13.4)
+- Status real do plano de realocação do Pangasius
+- GH e Nitrato atuais (o relatório de 13/09 só trouxe temperatura, NH₃, NO₂, pH e KH)
+
+---
+
+*Relatório gerado a partir da documentação do projeto Ciclídeos Nacionais (última atualização de parâmetros: 26/05/2026; atualização de manejo incorporada em 13/09/2026 — seção 13). As recomendações de segurança estrutural não substituem avaliação de engenheiro habilitado.*
