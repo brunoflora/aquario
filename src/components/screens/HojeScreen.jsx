@@ -90,7 +90,13 @@ function VerdictHero({ verdict, onRegistrar }) {
   );
 }
 
-/** Os seis parâmetros numa grade. Valor em mono, estado na barra sob o número. */
+/**
+ * Os parâmetros numa grade. Valor em mono, estado na barra sob o número.
+ * `auto-fill` em vez de 3 colunas fixas: com 7 parâmetros (desde que GH
+ * entrou no modelo), uma grade de 3 colunas deixa a última linha com um
+ * item órfão. Auto-fill reflui sozinho para qualquer contagem de parâmetros
+ * sem gerar buracos, e continua igual com os 6 de antes.
+ */
 function ParamGrid({ reading, onEditar }) {
   const aq = useAq();
   return (
@@ -104,7 +110,7 @@ function ParamGrid({ reading, onEditar }) {
       >
         Parâmetros
       </SectionLabel>
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1 }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
         {CORE_PARAMS.map((key) => {
           const value = reading ? reading[key] : "";
           const status = paramStatus(key, value);
@@ -116,6 +122,7 @@ function ParamGrid({ reading, onEditar }) {
               sx={{
                 borderRadius: 2.5, border: `1px solid ${aq.line}`, backgroundColor: aq.surface,
                 p: 1.25, minHeight: 92, display: "flex", flexDirection: "column", justifyContent: "space-between",
+                flex: "1 1 108px", minWidth: 108,
               }}
             >
               <Typography variant="caption" sx={{ color: aq.inkDim, fontSize: 11, lineHeight: 1.2 }}>

@@ -1,59 +1,63 @@
-// Tokens de design do painel.
+// Tokens de design do painel — v2.
 //
-// A identidade vem do assunto: um trecho de rio amazônico de água preta. O
-// preto do fundo não é neutro — puxa verde e quente, como água tingida de
-// tanino vista contra o vidro. Os cinzas também são enviesados para verde, de
-// propósito: cinza puro (#888) é o cinza de quem não escolheu.
+// A identidade vem do assunto, revisada para maior precisão: água preta
+// amazônica de verdade não é esverdeada — é a cor de chá forte, quase café,
+// pelo ácido húmico e tanino dissolvidos (rio Negro, rio Urubu). O escuro é
+// quente (marrom-avermelhado), não frio. O claro inverte a lógica de
+// propósito: em vez de repetir o mesmo bege quente nos dois temas (o "modo
+// claro" mais óbvio que existe), vai para um branco-esverdeado frio e clínico
+// — a bancada de laboratório sob luz de dia, não a mesma água à meia-luz.
 //
-// REGRA CENTRAL DA PALETA: cor saturada significa ESTADO DA ÁGUA, e nada mais.
-// Não existe cor de marca competindo com a tríade semântica — botões, links e
-// abas usam contraste de tinta, não matiz. Num instrumento de monitoramento,
-// qualquer cor que não seja status é ruído que disputa atenção com o alarme.
+// REGRA CENTRAL DA PALETA, preservada: cor saturada significa ESTADO DA ÁGUA,
+// e nada mais. Não existe cor de marca competindo com a tríade semântica —
+// botões, links e abas usam contraste de tinta, não matiz.
 
 export const PALETTE = {
   dark: {
-    ground: "#090C0B",
-    surface: "#111917",
-    surfaceRaised: "#18211E",
-    line: "#24302B",
-    lineStrong: "#33423B",
-    ink: "#E9F1EC",
-    inkDim: "#8DA096",
-    // 5,5:1 sobre surface. O valor anterior (#5E6F67) rendia 3,1:1 — abaixo do
-    // mínimo de 4,5:1 da WCAG AA para texto pequeno, e este token carrega
-    // justamente o texto pequeno: faixas ideais, unidades, deltas de tendência
-    // e os rótulos da navegação inferior.
-    inkFaint: "#7A8C83",
-    ok: "#35B87A",
-    warn: "#D99A2B",
-    crit: "#E04B4F",
-    okWash: "rgba(53,184,122,.13)",
-    warnWash: "rgba(217,154,43,.13)",
-    critWash: "rgba(224,75,79,.15)",
+    ground: "#0C0805",
+    surface: "#17100A",
+    surfaceRaised: "#211709",
+    line: "#2F2415",
+    lineStrong: "#493822",
+    ink: "#F5E9D8",
+    inkDim: "#B39D7C",
+    // 4,8:1 sobre surface / 5,1:1 sobre ground — ambos acima do mínimo AA de
+    // 4,5:1. Este token carrega texto pequeno: faixas ideais, unidades,
+    // deltas de tendência e rótulos da navegação inferior.
+    inkFaint: "#957D5F",
+    ok: "#4FA66B",
+    warn: "#D9922E",
+    crit: "#E2554A",
+    okWash: "rgba(79,166,107,.14)",
+    warnWash: "rgba(217,146,46,.14)",
+    critWash: "rgba(226,85,74,.16)",
   },
   light: {
-    ground: "#F4F7F5",
+    ground: "#F4F6F5",
     surface: "#FFFFFF",
     surfaceRaised: "#FFFFFF",
-    line: "#DDE5E0",
-    lineStrong: "#C3D0C8",
-    ink: "#0E1613",
-    inkDim: "#5A6B63",
-    inkFaint: "#667469", // 4,9:1 sobre branco; o anterior (#87978E) dava 3,1:1
-    ok: "#17804C",
-    warn: "#94640C",
-    crit: "#BC2F33",
-    okWash: "rgba(23,128,76,.10)",
-    warnWash: "rgba(148,100,12,.10)",
-    critWash: "rgba(188,47,51,.10)",
+    line: "#E1E6E2",
+    lineStrong: "#C7D0C9",
+    ink: "#14110D",
+    inkDim: "#5C5346",
+    inkFaint: "#6E6354", // 5,4:1 sobre ground / 5,9:1 sobre branco
+    ok: "#1E7A46",
+    warn: "#9C6314",
+    crit: "#B23A32",
+    okWash: "rgba(30,122,70,.10)",
+    warnWash: "rgba(156,99,20,.10)",
+    critWash: "rgba(178,58,50,.10)",
   },
 };
 
-// Prosa numa grotesca com caráter; MEDIDAS em mono. A separação é semântica,
-// não decorativa: o que sai de um instrumento de teste é lido como leitura de
-// instrumento, com algarismos tabulares que alinham em coluna.
-export const FONT_UI = '"Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif';
-export const FONT_DATA = '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
+// Instrument Sans para prosa — grotesca humanista com caráter próprio, sem
+// cair no Inter/Space Grotesk padrão de qualquer produto gerado por IA.
+// JetBrains Mono para MEDIDAS — desenhada para leitura técnica de números,
+// algarismos tabulares nativos, o mesmo peso visual que qualquer painel de
+// instrumento real usa hoje. A separação é semântica: o que sai de um
+// teste de água é lido como leitura de instrumento, não como prosa.
+export const FONT_UI = '"Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
+export const FONT_DATA = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
 
 // WCAG 2.5.5 — o contexto de uso é o pior possível para precisão de toque:
 // em pé na frente do aquário, uma mão no celular, a outra no frasco de teste.
