@@ -450,7 +450,7 @@ O relatório de 13/09 mede **KH = 0°dKH** e **pH = 6,4–6,6**. Esse é exatame
 **Novo protocolo de correção, conforme relatório do usuário (mais detalhado que a seção 9 quanto ao ponto de dosagem):**
 
 1. **Curto prazo:** bicarbonato de sódio, 1–2 colheres de sopa diluídas em água do aquário, dosadas na **Câmara 3 (recalque)** — não na Câmara 2, como uma das alternativas passivas da seção 9 sugeria. Dosagem diária, testando KH/pH a cada 12h, até o teste de KH virar de cor na 3ª–4ª gota (~3–4°dKH).
-2. **Longo prazo (tamponamento passivo):** aragonita grossa, conchas moídas ou dolomita, em bags microperfurados, na **base da Câmara 1** (abaixo do perlon) ou **fundo da Câmara 3**. Restrição explícita do relatório: **a Câmara 2 deve ficar 100% livre** — a fresta de passagem de 1 cm entre C2 e C3 não pode ser obstruída por mídia, sob risco de travar o fluxo e transbordar o sump.
+2. **Longo prazo (tamponamento passivo):** aragonita grossa, conchas moídas ou dolomita, em bags microperfurados. **Decisão confirmada pelo usuário em 13/09/2026: vai na Câmara 1** (não na C3, e não na C2 — a manta de perlon está na C2, não na C1, ver seção 13.7.1). Restrição explícita do relatório original: **a Câmara 2 deve ficar 100% livre** — a fresta de passagem de 1 cm entre C2 e C3 não pode ser obstruída por mídia, sob risco de travar o fluxo e transbordar o sump. Essa restrição já está respeitada pela escolha da C1.
 3. **Manutenção de rotina:** perlon lavado/trocado semanalmente (mais frequente que os 10–14 dias já revisados na seção 10), sifonagem focada a cada TPA, e TPA agressiva de **30–50% semanal** (a seção 10 previa 33% semanal ou quinzenal).
 
 ### 13.4 Discrepância nas dimensões do sump — NÃO resolvida
@@ -481,7 +481,6 @@ A seção 7 já registrava, desde a origem, que o Pangasius era estruturalmente 
 - Status real do plano de realocação do Pangasius
 - GH e Nitrato atuais (o relatório de 13/09 só trouxe temperatura, NH₃, NO₂, pH e KH)
 - Volume em litros do Nano Rings (1kg) e do Nano Block (4un) — vendidos por peso/unidade, não por litro; sem isso não dá para fechar a soma de mídia biológica contra a meta de 12–18L da seção 6
-- 🔴 **Nova, crítica:** o perlon + K1 fluidizado estão dentro da Câmara 2 — mesma câmara que o passo 2 do protocolo de KH (seção 13.3) exige manter 100% livre para não obstruir a fresta de 1cm. Confirmar se essa instalação é anterior ao protocolo ou se é uma tensão real a corrigir (ver seção 13.7.1)
 
 ### 13.7 Expansão de mídia biológica (mesmo dia, addendum)
 
@@ -503,16 +502,18 @@ O usuário comprou mídia adicional para a Câmara 2 (o gargalo identificado na 
 
 **Ocean K (K1) — confirmado pelo usuário em 13/09/2026:** está instalado **dentro da Câmara 2**, abaixo da manta de perlon, com fluxo de água e movimento constante — funcionando como leito fluidizado ativo, não solto e parado. Isso resolve a dúvida sobre se a mídia cumpre sua função (cumpre).
 
-#### 13.7.1 🔴 Tensão identificada: perlon + K1 na própria Câmara 2
+#### 13.7.1 Tensão com o protocolo de KH — esclarecida, sem conflito
 
-Essa mesma confirmação expõe um conflito com o **passo 2 do protocolo de correção de KH** (seção 13.3), que diz textualmente: *"a Câmara 2 deve ser mantida 100% livre. A fresta inferior de passagem de 1 cm não pode sofrer obstrução mecânica por mídias, evitando o travamento do fluxo hidráulico e riscos de transbordamento do Sump."*
+Questão levantada anteriormente: perlon + K1 ocupam a Câmara 2, que o passo 2 do protocolo de KH (seção 13.3) pede para manter livre.
 
-Hoje a Câmara 2 — que tem apenas 10 cm de comprimento na arquitetura do relatório de 13/09 (seção 13.4) — abriga **ao mesmo tempo**: a manta de perlon (retém sólidos, acumula gradualmente) e a mídia K1 em movimento constante. Dois pontos não resolvidos aqui:
+**Esclarecido pelo usuário em 13/09/2026:**
+- A instalação de perlon + K1 na Câmara 2 **é anterior** ao protocolo de KH — não foi montada por causa dele nem depois dele.
+- O usuário confirma **100% de fluidez da água** através dessa instalação — ou seja, apesar de ocupar a câmara, não há obstrução do fluxo hidráulico nem da fresta de passagem de 1 cm.
+- **Decisão tomada para a mídia alcalinizante do protocolo de KH: vai para a Câmara 1** (uma das duas opções que o próprio protocolo já previa — "base da Câmara 1 ou fundo da Câmara 3"), não para a Câmara 2.
 
-1. **Não sei se essa instalação é anterior ao protocolo de KH** (e a instrução de "manter livre" se referia só à mídia alcalinizante nova do passo 2, não ao que já estava montado) — ou se é uma **inconsistência real** entre a prática atual e a própria recomendação de segurança do usuário.
-2. Perlon suja progressivamente ao longo dos dias entre trocas (a própria seção 10 já recomenda trocar semanalmente por esse motivo). Numa câmara de só 10 cm, com a fresta de passagem de apenas 1 cm no fundo, o acúmulo de sólidos no perlon **antes da próxima troca semanal** pode ser justamente o tipo de obstrução gradual que o protocolo de KH tentava evitar — isso não foi testado nem medido, é um risco a monitorar, não um fato constatado.
+Com isso, não há conflito real entre a instalação existente e a execução do protocolo de KH — a Câmara 2 segue sem receber mídia nova, e o fluxo já é confirmado como pleno.
 
-**Não decidido aqui se a instalação precisa mudar** — fica como pergunta para o usuário confirmar intenção e, se for o caso, decidir se reposiciona o perlon/K1 para C1 ou C3, ou se mantém como está por já funcionar assim há mais tempo.
+**Nota de precisão sobre a seção 13.3:** o texto original do protocolo dizia "base da Câmara 1 (abaixo do perlon)" — mas o perlon está confirmado na Câmara 2, não na C1. Isso não invalida a escolha da C1 para a mídia alcalinizante (ela continua sendo uma das duas opções válidas do protocolo), só corrige a premissa de que haveria perlon acima dela ali.
 
 ---
 
