@@ -480,27 +480,28 @@ A seção 7 já registrava, desde a origem, que o Pangasius era estruturalmente 
 - Confirmação física das dimensões do sump (seção 13.4)
 - Status real do plano de realocação do Pangasius
 - GH e Nitrato atuais (o relatório de 13/09 só trouxe temperatura, NH₃, NO₂, pH e KH)
-- Se o saco "Miracle Baby Quartzite Glass 10L" (seção 13.7) é adicional ao Quartzite Glass 10L já contado, ou o mesmo
-- Se o pedido de Nano Block (seção 13.7) é 2 ou 4 unidades
+- Se o Ocean K (K1) já está montado como reator de leito fluidizado com fluxo constante, ou apenas solto numa câmara (seção 13.7)
+- Volume em litros do Nano Rings (1kg) e do Nano Block (4un) — vendidos por peso/unidade, não por litro; sem isso não dá para fechar a soma de mídia biológica contra a meta de 12–18L da seção 6
 
 ### 13.7 Expansão de mídia biológica (mesmo dia, addendum)
 
 O usuário comprou mídia adicional para a Câmara 2 (o gargalo identificado na seção 6):
 
-| Produto | Marca | Tipo | Quantidade pedida |
-|---|---|---|---|
-| Miracle Baby Quartzite Glass | AquaTank | Cerâmica estática, porosa | 01× embalagem de 10L |
-| Nano Rings High Energy | Ocean Tech | Cerâmica estática, em anéis | 01× 1kg |
-| Nano Block | Ocean Tech | Cerâmica estática, em blocos | 02× (embalagem vendida em 2un cada) |
-| Ocean K (K1) "Reator de Biofilme" | Ocean Tech | **Leito móvel/fluidizado** — mídia solta que precisa de fluxo de água/ar para tumbling, não se comporta como as demais | 01× 1,5L |
+| Produto | Marca | Tipo | Quantidade | Volume/peso declarado |
+|---|---|---|---|---|
+| Miracle Baby Quartzite Glass | AquaTank | Cerâmica estática, porosa | 01× — **confirmado: é o mesmo saco já contado como "Quartzite Glass 10L" na ficha técnica, não é adicional** | 10L (já somado desde antes) |
+| Nano Rings High Energy | Ocean Tech | Cerâmica estática, em anéis | 01× | 1kg (peso — fabricante não declara litros) |
+| Nano Block | Ocean Tech | Cerâmica estática, em blocos | **04 unidades totais — confirmado pelo usuário** | não declarado em litros (vendido por unidade) |
+| Ocean K (K1) "Reator de Biofilme" | Ocean Tech | **Leito móvel/fluidizado** — mídia solta que precisa de fluxo de água/ar para tumbling, não se comporta como as demais | 01× | 1,5L |
 
-**Duas pendências não resolvidas por suposição** (incluídas na lista da seção 13.6):
-1. O saco "Miracle Baby Quartzite Glass 10L" pode ser **o mesmo** já contabilizado como "Quartzite Glass 10L" na ficha técnica (mesma especificação: Quartzite Glass, 10L), ou pode ser **um segundo saco adicional**. Isso muda o total de mídia biológica em 10L — decisivo para saber se o sistema já atingiu a meta de 12–18L da seção 6.
-2. Não está confirmado se "02× Nano Block" significa 2 unidades ou 4 (2 pacotes de 2un cada).
+**Balanço de volume, com o que dá para calcular sem inferir:**
+- Volume já contado antes desta expansão: 10L (Quartzite Glass/Miracle Baby) + cerâmicas adicionais não quantificadas
+- Volume **novo** confirmado em litros: apenas **+1,5L** (Ocean K/K1)
+- Nano Rings (1kg) e Nano Block (4un) **não têm conversão para litros** sem saber a densidade/dimensão de cada peça — não vou estimar isso sem dado real, então eles somam ao sistema mas ficam fora da conta de litros contra a meta de 12–18L da seção 6
 
-**Nota sobre o Ocean K (K1):** essa mídia é do tipo leito móvel/fluidizado — coincide exatamente com a opção "Leito fluidizado externo" já listada na tabela de soluções da seção 6 ("melhor custo-benefício por litro"). Não está confirmado se o usuário já montou um reator externo para essa mídia ou se pretende usá-la solta dentro de uma câmara do sump (o que não teria o mesmo efeito — K1 precisa de agitação/fluxo constante para funcionar).
+**Conclusão honesta:** não é possível confirmar se a meta de 12–18L da Câmara 2 foi atingida. O que dá para afirmar com os números disponíveis é que o volume conhecido subiu de 10L (+ cerâmicas não quantificadas) para pelo menos **11,5L** (+ mesmas cerâmicas não quantificadas + Nano Rings + Nano Block, ainda sem conversão) — ou seja, a expansão ajuda, mas sem os volumes reais de Nano Rings e Nano Block não dá para saber se fechou o gargalo.
 
-Sem essas confirmações, não é possível recalcular se o gargalo de mídia biológica da Câmara 2 (seção 6) foi resolvido.
+**Nota sobre o Ocean K (K1), ainda pendente:** essa mídia é do tipo leito móvel/fluidizado — coincide exatamente com a opção "Leito fluidizado externo" já listada na tabela de soluções da seção 6 ("melhor custo-benefício por litro"). Segue sem confirmação se o usuário já montou um reator externo com fluxo constante para essa mídia, ou se está solta dentro de uma câmara do sump — sem tumbling, o K1 não funciona como leito fluidizado.
 
 ---
 
