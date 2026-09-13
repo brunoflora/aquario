@@ -3,11 +3,10 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import LinearProgress from "@mui/material/LinearProgress";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useAppState } from "../../state/AppStateProvider.jsx";
 import {
-  CORE_PARAMS, PARAM_LABELS, TREND_UNITS, sortedReadings, evaluateGates,
+  CORE_PARAMS, PARAM_LABELS, TREND_UNITS, sortedReadings,
   deriveEffectiveReading, paramStatus, calculateTPA, idealBand,
 } from "../../domain/water.js";
 import { buildVerdict, scoreTone } from "../../domain/verdict.js";
@@ -16,7 +15,7 @@ import { computeSystem } from "../../domain/system.js";
 import { Panel, SectionLabel, Num, StatusDot, useAq, toneColor } from "../ui.jsx";
 import Sparkline from "../Sparkline.jsx";
 
-const SHORT_LABEL = { temp: "Temp.", ph: "pH", kh: "KH", nh3: "NH₃ tóx.", no2: "NO₂", no3: "NO₃" };
+const SHORT_LABEL = { temp: "Temp.", ph: "pH", kh: "KH", gh: "GH", nh3: "NH₃ tóx.", no2: "NO₂", no3: "NO₃" };
 const TONE_OF = { good: "good", warn: "warn", bad: "bad", empty: "none" };
 
 /**
@@ -205,64 +204,20 @@ function AcaoCard({ tpa, sistema, verdict, onPlano }) {
   );
 }
 
-/** Progresso dos gates + a média, agora subordinada e rotulada como média. */
-function TendenciaCard({ gates, verdict }) {
+/** Média ponderada, subordinada ao veredicto (que já apareceu no herói). */
+function ScoreMedioCard({ verdict }) {
   const aq = useAq();
   const tone = scoreTone(verdict.score, verdict.tone);
-  const gateRows = [
-    { label: "Água clara", streak: gates.clearStreak, target: gates.clearTarget, met: gates.clearMet },
-    { label: "Biologia zerada", streak: gates.bioStreak, target: gates.bioTarget, met: gates.bioMet },
-  ];
+  if (verdict.score === null) return null;
 
   return (
     <Panel>
-      <Stack direction="row" sx={{ alignItems: "baseline", justifyContent: "space-between", mb: 1.5 }}>
-        <Typography sx={{ fontWeight: 600, fontSize: 15 }}>Liberação do Green Terror</Typography>
-        <Typography variant="caption" sx={{ color: gates.ready ? aq.ok : aq.inkDim }}>
-          {gates.ready ? "liberado" : "em progresso"}
+      <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
+        <Num size={22} tone={tone}>{verdict.score}</Num>
+        <Typography variant="body2" sx={{ color: aq.inkDim }}>
+          /100 — média ponderada dos {CORE_PARAMS.length} parâmetros, não o veredicto
         </Typography>
       </Stack>
-
-      <Stack spacing={1.5}>
-        {gateRows.map((g) => {
-          const pct = Math.min(100, (g.streak / g.target) * 100);
-          return (
-            <Box key={g.label}>
-              <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "baseline", mb: 0.5 }}>
-                <Typography variant="caption" sx={{ color: aq.inkDim }}>{g.label}</Typography>
-                <Typography variant="caption" className="aq-num" sx={{ color: g.met ? aq.ok : aq.ink }}>
-                  {Math.min(g.streak, g.target)}/{g.target} dias
-                </Typography>
-              </Stack>
-              <LinearProgress
-                variant="determinate" value={pct}
-                sx={{
-                  height: 4, borderRadius: 2, backgroundColor: aq.line,
-                  "& .MuiLinearProgress-bar": { backgroundColor: g.met ? aq.ok : aq.inkDim, borderRadius: 2 },
-                }}
-              />
-            </Box>
-          );
-        })}
-      </Stack>
-
-      {!gates.ready && gates.gargalo && (
-        <Typography variant="body2" sx={{ color: aq.inkDim, mt: 1.5 }}>
-          Falta: {gates.gargalo}.
-        </Typography>
-      )}
-
-      {verdict.score !== null && (
-        <Stack
-          direction="row"
-          sx={{ alignItems: "center", gap: 1, mt: 2, pt: 1.75, borderTop: `1px solid ${aq.line}` }}
-        >
-          <Num size={17} tone={tone}>{verdict.score}</Num>
-          <Typography variant="caption" sx={{ color: aq.inkDim }}>
-            /100 — média ponderada dos 6 parâmetros, não o veredicto
-          </Typography>
-        </Stack>
-      )}
     </Panel>
   );
 }
@@ -332,7 +287,6 @@ export default function HojeScreen({ onIrParaMedir, onIrParaPlano }) {
   const last = effective.length ? effective[effective.length - 1] : null;
 
   const verdict = useMemo(() => buildVerdict(last, todayStr()), [last]);
-  const gates = useMemo(() => evaluateGates(effective), [effective]);
   const tpa = useMemo(() => (last ? calculateTPA(last) : null), [last]);
   const sistema = useMemo(() => computeSystem(state.config, state.readings), [state.config, state.readings]);
 
@@ -356,10 +310,7 @@ export default function HojeScreen({ onIrParaMedir, onIrParaPlano }) {
         </Box>
       )}
 
-      <Box>
-        <SectionLabel>Progresso</SectionLabel>
-        <TendenciaCard gates={gates} verdict={verdict} />
-      </Box>
+      <ScoreMedioCard verdict={verdict} />
     </Stack>
   );
 }

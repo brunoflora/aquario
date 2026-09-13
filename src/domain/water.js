@@ -1,13 +1,17 @@
-// Lógica de score/gates da água — porte fiel do index.html vanilla original.
+// Lógica de score e avaliação da água.
 
-export const CORE_PARAMS = ["temp", "ph", "kh", "nh3", "no2", "no3"];
+export const CORE_PARAMS = ["temp", "ph", "kh", "gh", "nh3", "no2", "no3"];
 
-export const WEIGHTS = { temp: 20, ph: 15, kh: 10, nh3: 20, no2: 20, no3: 10, turbidez: 5 };
+export const WEIGHTS = { temp: 20, ph: 15, kh: 10, gh: 10, nh3: 20, no2: 20, no3: 10, turbidez: 5 };
 
+// Faixas de GH (dureza geral) vêm do painel de referência de parâmetros do
+// próprio material do usuário: ideal 6–12 °dGH, aceitável até 4–20 — a mesma
+// fonte usada para validar a meta de KH em outras partes do app.
 export const RANGES = {
   temp: { goodMin: 25, goodMax: 28, warnMin: 23, warnMax: 29.5 },
   ph: { goodMin: 6.5, goodMax: 7.6, warnMin: 6.0, warnMax: 8.0 },
   kh: { goodMin: 4, goodMax: 8, warnMin: 2, warnMax: 10 },
+  gh: { goodMin: 6, goodMax: 12, warnMin: 4, warnMax: 20 },
   nh3: { goodMax: 0.02, warnMax: 0.25 },
   no2: { goodMax: 0.02, warnMax: 0.25 },
   no3: { goodMax: 20, warnMax: 40 },
@@ -17,14 +21,15 @@ export const PARAM_LABELS = {
   temp: "Temperatura",
   ph: "pH",
   kh: "KH",
+  gh: "GH",
   nh3: "Amônia tóxica (NH₃)",
   no2: "Nitrito (NO₂)",
   no3: "Nitrato (NO₃)",
   turbidez: "Turbidez",
 };
 
-export const TREND_ORDER = ["temp", "ph", "kh", "nh3", "no2", "no3"];
-export const TREND_UNITS = { temp: "°C", ph: "", kh: "dKH", nh3: "ppm", no2: "ppm", no3: "ppm" };
+export const TREND_ORDER = ["temp", "ph", "kh", "gh", "nh3", "no2", "no3"];
+export const TREND_UNITS = { temp: "°C", ph: "", kh: "dKH", gh: "dGH", nh3: "ppm", no2: "ppm", no3: "ppm" };
 
 export function idealBand(key) {
   const r = RANGES[key];
@@ -95,62 +100,8 @@ export function offendersOf(reading) {
     });
 }
 
-export function toDayIndex(dateStr) {
-  const parts = dateStr.split("-").map(Number);
-  return Date.UTC(parts[0], parts[1] - 1, parts[2]) / 86400000;
-}
-
 export function sortedReadings(readings) {
   return readings.slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-}
-
-export function computeStreak(sorted, predicate) {
-  let streak = 0;
-  let prevDay = null;
-  for (let i = sorted.length - 1; i >= 0; i--) {
-    const r = sorted[i];
-    const dayIdx = toDayIndex(r.date);
-    if (prevDay !== null && prevDay - dayIdx !== 1) break;
-    if (!predicate(r)) break;
-    streak++;
-    prevDay = dayIdx;
-  }
-  return streak;
-}
-
-export function evaluateGates(readings) {
-  const sorted = sortedReadings(readings);
-  const clearStreak = computeStreak(sorted, (r) => r.turbidez === false || r.turbidez === undefined);
-  const bioStreak = computeStreak(sorted, (r) => {
-    const nh3 = r.nh3 === null || r.nh3 === undefined || r.nh3 === "" ? null : Number(r.nh3);
-    const no2 = r.no2 === null || r.no2 === undefined || r.no2 === "" ? null : Number(r.no2);
-    return nh3 !== null && no2 !== null && nh3 <= 0.01 && no2 <= 0.01;
-  });
-  const clearTarget = 5;
-  const bioTarget = 3;
-  const faltaClear = Math.max(0, clearTarget - clearStreak);
-  const faltaBio = Math.max(0, bioTarget - bioStreak);
-
-  // O gargalo é o que ainda segura a liberação. Sem isto o app dizia só
-  // "Pronto p/ Green Terror: não" — tinha o dado e não dizia o que faltava,
-  // justamente no marco que o aquarista está esperando há semanas.
-  let gargalo = null;
-  if (faltaBio > 0 && faltaBio >= faltaClear) {
-    gargalo = `faltam ${faltaBio} dia(s) com amônia e nitrito zerados`;
-  } else if (faltaClear > 0) {
-    gargalo = `faltam ${faltaClear} dia(s) de água clara`;
-  }
-
-  return {
-    clearStreak,
-    clearTarget,
-    clearMet: clearStreak >= clearTarget,
-    bioStreak,
-    bioTarget,
-    bioMet: bioStreak >= bioTarget,
-    ready: clearStreak >= clearTarget && bioStreak >= bioTarget,
-    gargalo,
-  };
 }
 
 /**
@@ -220,7 +171,7 @@ export { nh3Fraction };
  * O teste de amônia lê "amônia total" (TAN) pela cor — sozinho, esse número
  * não diz se é perigoso. Esta função devolve uma cópia da leitura com "nh3"
  * já substituído pelo valor tóxico calculado (usando o pH e a temperatura
- * do MESMO dia), para que score, gates, radar, alerta e cálculo de TPA
+ * do MESMO dia), para que score, veredicto, alerta e cálculo de TPA
  * todos julguem o número que realmente importa. O total bruto fica
  * guardado em nh3Total, para exibição e para a explicação do cálculo.
  */
@@ -244,6 +195,10 @@ const ACTION_MESSAGES = {
   kh: {
     bad: "KH fora da faixa recomendada (4–8 dKH), o que reduz a estabilidade do pH.",
     warn: "KH no limite. Considere reforçar a capacidade de tamponamento.",
+  },
+  gh: {
+    bad: "GH fora da faixa recomendada (6–12 dGH) — dureza geral incompatível com o perfil da fauna atual.",
+    warn: "GH no limite da faixa (4–20 dGH). Acompanhe: dureza geral afeta osmorregulação e reprodução.",
   },
   // Amônia e nitrito não têm faixa "tranquila": o ideal é zero e qualquer valor
   // detectável já agride brânquia. A copy de alerta precisa pedir ação, não
@@ -269,6 +224,7 @@ const FIELD_GOOD_MESSAGES = {
   temp: "Na faixa ideal (25–28°C).",
   ph: "Na faixa ideal (6,5–7,6).",
   kh: "Na faixa ideal (4–8 dKH) — bom tampão para o pH.",
+  gh: "Na faixa ideal (6–12 dGH).",
   nh3: "Tóxica (NH₃) sob controle para o pH e a temperatura de hoje.",
   no2: "Zerado, como deve ser.",
   no3: "Dentro da faixa segura (até 20 ppm).",
@@ -417,6 +373,18 @@ const SPECIALIST_PLAN = {
       resultado: "Se o KH se mantiver estável a partir daqui, não é preciso agir mais. Se continuar caindo, reforce.",
     },
   },
+  gh: {
+    bad: {
+      diagnostico: "Dureza geral fora da faixa recomendada (6–12 dGH) para o perfil misto de ciclídeos atual.",
+      acao: "Se GH baixo: revise se há fonte de cálcio/magnésio (rocha calcária, mídia mineral). Se GH alto: dilua com água de osmose reversa nas próximas TPAs.",
+      resultado: "GH muda devagar — espere alguns dias de TPA consistente para ver a tendência se mover, não de um dia para o outro.",
+    },
+    warn: {
+      diagnostico: "No limite da faixa (4–20 dGH).",
+      acao: "Acompanhe a tendência nas próximas medições, sem intervenção imediata.",
+      resultado: "Se estabilizar dentro da faixa, não precisa de ação. Se continuar se afastando, revise a fonte de água da TPA.",
+    },
+  },
   // Amônia e nitrito não têm faixa "tranquila": o ideal é zero e qualquer valor
   // detectável já agride brânquia — por isso a ação aqui é sempre TPA, não
   // "monitorar", mesmo no nível de alerta.
@@ -466,14 +434,13 @@ const SPECIALIST_PLAN = {
 };
 
 /**
- * O "especialista em aquário jumbo": lê a leitura mais recente e os gates, e
- * devolve um plano de ação estruturado em input (o dado) → output (o
- * diagnóstico) → outcome (o que esperar depois de agir), um item por
- * parâmetro fora da faixa, mais um item sobre o gate de introdução do Green
- * Terror. Continua sendo regra codificada (determinístico, auditável, sem
- * chamada de rede) — não um modelo de linguagem.
+ * O "especialista em aquário jumbo": lê a leitura mais recente e devolve um
+ * plano de ação estruturado em input (o dado) → output (o diagnóstico) →
+ * outcome (o que esperar depois de agir), um item por parâmetro fora da
+ * faixa. Regra codificada (determinístico, auditável, sem chamada de rede) —
+ * não um modelo de linguagem.
  */
-export function generateSpecialistPlan(lastReading, gates) {
+export function generateSpecialistPlan(lastReading) {
   if (!lastReading) {
     return [{
       key: null, level: "warn", label: null,
@@ -540,24 +507,10 @@ export function generateSpecialistPlan(lastReading, gates) {
     ((TOXIC_PARAMS.indexOf(b.key) >= 0) - (TOXIC_PARAMS.indexOf(a.key) >= 0))
   );
 
-  items.push(gates.ready ? {
-    key: "gate", level: "good", label: "Introdução do Green Terror",
-    input: `água clara ${gates.clearStreak}/${gates.clearTarget} dias · biologia zerada ${gates.bioStreak}/${gates.bioTarget} dias`,
-    output: "Critérios de estabilidade atendidos.",
-    action: "Pode introduzir o Green Terror.",
-    outcome: "Ambiente pronto — mantenha a rotina de medição também depois da introdução.",
-  } : {
-    key: "gate", level: "warn", label: "Introdução do Green Terror",
-    input: `água clara ${gates.clearStreak}/${gates.clearTarget} dias · biologia zerada ${gates.bioStreak}/${gates.bioTarget} dias`,
-    output: `Ainda ${gates.gargalo || "sem leituras suficientes para calcular o progresso"}.`,
-    action: "Continue a rotina diária de medição sem interrupção — um dia sem medir zera a contagem dos dois gates.",
-    outcome: "Ao completar os dias que faltam, o ambiente libera a introdução.",
-  });
-
-  if (items.length === 1 && openKeys.length === 0) {
+  if (items.length === 0 && openKeys.length === 0) {
     items.unshift({
       key: null, level: "good", label: "Todos os parâmetros",
-      input: "6 de 6 parâmetros na faixa ideal",
+      input: `${CORE_PARAMS.length} de ${CORE_PARAMS.length} parâmetros na faixa ideal`,
       output: "Nenhum parâmetro fora da faixa hoje.",
       action: "Manter a rotina atual de medição e manutenção.",
       outcome: "Sem mudanças esperadas; continue monitorando diariamente.",
