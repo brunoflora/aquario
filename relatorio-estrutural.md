@@ -265,9 +265,9 @@ Carga alta, típica de sump compacto. Com peixes de grande porte e alimentação
 | Jack Dempsey Blue | *Rocio octofasciata* | 1 | 10 cm | **20–25 cm** | 2,2× |
 | Pangasius Albino | *Pangasianodon hypophthalmus* | 1 | 10 cm | **100–130 cm** | ⚠ **11×** |
 | Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 10 e 6 cm | **20–25 cm** cada | 2,5× |
-| **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | — | — | — |
-| **Cascudo** *(novo, 06/09/2026)* | Loricariidae | 2 | — | — | — |
-| Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09, 13 restantes no mesmo dia | ~5 cm | — | consumidos pelo Oscar |
+| **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | 15 cm | não informado | — |
+| **Cascudo** *(06/09/2026; 1 morto registrado em 19/10/2026)* | Loricariidae | 1 vivo + 2 a caminho | 10 cm | não informado | — |
+| Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09; 13 restantes consumidos pelo Oscar (informado em 19/10/2026) | ~5 cm | — | — |
 
 ### Massa e carga orgânica projetadas
 
@@ -277,7 +277,7 @@ Carga alta, típica de sump compacto. Com peixes de grande porte e alimentação
 | Jack Dempsey | ~30 g | ~250 g |
 | Pangasius | ~15 g | **~15.000 g** (adulto pleno) |
 | Severuns (2) | ~60 g | ~400 g |
-| Lambaris (6) | ~15 g | ~90 g |
+| Lambaris (6) — **removidos: todos consumidos (informado em 19/10/2026)** | ~15 g | ~90 g (linha mantida só como histórico; excluída do plantel atual) |
 | **Total sem Pangasius** | **~195 g** | **≈ 1.340 g** |
 | **Total com Pangasius** | ~210 g | **≈ 16.340 g** |
 
