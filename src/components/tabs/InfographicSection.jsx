@@ -431,8 +431,8 @@ export default function InfographicSection() {
                 ["Oscar Bronze", "Astronotus ocellatus", "15 → 38 cm", 38 / 200 * 100],
                 ["Jack Dempsey Blue", "Rocio octofasciata", "10 → 25 cm", 25 / 200 * 100],
                 ["Severum Gold ♀♂ (2×)", "Heros efasciatus", "10 e 6 → 25 cm cada", 25 / 200 * 100],
-                ["Green Terror (novo, 06/09/2026)", "Andinoacara rivulatus", "tamanho não registrado", 0],
-                ["Cascudo (2×, novo, 06/09/2026)", "Loricariidae", "tamanho não registrado", 0],
+                ["Green Terror (novo, 06/09/2026)", "Andinoacara rivulatus", "15 cm → adulto não informado", 15 / 200 * 100],
+                ["Cascudo (1×, novo, 06/09/2026)", "Loricariidae", "10 cm → adulto não informado", 10 / 200 * 100],
                 ["Lambaris (6×, plantel)", "Astyanax sp.", "5 → 12 cm", 12 / 200 * 100],
                 ["Pangasius Albino", "Pangasianodon hypophthalmus", "10 → 130 cm", 130 / 200 * 100],
               ].map(([name, sci, size, pct]) => (
