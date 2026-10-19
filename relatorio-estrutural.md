@@ -267,7 +267,7 @@ Carga alta, típica de sump compacto. Com peixes de grande porte e alimentação
 | Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 10 e 6 cm | **20–25 cm** cada | 2,5× |
 | **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | 15 cm | não informado | — |
 | **Cascudo** *(06/09/2026; 1 morto registrado em 19/10/2026)* | Loricariidae | 1 vivo + 2 a caminho | 10 cm | não informado | — |
-| Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09, 13 restantes no mesmo dia | ~5 cm | — | consumidos pelo Oscar |
+| Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09; 13 restantes consumidos pelo Oscar (informado em 19/10/2026) | ~5 cm | — | — |
 
 ### Massa e carga orgânica projetadas
 

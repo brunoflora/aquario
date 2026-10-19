@@ -476,7 +476,8 @@ export default function InfographicSection() {
           </ToneAlert>
           <ToneAlert tone="info">
             <strong>Lambaris (6×) na tabela acima são o plantel de referência da ficha técnica</strong> — um grupo
-            separado do lote de forragem viva (20 unidades, 13 restantes em 06/09/2026) que é alimentado ao Oscar
+            separado do lote de forragem viva (20 unidades em 06/09/2026; os 13 restantes foram consumidos pelo Oscar,
+            informado em 19/10/2026) que é alimentado ao Oscar
             e não conta como fauna residente.
           </ToneAlert>
         </CardContent>
