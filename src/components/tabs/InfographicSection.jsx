@@ -433,7 +433,6 @@ export default function InfographicSection() {
                 ["Severum Gold ♀♂ (2×)", "Heros efasciatus", "10 e 6 → 25 cm cada", 25 / 200 * 100],
                 ["Green Terror (novo, 06/09/2026)", "Andinoacara rivulatus", "15 cm → adulto não informado", 15 / 200 * 100],
                 ["Cascudo (1×, novo, 06/09/2026)", "Loricariidae", "10 cm → adulto não informado", 10 / 200 * 100],
-                ["Lambaris (6×, plantel)", "Astyanax sp.", "5 → 12 cm", 12 / 200 * 100],
                 ["Pangasius Albino", "Pangasianodon hypophthalmus", "10 → 130 cm", 130 / 200 * 100],
               ].map(([name, sci, size, pct]) => (
                 <TableRow key={name}>
@@ -473,12 +472,6 @@ export default function InfographicSection() {
             <br />Duas ou três <strong>colunas verticais de rocha</strong> por volta dos 50 cm e 150 cm reforçam a
             linguagem de galeria, criam territórios distintos e dão ao casal de Severum um sítio de desova
             protegido.
-          </ToneAlert>
-          <ToneAlert tone="info">
-            <strong>Lambaris (6×) na tabela acima são o plantel de referência da ficha técnica</strong> — um grupo
-            separado do lote de forragem viva (20 unidades em 06/09/2026; os 13 restantes foram consumidos pelo Oscar,
-            informado em 19/10/2026) que é alimentado ao Oscar
-            e não conta como fauna residente.
           </ToneAlert>
         </CardContent>
       </Card>
