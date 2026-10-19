@@ -266,7 +266,7 @@ Carga alta, típica de sump compacto. Com peixes de grande porte e alimentação
 | Pangasius Albino | *Pangasianodon hypophthalmus* | 1 | 10 cm | **100–130 cm** | ⚠ **11×** |
 | Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 10 e 6 cm | **20–25 cm** cada | 2,5× |
 | **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | — | — | — |
-| **Cascudo** *(novo, 06/09/2026)* | Loricariidae | 2 | — | — | — |
+| **Cascudo** *(06/09/2026; 1 morto registrado em 19/10/2026)* | Loricariidae | 1 vivo + 2 a caminho | — | — | — |
 | Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09, 13 restantes no mesmo dia | ~5 cm | — | consumidos pelo Oscar |
 
 ### Massa e carga orgânica projetadas
