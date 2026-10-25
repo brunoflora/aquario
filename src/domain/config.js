@@ -104,7 +104,7 @@ export const DEFAULT_CONFIG = {
   "hyd-turnover": "7,3–8,4×/h",
   "hyd-wavemaker": "15W, fluxo cruzado [EST] 6.000–9.000 L/h",
   "hyd-antisiphon": "Pendente — furar 3–4mm abaixo da linha d'água",
-  "hyd-notes": "Medido pelo dono em 25/10/2026: descida com 50 mm, reduzida para 3/4\" (~25 mm) com mangueira até a Câmara 1; retorno de 3/4\" da bomba até o aquário. O campo \"Diâmetro da descida\" guarda 25 mm (o ponto mais estreito), não os 50 mm, porque é a redução que limita o escoamento. Vazão real do retorno e turnover (5.000 L/h e 7,3×/h) são estimativas anteriores e podem estar superestimadas com o retorno em 3/4\": medir enchendo um balde. Teste de queda de energia ainda não feito.",
+  "hyd-notes": "Medido pelo dono em 25/10/2026: descida com 50 mm, reduzida para 3/4\" (~25 mm) com mangueira até a Câmara 1; retorno de 3/4\" da bomba até o aquário. Ladrão (extravasor de emergência) também de 3/4\", descarregando na Câmara 3 (retorno); altura do ladrão em relação à descida principal ainda não informada. O campo \"Diâmetro da descida\" guarda 25 mm (o ponto mais estreito), não os 50 mm, porque é a redução que limita o escoamento. Vazão real do retorno e turnover (5.000 L/h e 7,3×/h) são estimativas anteriores e podem estar superestimadas com o retorno em 3/4\": medir enchendo um balde. Teste de queda de energia ainda não feito.",
   "eq-heater": "Instalado — termostato mantém 26–28°C [relatório 13/09/2026]. Modelo/potência exatos ainda não confirmados.",
   "eq-lighting": "",
   "eq-extra-pumps": "Wave maker 15W (fluxo cruzado)",
