@@ -3,7 +3,7 @@
 **Local:** Balneário Cidade Atlântica, Guarujá/SP
 **Sistema:** Display 700 L + sump 108 L
 **Início:** Nov/2025 · Ciclagem: Dez/2025
-**Data do relatório:** 09/08/2026 · **Atualizado em:** 13/09/2026 (ver seção 13)
+**Data do relatório:** 09/08/2026 · **Atualizado em:** 25/10/2026 (ver seções 13 e 14; cronologia completa em `historico-manejo.md`)
 
 > **Base de cálculo:** medidas confirmadas do projeto. Onde faltam dados (nível real de água, espessura de vidro, diâmetro da tubulação, volume real de rocha), foram usadas estimativas explicitamente marcadas como **[EST]**. Substitua-as pelas medidas reais para fechar o relatório.
 
@@ -261,11 +261,12 @@ Carga alta, típica de sump compacto. Com peixes de grande porte e alimentação
 
 | Espécie | Nome científico | Qtd. | Tam. atual | Tam. adulto | Fator de crescimento |
 |---|---|---|---|---|---|
-| Oscar Bronze | *Astronotus ocellatus* | 1 | 15 cm | **30–38 cm** | 2,2× |
-| Jack Dempsey Blue | *Rocio octofasciata* | 1 | 10 cm | **20–25 cm** | 2,2× |
-| Pangasius Albino | *Pangasianodon hypophthalmus* | 1 | 10 cm | **100–130 cm** | ⚠ **11×** |
-| Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 10 e 6 cm | **20–25 cm** cada | 2,5× |
-| **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | 15 cm | não informado | — |
+| Oscar Bronze | *Astronotus ocellatus* | 1 | 22 cm (25/10/2026) | **30–38 cm** | 1,4–1,7× |
+| Jack Dempsey Blue | *Rocio octofasciata* | 1 | 16 cm (25/10/2026) | **20–25 cm** | 1,3–1,6× |
+| Pangasius Albino | *Pangasianodon hypophthalmus* | 1 | 15 cm (25/10/2026) | **100–130 cm** | ⚠ **6,7–8,7×** |
+| Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 11 cm (25/10/2026; um valor informado para os 2 — antes 10 e 6 cm) | **20–25 cm** cada | 1,8–2,3× |
+| **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | 13 cm (25/10/2026; medida anterior: 15 cm) | não informado | — |
+| **Aruanã Prata** *(25/10/2026; no tanque separado de ~13 L)* | *Osteoglossum bicirrhosum* | 1 (2 compradas, 1 consumida pelo Oscar) | 12 cm (25/10/2026; na compra: 6–8 cm) | não informado | — |
 | **Cascudo** *(06/09/2026; 1 morto registrado em 19/10/2026)* | Loricariidae | 1 vivo + 2 a caminho | 10 cm | não informado | — |
 | Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09; 13 restantes consumidos pelo Oscar (informado em 19/10/2026) | ~5 cm | — | — |
 
@@ -517,4 +518,16 @@ Com isso, não há conflito real entre a instalação existente e a execução d
 
 ---
 
-*Relatório gerado a partir da documentação do projeto Ciclídeos Nacionais (última atualização de parâmetros: 26/05/2026; atualização de manejo incorporada em 13/09/2026 — seção 13). As recomendações de segurança estrutural não substituem avaliação de engenheiro habilitado.*
+## 14. Atualização — 19 a 25/10/2026
+
+Fonte: informado pelo dono. Cronologia e pendências vigentes em `historico-manejo.md`.
+
+- **Biometria do jumbo (25/10/2026):** Oscar 22 cm, Jack Dempsey 16 cm, Pangasius 15 cm, Green Terror 13 cm, Severum 11 cm (um valor para os 2). A tabela da seção 7 foi atualizada; as massas estimadas da seção 7 (marcadas [EST]) não foram recalculadas e partem das medidas antigas.
+- **Cascudos:** 1 morreu; 1 vivo (10 cm). 2 novos encomendados em 19/10/2026, sem chegada confirmada.
+- **Lambaris:** todos consumidos pelo Oscar (forragem e plantel de referência). Nenhum restante.
+- **Aruanã prata:** 2 juvenis de 6–8 cm compradas; 1 consumida pelo Oscar. A sobrevivente (12 cm em 25/10/2026) está em tanque provisório de 35 × 15 × 25 cm (~13 L brutos), com filtro externo HF-0300, água e mídias do aquário maduro, perlon e carvão novos, sem layout. Volume insuficiente para crescimento; não vai para o sump. Só volta ao jumbo depois de decidir com o tamanho dos dois peixes e um tanque definitivo.
+- **Pendências novas:** tamanho adulto de Green Terror, cascudo e aruanã; confirmar a medida da aruanã (6–8 cm na compra, 12 cm depois); tamanho individual dos 2 Severuns; tanque definitivo da aruanã.
+
+---
+
+*Relatório gerado a partir da documentação do projeto Ciclídeos Nacionais (última atualização de parâmetros: 26/05/2026; atualização de manejo incorporada em 13/09/2026 — seção 13; fauna atualizada em 25/10/2026 — seção 14). As recomendações de segurança estrutural não substituem avaliação de engenheiro habilitado.*

@@ -428,12 +428,12 @@ export default function InfographicSection() {
           <Table size="small" sx={{ mb: 2 }}>
             <TableBody>
               {[
-                ["Oscar Bronze", "Astronotus ocellatus", "15 → 38 cm", 38 / 200 * 100],
-                ["Jack Dempsey Blue", "Rocio octofasciata", "10 → 25 cm", 25 / 200 * 100],
-                ["Severum Gold ♀♂ (2×)", "Heros efasciatus", "10 e 6 → 25 cm cada", 25 / 200 * 100],
-                ["Green Terror (novo, 06/09/2026)", "Andinoacara rivulatus", "15 cm → adulto não informado", 15 / 200 * 100],
+                ["Oscar Bronze", "Astronotus ocellatus", "22 → 38 cm", 38 / 200 * 100],
+                ["Jack Dempsey Blue", "Rocio octofasciata", "16 → 25 cm", 25 / 200 * 100],
+                ["Severum Gold ♀♂ (2×)", "Heros efasciatus", "11 → 25 cm cada", 25 / 200 * 100],
+                ["Green Terror (novo, 06/09/2026)", "Andinoacara rivulatus", "13 cm → adulto não informado", 13 / 200 * 100],
                 ["Cascudo (1×, novo, 06/09/2026)", "Loricariidae", "10 cm → adulto não informado", 10 / 200 * 100],
-                ["Pangasius Albino", "Pangasianodon hypophthalmus", "10 → 130 cm", 130 / 200 * 100],
+                ["Pangasius Albino", "Pangasianodon hypophthalmus", "15 → 130 cm", 130 / 200 * 100],
               ].map(([name, sci, size, pct]) => (
                 <TableRow key={name}>
                   <TableCell sx={{ border: 0, pl: 0 }}>

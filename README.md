@@ -4,7 +4,7 @@ Painel de acompanhamento do aquário jumbo de ciclídeos nacionais, em quatro ab
 
 A interface usa uma analogia de rio amazônico que não é decorativa — ela mapeia função: o display é *o rio*, o sump é *a várzea* (na Amazônia é a planície alagada que filtra o rio), a hidráulica é *a correnteza*, a queda de energia é *a cheia*, o KH 0 é *água preta*, a carga na laje é *o leito* e a manutenção é *o calendário das águas*.
 
-Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`), depois virou uma página vanilla (HTML/CSS/JS puro, sem build) e hoje é um app **React + MUI real**, buildado com Vite. Ver `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Sistema, e `ficha-tecnica-manejo-2026-09-13.md` para o histórico de manejo mais recente.
+Este projeto nasceu de um artefato React que rodava dentro de uma conversa do Claude (persistência via `window.storage`), depois virou uma página vanilla (HTML/CSS/JS puro, sem build) e hoje é um app **React + MUI real**, buildado com Vite. Ver `relatorio-estrutural.md` para o relatório técnico-estrutural completo (dimensional, hidráulica, carga estrutural, fauna e prioridades) que embasa os valores padrão da aba Sistema, e `ficha-tecnica-manejo-2026-09-13.md` para o instantâneo de manejo de 13/09/2026. **`historico-manejo.md` é a linha do tempo viva do projeto** (fauna, mídia, parâmetros, equipamento e pendências, com data e fonte); toda informação nova entra nele e no estado atual (`src/domain/config.js` e `relatorio-estrutural.md`) no mesmo commit.
 
 ## Sistema de design
 
