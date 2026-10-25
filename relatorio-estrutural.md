@@ -3,7 +3,7 @@
 **Local:** Balneário Cidade Atlântica, Guarujá/SP
 **Sistema:** Display 700 L + sump 108 L
 **Início:** Nov/2025 · Ciclagem: Dez/2025
-**Data do relatório:** 09/08/2026 · **Atualizado em:** 13/09/2026 (ver seção 13)
+**Data do relatório:** 09/08/2026 · **Atualizado em:** 25/10/2026 (ver seções 13 e 14; cronologia completa em `historico-manejo.md`)
 
 > **Base de cálculo:** medidas confirmadas do projeto. Onde faltam dados (nível real de água, espessura de vidro, diâmetro da tubulação, volume real de rocha), foram usadas estimativas explicitamente marcadas como **[EST]**. Substitua-as pelas medidas reais para fechar o relatório.
 
@@ -518,4 +518,16 @@ Com isso, não há conflito real entre a instalação existente e a execução d
 
 ---
 
-*Relatório gerado a partir da documentação do projeto Ciclídeos Nacionais (última atualização de parâmetros: 26/05/2026; atualização de manejo incorporada em 13/09/2026 — seção 13). As recomendações de segurança estrutural não substituem avaliação de engenheiro habilitado.*
+## 14. Atualização — 19 a 25/10/2026
+
+Fonte: informado pelo dono. Cronologia e pendências vigentes em `historico-manejo.md`.
+
+- **Biometria do jumbo (25/10/2026):** Oscar 22 cm, Jack Dempsey 16 cm, Pangasius 15 cm, Green Terror 13 cm, Severum 11 cm (um valor para os 2). A tabela da seção 7 foi atualizada; as massas estimadas da seção 7 (marcadas [EST]) não foram recalculadas e partem das medidas antigas.
+- **Cascudos:** 1 morreu; 1 vivo (10 cm). 2 novos encomendados em 19/10/2026, sem chegada confirmada.
+- **Lambaris:** todos consumidos pelo Oscar (forragem e plantel de referência). Nenhum restante.
+- **Aruanã prata:** 2 juvenis de 6–8 cm compradas; 1 consumida pelo Oscar. A sobrevivente (12 cm em 25/10/2026) está em tanque provisório de 35 × 15 × 25 cm (~13 L brutos), com filtro externo HF-0300, água e mídias do aquário maduro, perlon e carvão novos, sem layout. Volume insuficiente para crescimento; não vai para o sump. Só volta ao jumbo depois de decidir com o tamanho dos dois peixes e um tanque definitivo.
+- **Pendências novas:** tamanho adulto de Green Terror, cascudo e aruanã; confirmar a medida da aruanã (6–8 cm na compra, 12 cm depois); tamanho individual dos 2 Severuns; tanque definitivo da aruanã.
+
+---
+
+*Relatório gerado a partir da documentação do projeto Ciclídeos Nacionais (última atualização de parâmetros: 26/05/2026; atualização de manejo incorporada em 13/09/2026 — seção 13; fauna atualizada em 25/10/2026 — seção 14). As recomendações de segurança estrutural não substituem avaliação de engenheiro habilitado.*

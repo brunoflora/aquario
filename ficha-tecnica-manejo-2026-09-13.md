@@ -1,6 +1,6 @@
 # Ficha Técnica e de Manejo — Aquário "Rio Amazônico" (Jumbo)
 
-**Última atualização:** 13/09/2026
+**Instantâneo de 13/09/2026, com a fauna atualizada em 25/10/2026.** A linha do tempo completa e as pendências vigentes estão em `historico-manejo.md`; o estado atual da ficha do app está em `src/domain/config.js`.
 **Fontes:** ficha técnica do app Ciclídeos Nacionais (preenchida entre nov/2025–dez/2025), relatório de manejo enviado pelo usuário em 13/09/2026, correções verbais do usuário, e 5 materiais de referência em PDF (bônus de curso de aquarismo).
 
 > Convenção usada neste documento: cada dado traz a fonte entre colchetes. `[ficha]` = ficha técnica do app (mais antiga, pode estar desatualizada). `[relatório]` = relatório técnico de 13/09/2026 (mais recente). `[usuário]` = dito diretamente na conversa. `[PENDENTE]` = ainda não confirmado — não foi inferido.
@@ -92,18 +92,19 @@ O relatório de 13/09 traz uma arquitetura mais detalhada (inclusive a fresta de
 
 | Espécie | Nome científico | Qtd. | Tamanho atual → adulto | Entrada | Fonte |
 |---|---|---|---|---|---|
-| Oscar / Apaiari ("Bronze") | *Astronotus ocellatus* | 1 | 15 cm → 30–38 cm | anterior a nov/2025 | `[ficha]` + `[relatório]` |
-| Acará-Severo ("Severum Gold") | *Heros spp.* | 2 | 10 e 6 cm → 20–25 cm cada | anterior a nov/2025 | `[ficha]` + `[relatório]` |
-| Jack Dempsey ("Blue") | *Rocio octofasciata* | 1 | 10 cm → 20–25 cm | anterior a nov/2025 | `[ficha]` + `[relatório]` |
-| **Green Terror** | *Andinoacara rivulatus* | 1 | — | **domingo, 06/09/2026** | `[usuário]` + `[relatório]` |
-| **Cascudo** | Loricariidae | 2 | — | **domingo, 06/09/2026** (mesmo dia) | `[usuário]` + `[relatório]` |
-| Pangasius ("Albino") | *Pangasianodon hypophthalmus* | 1 | 10 cm → 100–130 cm adulto | anterior a nov/2025 | `[ficha]` + `[relatório]` |
+| Oscar / Apaiari ("Bronze") | *Astronotus ocellatus* | 1 | 22 cm (25/10/2026) → 30–38 cm | anterior a nov/2025 | `[usuário]` |
+| Acará-Severo ("Severum Gold") | *Heros spp.* | 2 | 11 cm (25/10/2026, um valor para os 2) → 20–25 cm cada | anterior a nov/2025 | `[usuário]` |
+| Jack Dempsey ("Blue") | *Rocio octofasciata* | 1 | 16 cm (25/10/2026) → 20–25 cm | anterior a nov/2025 | `[usuário]` |
+| **Green Terror** | *Andinoacara rivulatus* | 1 | 13 cm (25/10/2026) → não informado | **domingo, 06/09/2026** | `[usuário]` |
+| **Cascudo** | Loricariidae | 1 vivo (1 morreu em 19/10/2026; 2 novos encomendados, sem chegada confirmada) | 10 cm (19/10/2026) → não informado | **domingo, 06/09/2026** | `[usuário]` |
+| Pangasius ("Albino") | *Pangasianodon hypophthalmus* | 1 | 15 cm (25/10/2026) → 100–130 cm adulto | anterior a nov/2025 | `[usuário]` |
+| **Aruanã Prata** (tanque separado, ~13 L) | *Osteoglossum bicirrhosum* | 1 (2 compradas; 1 consumida pelo Oscar) | 12 cm (25/10/2026) → não informado | 25/10/2026 | `[usuário]` |
 
 ### ⚠️ Pangasius — pendência crítica não resolvida
 A ficha técnica original (nov/2025) já sinalizava: **"incompatível com o sistema, planejar realocação em 6–12 meses."** Já se passaram ~9–10 meses. O relatório de 13/09/2026 lista o Pangasius como parte do plantel atual, sem mencionar se a realocação ocorreu ou foi replanejada. **Status real: `[PENDENTE]` — não infiro se ainda está no aquário por decisão consciente ou se o plano simplesmente não avançou.**
 
 ### Alimento vivo (não é plantel permanente)
-- **Lambaris**: lote de 20 unidades adicionado em 06/09/2026 como forragem viva para o Oscar. Na mesma data, restavam 13 (7 consumidos). Não contam como fauna residente. `[usuário]`
+- **Lambaris**: lote de 20 unidades adicionado em 06/09/2026 como forragem viva para o Oscar. Na mesma data, restavam 13 (7 consumidos). Em 19/10/2026 o dono informou que todos os lambaris foram consumidos, inclusive os 6 do plantel de referência da ficha de nov/2025. Não resta nenhum. `[usuário]`
 
 ---
 
