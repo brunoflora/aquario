@@ -261,11 +261,12 @@ Carga alta, típica de sump compacto. Com peixes de grande porte e alimentação
 
 | Espécie | Nome científico | Qtd. | Tam. atual | Tam. adulto | Fator de crescimento |
 |---|---|---|---|---|---|
-| Oscar Bronze | *Astronotus ocellatus* | 1 | 15 cm | **30–38 cm** | 2,2× |
-| Jack Dempsey Blue | *Rocio octofasciata* | 1 | 10 cm | **20–25 cm** | 2,2× |
-| Pangasius Albino | *Pangasianodon hypophthalmus* | 1 | 10 cm | **100–130 cm** | ⚠ **11×** |
-| Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 10 e 6 cm | **20–25 cm** cada | 2,5× |
-| **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | 15 cm | não informado | — |
+| Oscar Bronze | *Astronotus ocellatus* | 1 | 22 cm (25/10/2026) | **30–38 cm** | 1,4–1,7× |
+| Jack Dempsey Blue | *Rocio octofasciata* | 1 | 16 cm (25/10/2026) | **20–25 cm** | 1,3–1,6× |
+| Pangasius Albino | *Pangasianodon hypophthalmus* | 1 | 15 cm (25/10/2026) | **100–130 cm** | ⚠ **6,7–8,7×** |
+| Severum Gold ♀/♂ | *Heros efasciatus* | 2 | 11 cm (25/10/2026; um valor informado para os 2 — antes 10 e 6 cm) | **20–25 cm** cada | 1,8–2,3× |
+| **Green Terror** *(novo, 06/09/2026)* | *Andinoacara rivulatus* | 1 | 13 cm (25/10/2026; medida anterior: 15 cm) | não informado | — |
+| **Aruanã Prata** *(25/10/2026; no tanque separado de ~13 L)* | *Osteoglossum bicirrhosum* | 1 (2 compradas, 1 consumida pelo Oscar) | 12 cm (25/10/2026; na compra: 6–8 cm) | não informado | — |
 | **Cascudo** *(06/09/2026; 1 morto registrado em 19/10/2026)* | Loricariidae | 1 vivo + 2 a caminho | 10 cm | não informado | — |
 | Lambaris (alimento vivo, não residente) | *Astyanax* sp. | lote de 20 em 06/09; 13 restantes consumidos pelo Oscar (informado em 19/10/2026) | ~5 cm | — | — |
 
