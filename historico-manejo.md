@@ -8,6 +8,12 @@ Regra de manutenção: toda informação nova sobre fauna, flora, mídia, biolog
 
 ## 2026-10-25
 
+**Hidráulica** `[usuário]`
+- Descida de 50 mm, reduzida para 3/4" (~25 mm) com mangueira até a Câmara 1. Retorno de 3/4" da bomba ao aquário.
+- Ladrão de 3/4", descarregando na Câmara 3 (retorno). `[PENDENTE]` altura do ladrão em relação à descida principal.
+- A ficha do app passa a guardar 25 mm como diâmetro da descida (o ponto mais estreito), e o app calcula a capacidade de escoamento com esse valor.
+- Efeito: o escoamento por gravidade em 3/4" é de ~800–1.200 L/h pela tabela do projeto, abaixo dos ~5.000 L/h estimados para a bomba. Vazão real do retorno e turnover provavelmente superestimados. `[PENDENTE]` medir a vazão com um balde.
+
 **Biometria do aquário jumbo** `[usuário]`
 
 | Espécie | Tamanho | Adulto esperado | Medida anterior |
@@ -69,7 +75,8 @@ Regra de manutenção: toda informação nova sobre fauna, flora, mídia, biolog
 
 ## Pendências abertas (consolidado em 2026-10-25)
 
-- Diâmetro da descida (nunca medido) e furo anti-sifão (status não confirmado).
+- Vazão real do retorno (medir com balde) e teste de queda de energia. Descida e retorno já medidos: 3/4" no ponto mais estreito.
+- Furo anti-sifão (status não confirmado).
 - Remedição do sump (dimensões em conflito).
 - Modelo e potência do aquecedor; iluminação (modelo e fotoperíodo).
 - GH e nitrato atuais; KH e pH após o protocolo de correção.

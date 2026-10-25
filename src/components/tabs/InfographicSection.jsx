@@ -97,21 +97,22 @@ export default function InfographicSection() {
       <Card>
         <CardContent>
           <Typography variant="overline" color="text.secondary">O caminho da água</Typography>
-          <Typography variant="h6" gutterBottom>Um circuito fechado, com um trecho ainda no escuro</Typography>
+          <Typography variant="h6" gutterBottom>Um circuito fechado, com o gargalo na redução de 3/4"</Typography>
           <Typography paragraph color="text.secondary">
-            A água faz esta volta cerca de sete vezes por hora. Ela é tão rápida quanto o trecho mais estreito — e
-            o trecho mais estreito nunca foi medido.
+            A água faz esta volta na velocidade do trecho mais estreito. A descida tem 50 mm, mas é reduzida para
+            3/4" com mangueira até a Câmara 1, e o retorno da bomba também é de 3/4" (medido em 25/10/2026). O
+            giro real é menor que as sete vezes por hora estimadas antes — falta medir a vazão do retorno.
           </Typography>
           <Stack direction="row" spacing={1} useFlexGap sx={{ mb: 2, flexWrap: "wrap", alignItems: "center" }}>
             {[
               { vol: "598 L", name: "O rio", note: "display 200×50×70" },
-              { arrow: "→ descida Ø?", bad: true },
+              { arrow: "→ descida 50 mm → 3/4\"", bad: true },
               { vol: "33 L", name: "C1 · decantação", note: "sem mídia declarada" },
               { arrow: "→" },
               { vol: "8,5 L", name: "C2 · biológica", note: "perlon + K1 fluidizado — gargalo, precisa 12–18 L", bad: true },
               { arrow: "→" },
               { vol: "37 L", name: "C3 · retorno", note: "bomba Oceantech" },
-              { arrow: "↺ ~5.000 L/h" },
+              { arrow: "↺ retorno 3/4\" (vazão a medir)" },
             ].map((n, i) => n.arrow ? (
               <Typography key={i} color={n.bad ? "error.main" : "text.secondary"} fontWeight={n.bad ? 700 : 400}>{n.arrow}</Typography>
             ) : (
@@ -123,7 +124,7 @@ export default function InfographicSection() {
             ))}
           </Stack>
           <ToneAlert tone="warn">
-            Dois pontos frágeis já aparecem no desenho: a <strong>descida sem diâmetro conhecido</strong>
+            Dois pontos frágeis já aparecem no desenho: a <strong>descida reduzida a 3/4"</strong>
             (capítulo 3) e a <strong>câmara biológica menor que a necessidade futura</strong> (capítulo 2).
           </ToneAlert>
         </CardContent>
@@ -214,7 +215,7 @@ export default function InfographicSection() {
           </Typography>
           <Typography paragraph color="text.secondary">
             Só que a bomba empurra por cima e a gravidade devolve por baixo. <strong>Se a descida não escoar os
-            mesmos 5.000 L/h, o display transborda</strong> — e o diâmetro dela nunca foi medido.
+            mesmos 5.000 L/h, o display transborda</strong> — e a descida tem uma redução para 3/4" (medido em 25/10/2026).
           </Typography>
           <Table size="small" sx={{ mb: 2 }}>
             <TableBody>
